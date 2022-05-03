@@ -15,14 +15,6 @@ router.get('/', async (req, res) =>  {
     res.locals.monitoringData = await prisma.monitoringData.findMany();
     res.render('home');
 });
-router.post('/', mustBeAuthorizedView(async (req, res) => {
-    const id = uuid.v4();
-
-    await prisma.monitoringData.create({ data: { id } });
-
-    res.locals.monitoringData = await prisma.monitoringData.findMany();
-    res.render('home');
-}));
 
 router.get('/login/', mustNotBeAuthroizedView((req, res) => res.render('login')));
 router.post('/login/', mustNotBeAuthroizedView(async (req, res) => {

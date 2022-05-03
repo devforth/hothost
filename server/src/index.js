@@ -3,7 +3,6 @@ const express = require('express');
 
 const { create } = require('express-handlebars');
 
-const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const formidable = require('express-formidable');
 
@@ -47,7 +46,6 @@ async function main() {
 
   app.use(formidable());
   app.use(cookieParser());
-  app.use(bodyParser.json());
 
   app.use(authMiddleware);
 
