@@ -66,7 +66,7 @@ docker run -d --name=hothost \
               <div class="hidden py-4 bg-gray-50 rounded-lg dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
                   
                 <p class="text-sm text-gray-500 dark:text-gray-400 relative">
-                  If you have a Docker Compose stack you can just add this snippe:
+                  If you have a Docker Compose stack you can just add this snippet:
                   <button
                     class="absolute right-2 top-12 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
                     onclick="copyToCb('composepre')"
@@ -97,7 +97,17 @@ services:
 
               </div>
               <div class="hidden py-4 bg-gray-50 rounded-lg dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                  <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    If you want to run agent locally without Docker you can add one-time job on start <code>crontab -e`</code>  and add next
+                    <pre id="composepre" class="p-4 mb-4 text-xs bg-gray-100 dark:bg-gray-800 block rounded shadow-xl mt-5 whitespace-pre overflow-x-none text-gray-500 dark:text-gray-400">
+@reboot HOTHOST_SERVER_HOST=1\
+  HOTHOST_MONITOR_INTERVAL=1\
+  HOTHOST_AGENT_SECRET=1\
+  curl https://raw.githubusercontent.com/devforth/hothost/main/hothost-agent/getinfo.sh | bash
+</pre>
+                      
+                    
+                  </p>
               </div>
           </div>
         </div>
