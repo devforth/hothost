@@ -28,12 +28,13 @@ async function main() {
 
   const hbs = create({
     extname: 'html',
-    layoutsDir: path.join(path.dirname(__dirname), 'html'),
+    defaultLayout: 'main',
+    layoutsDir: path.join(path.dirname(__dirname), 'html', 'layouts'),
   });
 
   app.set('view engine', 'html');
   app.engine('html', hbs.engine);
-  app.set('views', path.join(path.dirname(__dirname), 'html'));
+  app.set('views', path.join(path.dirname(__dirname), 'html', 'views'));
 
 
   app.use(formidable());
