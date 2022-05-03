@@ -10,8 +10,72 @@
  </div>
  <div class="flow-root">
     <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+      
+      <tr>
+        <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-700">
+          <h5 class="text-md font-bold leading-none text-gray-900 dark:text-white">Configure your agent</h5>
+
+          <div class="mb-4 ">
+              <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
+                  <li role="presentation">
+                      <button class="inline-block p-4 rounded-t-lg border-b-2" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                        Pure Docker
+                      </button>
+                  </li>
+                  <li  role="presentation">
+                      <button class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">
+                        Compose
+                      </button>
+                  </li>
+                  <li role="presentation">
+                      <button class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+                        Pure Bash
+                      </button>
+                  </li>
+              </ul>
+          </div>
+          <div id="myTabContent">
+              <div class="hidden py-2 rounded-lg " id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <p class="text-sm text-gray-500 dark:text-gray-400 relative">
+                  Make sure you have <a class="text-blue-600 hover:underline dark:text-blue-500" href="https://docs.docker.com/engine/install/">Docker engine installed</a> and run this:
+                  <button
+                    class="absolute right-2 top-12 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+                    onclick="copyToCb('puredocpre')"
+                  >
+                    Copy
+                  </button>
+                </p>
+
+                <pre id="puredocpre" class="p-4 mb-4 text-xs bg-gray-100 dark:bg-gray-800 block rounded shadow-xl mt-5 whitespace-pre overflow-x-none text-gray-500 dark:text-gray-400">
+docker run -d --name=hothost \
+  -v /etc/passwd:/host/etc/passwd:ro \
+  -v /etc/group:/host/etc/group:ro \
+  -v /proc:/host/proc:ro \
+  -v /sys:/host/sys:ro \
+  -v /etc/os-release:/host/etc/os-release:ro \
+  --restart unless-stopped \
+  --cap-add SYS_PTRACE \
+  --security-opt apparmor=unconfined \
+  -v /etc/hostname:/host/etc/hostname:ro \
+  devforth/hothost bash</pre>
+                <p class="text-sm text-gray-500 dark:text-gray-400 relative">
+                  Refresh this page to see update.
+                </p>
+              </div>
+              
+              <div class="hidden py-4 bg-gray-50 rounded-lg dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                  <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>
+              </div>
+              <div class="hidden py-4 bg-gray-50 rounded-lg dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                  <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Settings tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>
+              </div>
+          </div>
+        </div>
+      </tr>
       {{#each monitoringData}}
-      <tr class="pt-11">
+
+
+      <tr class="pt-11 border-b border-gray-200 dark:border-gray-700">
             <td class="py-4 pr-4 flex-shrink-0">
                 <img class="w-8 h-8 rounded-full" src="/img/ubuntu.svg" alt="Neil image">
             </td>
@@ -75,4 +139,15 @@
   </div>
 </div>
 
+
+<script>
+  function copyToCb(idOfPre) {
+    const copyText = document.getElementById(idOfPre).textContent;
+    const textArea = document.createElement('textarea');
+    textArea.textContent = copyText;
+    document.body.append(textArea);
+    textArea.select();
+    document.execCommand("copy");
+  }
+</script>
 
