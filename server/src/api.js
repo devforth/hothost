@@ -13,7 +13,7 @@ function readableRandomStringMaker(length) {
 }
 
 
-router.get('/add_monitor', mustBeAuthorizedView(async (req, res) => {
+router.post('/add_monitor', mustBeAuthorizedView(async (req, res) => {
     const id = uuid.v4();
 
     const now = new Date();
@@ -25,7 +25,7 @@ router.get('/add_monitor', mustBeAuthorizedView(async (req, res) => {
 }));
 
 
-router.get('/remove_monitor', mustBeAuthorizedView(async (req, res) => {
+router.post('/remove_monitor', mustBeAuthorizedView(async (req, res) => {
     const { id } = req.query;
     await prisma.monitoringData.delete({ where: { id } });
 
@@ -35,7 +35,7 @@ router.get('/remove_monitor', mustBeAuthorizedView(async (req, res) => {
 
 router.post('/data/:secret', async (req, res) => {
     const monitorData = req.fields;
-    const md = await prisma.monitoringData.findUnique({ where: { id: req.params.secret } });
+    const md = await prisma.monitoringData.findUnique({ where: { secret: req.params.secret } });
     if (!md) {
         res.statusCode = 401;
         res.send('Unauthorized');
@@ -45,7 +45,7 @@ router.post('/data/:secret', async (req, res) => {
             acc[key] = value !== undefined && value !== null ? value.toString() : value;
             return acc;
         }, {});
-        await prisma.monitoringData.update({ data, where: { id: req.params.secret } });
+        await prisma.monitoringData.update({ data, where: { secret: req.params.secret } });
         res.send('OK');
     }
 });

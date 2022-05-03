@@ -13,7 +13,7 @@ const router = express.Router();
 router.use(express.static('static'));
 
 router.get('/', async (req, res) =>  {
-    const monitoringData = await prisma.monitoringData.findMany({ orderBy: { createdAt: 'asc' } });
+    const monitoringData = await prisma.monitoringData.findMany({ orderBy: { createdAt: 'desc' } });
     res.locals.monitoringData = monitoringData.map(data => (data.createdAt.toISOString() === data.updatedAt.toISOString() ? 
         { 
             id: data.id,
@@ -50,7 +50,11 @@ router.post('/login/', mustNotBeAuthroizedView(async (req, res) => {
         const { username, password } = req.fields;
         if (username && password) {
             const jwtToken = await authorizeUser(username, password);
-            res.cookie('__hhjwt', jwtToken, { maxAge: 60 * 60 * 1000 });
+            res.cookie('__hhjwt', jwtToken, { 
+                maxAge: 60 * 60 * 1000,
+                sameSite: 'Strict', // prevents from broader class of CSRF attacks then even Lax, no need in external CSRF handlers for 92.16% of browsers
+                secure: false, // some users might have non-SSL sites, probably should go from ENV var which gives greenlight
+            });
             res.redirect(req.query.next || '/');
         }
     } catch (e) {
