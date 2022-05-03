@@ -1,24 +1,22 @@
 <div class="container mx-auto flex justify-center ">
-  <div class="p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
+  <div class="w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
       <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Hosts under monitoring</h5>
-      <form action="/api/add_monitor" method="post">
-        <button class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
-            focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Add new host
-        </button>
-      </form>
+      <a href="/api/add_monitor" class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+          focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Add new host
+      </a>
  </div>
  <div class="flow-root">
-    <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+    <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700 w-full">
       {{#each monitoringData}}
       {{#if this.no_data}}
       <tr>
         <td colspan="6">
-          <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+          <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 w-full">
             <h5 class="text-md mb-4 font-bold leading-none text-gray-900 dark:text-white">Configure your agent</h5>
 
             <div class="mb-4 ">
@@ -55,7 +53,6 @@
                   </button>
                 </p>
                 
-
                 <pre id="puredocpre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
 docker run -d \
   -v /etc/passwd:/host/etc/passwd:ro \
@@ -63,11 +60,18 @@ docker run -d \
   -v /proc:/host/proc:ro \
   -v /sys:/host/sys:ro \
   -v /etc/os-release:/host/etc/os-release:ro \
+  --env HOTHOST_SERVER_BASE=___CURRENT_URL___ \
+  --env HOTHOST_AGENT_SECRET={{ this.secret }} \
+  --env HOTHOST_MONITOR_INTERVAL=60 \
   --restart unless-stopped \
   --cap-add SYS_PTRACE \
   --security-opt apparmor=unconfined \
   -v /etc/hostname:/host/etc/hostname:ro \
   devforth/hothost-agent</pre>
+              <script>
+                document.getElementById('puredocpre').innerHTML = 
+                  document.getElementById('puredocpre').innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
+              </script>
               </div>
               <div class="hidden py-4 rounded-lg dark:bg-gray-800" id="dashboard-{{ this.id }}" role="tabpanel" aria-labelledby="dashboard-tab-{{ this.id }}">
                 <p class="text-sm text-gray-500 dark:text-gray-400 relative">
@@ -87,6 +91,10 @@ version: '3'
 services:
   netdata:
     image: devforth/hothost-agent
+    environment:
+      - HOTHOST_SERVER_BASE: ___CURRENT_URL___ \
+      - HOTHOST_AGENT_SECRET: {{ this.secret }} \
+      - HOTHOST_MONITOR_INTERVAL: 60
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
@@ -98,7 +106,10 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /etc/os-release:/host/etc/os-release:ro</pre>
-
+              <script>
+                document.getElementById('composepre').innerHTML = 
+                  document.getElementById('composepre').innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
+              </script>
               </div>
               <div class="hidden py-4 rounded-lg dark:bg-gray-800" id="settings-{{ this.id }}" role="tabpanel" aria-labelledby="settings-tab-{{ this.id }}">
                 <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -117,11 +128,15 @@ services:
                   </button>
                 </p>
                 <pre id="bashpre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
-@reboot HOTHOST_SERVER_HOST=1\
-HOTHOST_MONITOR_INTERVAL=1\
-HOTHOST_AGENT_SECRET=1\
+@reboot HOTHOST_SERVER_BASE=___CURRENT_URL___\
+HOTHOST_MONITOR_INTERVAL=60\
+HOTHOST_AGENT_SECRET=HOTHOST_AGENT_SECRET: {{ this.secret }} \
 curl https://raw.githubusercontent.com/devforth/hothost/main/hothost-agent/getinfo.sh | bash
 </pre>
+<script>
+  document.getElementById('bashpre').innerHTML = 
+    document.getElementById('bashpre').innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
+</script>
                 <p>
                 </p>
               </div>
@@ -130,14 +145,15 @@ curl https://raw.githubusercontent.com/devforth/hothost/main/hothost-agent/getin
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Refresh this page to see update.
 
-              <button
-                class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded flex items-center"
+              <a href="/api/remove_monitor?id={{ this.id }}"
+                class="flex mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Remove
-              </button>
+              </a>
+
             </p>
 
 

@@ -24,7 +24,7 @@
     {
       "label": "Server",
       "type": "shell",
-      "command": "cd server && npm run start",
+      "command": "cd server && npm run migrate && npm run start",
       "presentation": {
         "reveal": "always",
         "panel": "new",

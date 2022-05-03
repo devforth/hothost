@@ -20,6 +20,8 @@ model MonitoringData {
   createdAt                       DateTime    @default(now())
   updatedAt                       DateTime    @updatedAt
 
+  secret                          String?     @unique
+
   CONTAINER_OS_NAME               String?
   CONTAINER_OS_ID                 String?
   CONTAINER_OS_ID_LIKE            String?

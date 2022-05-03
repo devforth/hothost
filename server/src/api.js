@@ -6,14 +6,32 @@ const { mustBeAuthorizedView } = require('./utils');
 
 const router = express.Router();
 
-router.post('/add_monitor', mustBeAuthorizedView(async (req, res) => {
+
+function readableRandomStringMaker(length) {
+    for (var s=''; s.length < length; s += 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.charAt(Math.random()*62|0));
+    return s;
+}
+
+
+router.get('/add_monitor', mustBeAuthorizedView(async (req, res) => {
     const id = uuid.v4();
 
     const now = new Date();
-    await prisma.monitoringData.create({ data: { id, createdAt: now, updatedAt: now } });
+
+    const secret = readableRandomStringMaker(64);
+    await prisma.monitoringData.create({ data: { id, createdAt: now, updatedAt: now, secret, } });
+ 
+    res.redirect('/');
+}));
+
+
+router.get('/remove_monitor', mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.query;
+    await prisma.monitoringData.delete({ where: { id } });
 
     res.redirect('/');
 }));
+
 
 router.post('/data/:secret', async (req, res) => {
     const monitorData = req.fields;

@@ -385,9 +385,9 @@ then
   exit -1
 fi
 
-if [ -z "$HOTHOST_SERVER_HOST" ]
+if [ -z "$HOTHOST_SERVER_BASE" ]
 then
-  echo "You have to set HOTHOST_SERVER_HOST to deliver data to hothost server https://github.com/devforth/hothost"
+  echo "You have to set HOTHOST_SERVER_BASE to deliver data to hothost server https://github.com/devforth/hothost"
   exit -1
 fi
 
@@ -469,7 +469,7 @@ do
  
   echo $JSON_DATA;
 
-  curl -X POST $HOTHOST_SERVER_HOST/api/data/$HOTHOST_AGENT_SECRET \
+  curl -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$JSON_DATA"
   sleep $HOTHOST_MONITOR_INTERVAL
