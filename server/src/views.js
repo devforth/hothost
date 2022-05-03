@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-
+router.use(express.static('static'));
 
 router.get('/', (req, res) => {
     res.locals = {
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/login/', (req, res) => {
-
+    res.render('login');
 });
 
 module.exports = router;

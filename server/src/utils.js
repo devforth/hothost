@@ -1,10 +1,6 @@
 const uuid = require('uuid');
 const prisma = require('./prisma');
 
-if (process.env.ENV === 'local') {
-    process.env.ADMIN_PASSWORD_HASH = 'e10adc3949ba59abbe56e057f20f883e';
-}
-
 module.exports = {
     checkUserExistsOrCreate: async () => {
         const count = await prisma.user.count();
