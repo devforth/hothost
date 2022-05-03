@@ -12,7 +12,7 @@
     <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
       
       <tr>
-        <div class="p-6 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-700">
+        <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
           <h5 class="text-md font-bold leading-none text-gray-900 dark:text-white">Configure your agent</h5>
 
           <div class="mb-4 ">
@@ -46,8 +46,8 @@
                   </button>
                 </p>
 
-                <pre id="puredocpre" class="p-4 mb-4 text-xs bg-gray-100 dark:bg-gray-800 block rounded shadow-xl mt-5 whitespace-pre overflow-x-none text-gray-500 dark:text-gray-400">
-docker run -d --name=hothost \
+                <pre id="puredocpre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
+docker run -d \
   -v /etc/passwd:/host/etc/passwd:ro \
   -v /etc/group:/host/etc/group:ro \
   -v /proc:/host/proc:ro \
@@ -57,13 +57,13 @@ docker run -d --name=hothost \
   --cap-add SYS_PTRACE \
   --security-opt apparmor=unconfined \
   -v /etc/hostname:/host/etc/hostname:ro \
-  devforth/hothost</pre>
+  devforth/hothost-agent</pre>
                 <p class="text-sm text-gray-500 dark:text-gray-400 relative">
                   Refresh this page to see update.
                 </p>
               </div>
               
-              <div class="hidden py-4 bg-gray-50 rounded-lg dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+              <div class="hidden py-4 rounded-lg dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
                   
                 <p class="text-sm text-gray-500 dark:text-gray-400 relative">
                   If you have a Docker Compose stack you can just add this snippet:
@@ -75,11 +75,11 @@ docker run -d --name=hothost \
                   </button>
                 </p>
 
-                <pre id="composepre" class="p-4 mb-4 text-xs bg-gray-100 dark:bg-gray-800 block rounded shadow-xl mt-5 whitespace-pre overflow-x-none text-gray-500 dark:text-gray-400">
+                <pre id="composepre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
 version: '3'
 services:
   netdata:
-    image: devforth/hothost
+    image: devforth/hothost-agent
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
@@ -96,10 +96,10 @@ services:
                 </p>
 
               </div>
-              <div class="hidden py-4 bg-gray-50 rounded-lg dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+              <div class="hidden py-4 rounded-lg dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                   <p class="text-sm text-gray-500 dark:text-gray-400">
-                    If you want to run agent locally without Docker you can add one-time job on start <code>crontab -e`</code>  and add next
-                    <pre id="composepre" class="p-4 mb-4 text-xs bg-gray-100 dark:bg-gray-800 block rounded shadow-xl mt-5 whitespace-pre overflow-x-none text-gray-500 dark:text-gray-400">
+                    If you want to run agent locally without Docker you can add one-time job on start <code class="rounded bg-pink-100 text-red-900 p-1">crontab -e</code>  and add next
+                    <pre id="composepre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
 @reboot HOTHOST_SERVER_HOST=1\
   HOTHOST_MONITOR_INTERVAL=1\
   HOTHOST_AGENT_SECRET=1\
