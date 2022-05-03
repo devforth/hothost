@@ -2,7 +2,8 @@
   <div class="min-w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
       <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Hosts under monitoring</h5>
-
+      
+      {{#if authorized}}
       <form action="/api/add_monitor" method="POST">
         <button  class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center">
@@ -12,11 +13,12 @@
           Add new host
         </button>
       </form>
+      {{/if}}
  </div>
  <div class="flow-root">
     <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700 w-full">
       {{#each monitoringData}}
-      {{#if this.no_data}}
+      {{#if (and this.no_data ../authorized)}}
       <tr>
         <td colspan="6">
           <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 w-full">
@@ -167,61 +169,64 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
         </td>
       </tr>
       {{else}}
-      <tr class="pt-11 border-b border-gray-200 dark:border-gray-700">
-            <td class="py-4 pr-4 flex-shrink-0">
-                <img class="w-8 h-8 rounded-full" src="/img/ubuntu.svg" alt="Neil image">
-            </td>
-            <td class="pr-5 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
-              {{#if 1}}
-              🟢 Online
-              {{else}}
-              🔴 Off
-              {{/if}}
-            </td>
-            <td class="pr-5 flex-1 min-w-1">
-                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                  {{ this.hostname }}
-                </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                  Public IP: {{ this.public_ip }}
-                </p>
-            </td>
-            <td class="pr-5 flex-1 min-w-1">
-              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                {{ this.os_name }}
-              </p>
-              <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                {{ this.os_version }}
-              </p>
-            </td>
-            <td class="pr-5 flex-1 min-w-1">
-              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                💻 {{ this.cpu_name }}
-
-              </p>
-              <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                CPUs: {{ this.cpu_count }}
-                &nbsp;&nbsp;&nbsp;
-                RAM: {{ this.ram_total }} ({{ this.ram_used }}% used)
-                &nbsp;&nbsp;&nbsp;
-                SWAP {{ this.swap_total }} ({{ this.swap_used }}% used)
-              </p>
-            </td>
-
-            <td class="flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
-              <p class="text-sm">
-                💽 Disk: {{ this.disk_total }}
-              </p>
-              <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                {{ this.disk_used }}% use
-                {{#if disk_warning }}
-                  <span class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">WARNING</span>
+        {{#if (not this.no_data)}}
+        <tr class="pt-11 border-b border-gray-200 dark:border-gray-700">
+              <td class="py-4 pr-4 flex-shrink-0">
+                  <img class="w-8 h-8 rounded-full" src="/img/ubuntu.svg" alt="Neil image">
+              </td>
+              <td class="pr-5 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+                {{#if 1}}
+                🟢 Online
                 {{else}}
-                  <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">OK</span>
+                🔴 Off
                 {{/if}}
-              </p>
-            </td>
-      </tr>
+              </td>
+              <td class="pr-5 flex-1 min-w-1">
+                  <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                    {{ this.hostname }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Public IP: {{ this.public_ip }}
+                  </p>
+              </td>
+              <td class="pr-5 flex-1 min-w-1">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {{ this.os_name }}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ this.os_version }}
+                </p>
+              </td>
+              <td class="pr-5 flex-1 min-w-1">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  💻 {{ this.cpu_name }}
+
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  CPUs: {{ this.cpu_count }}
+                  &nbsp;&nbsp;&nbsp;
+                  RAM: {{ this.ram_total }} ({{ this.ram_used }}% used)
+                  &nbsp;&nbsp;&nbsp;
+                  SWAP {{ this.swap_total }} ({{ this.swap_used }}% used)
+                </p>
+              </td>
+
+              <td class="flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+                <p class="text-sm">
+                  💽 Disk: {{ this.disk_total }}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ this.disk_used }}% use
+                  {{#if disk_warning }}
+                    <span class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">WARNING</span>
+                  {{else}}
+                    <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">OK</span>
+                  {{/if}}
+                </p>
+              </td>
+        </tr>
+        {{/if}}
+
       {{/if}}
       {{/each}}
     </table>
