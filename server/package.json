@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "cross-env ENV=local nodemon src/index.js",
-    "prisma": "prisma"
+    "prisma": "prisma",
+    "styler": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "cookie-parser": "^1.4.6",
     "express": "^4.18.1",
     "express-formidable": "^1.2.0",
+    "flowbite": "^1.4.4",
     "hbs": "^4.2.0",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
