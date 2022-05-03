@@ -397,6 +397,9 @@ do
   DISK_USED=`df / | tail -n 1 | tr -s " " " " | cut -d" " -f3`
   DISK_AVAILABLE=`df / | tail -n 1 | tr -s " " " " | cut -d" " -f4`
 
+  DISK_USED=$((DISK_USED * 1024))
+  DISK_AVAILABLE=$((DISK_AVAILABLE * 1024))
+
   # Detect the total system RAM
 
   TOTAL_RAM="unknown"
@@ -411,10 +414,14 @@ do
   elif [ -r /proc/meminfo ]; then
     RAM_DETECTION="procfs"
     TOTAL_RAM="$(grep -F MemTotal /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
-    FREE_RAM="$(grep -F MemFree /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
+    FREE_RAM="$(grep -F MemAvailable /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
     TOTAL_SWAP="$(grep -F SwapTotal /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
     FREE_SWAP="$(grep -F SwapFree /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
+
     TOTAL_RAM="$((TOTAL_RAM * 1024))"
+    FREE_RAM="$((FREE_RAM * 1024))"
+    TOTAL_SWAP="$((TOTAL_SWAP * 1024))"
+    FREE_SWAP="$((FREE_SWAP * 1024))"
   fi
 
   JSON_DATA=$(jo \

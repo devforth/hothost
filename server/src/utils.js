@@ -50,4 +50,16 @@ module.exports = {
     },
     mustBeAuthorizedApi: (callback) => {
     },
+    sizeFormat: (a) => {
+        let value = parseInt(a);
+        for (let unit of ['B', 'KiB', 'MiB', 'GiB', 'TiB']) {
+            if (Math.abs(value) < 1024) {
+                return `${value.toFixed(2)} ${unit}`;
+            }
+
+            value /= 1024;
+        }
+
+        return `${value.toFixed(2)} PiB`;
+    },
 }

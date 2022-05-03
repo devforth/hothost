@@ -9,15 +9,14 @@ const router = express.Router();
 router.post('/add_monitor', mustBeAuthorizedView(async (req, res) => {
     const id = uuid.v4();
 
-    await prisma.monitoringData.create({ data: { id } });
+    const now = new Date();
+    await prisma.monitoringData.create({ data: { id, createdAt: now, updatedAt: now } });
 
     res.redirect('/');
 }));
 
 router.post('/data/:secret', async (req, res) => {
     const monitorData = req.fields;
-    console.log(monitorData);
-
     const md = await prisma.monitoringData.findUnique({ where: { id: req.params.secret } });
     if (!md) {
         res.statusCode = 401;

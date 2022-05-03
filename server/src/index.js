@@ -35,7 +35,32 @@ async function main() {
       not(a) { return !a },
       and(a, b) { return a && b },
       eq(a, b) { return a.toString() === b.toString() },
-    }
+
+      sizeFormat(a) {
+        let value = parseInt(a);
+        for (let unit of ['B', 'KiB', 'MiB', 'GiB', 'TiB']) {
+            if (Math.abs(value) < 1024) {
+                return `${value.toFixed(2)} ${unit}`;
+            }
+
+            value /= 1024;
+        }
+
+        return `${value.toFixed(2)} PiB`;
+      },
+      percentage(a, b) {
+        const aValue = parseFloat(a);
+        const bValue = parseFloat(b);
+
+        return ((aValue / bValue) * 100).toFixed(0);
+      },
+      add(a, b) {
+        return +a + +b;
+      },
+      gt(a, b) {
+        return +a > +b;
+      }
+     }
   });
 
 
