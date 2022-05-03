@@ -13,6 +13,15 @@
       "runOptions": { "runOn": "folderOpen" }
     },
     {
+      "label": "Tilewind",
+      "type": "shell",
+      "command": "cd server && npm run migrate",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+      },
+    },
+    {
       "label": "Server",
       "type": "shell",
       "command": "cd server && npm run start",
