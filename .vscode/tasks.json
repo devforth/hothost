@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Tilewind",
+      "type": "shell",
+      "command": "cd server &&  npm run watch-tailwindcss",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "group": "develop",
+      },
+      "runOptions": { "runOn": "folderOpen" }
+    },
+    {
+      "label": "Server",
+      "type": "shell",
+      "command": "cd server && npm run start",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "group": "develop",
+      },
+      "runOptions": { "runOn": "folderOpen" }
+    }
+  ]
+}
