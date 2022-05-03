@@ -12,6 +12,7 @@ router.get('/login/', (req, res) => {
     if(req.user) {
         res.redirect('/');
     } else {
+        res.locals.hideLoginButton = true;
         res.render('login');
     }
 });
