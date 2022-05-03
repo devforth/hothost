@@ -18,8 +18,8 @@ router.post('/login/', async (req, res) => {
     });
 
     if (user) {
-        // const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.JWT_SECRET);
-        // res.cookie('__hhjwt', jwtToken, { expires: 60 * 1000 * 1000 });
+        const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.JWT_SECRET);
+        res.cookie('__hhjwt', jwtToken, { maxAge: 60 * 60 * 1000 });
         res.redirect('/');
     } else {
         res.locals.error = 'Invalid username or password';
