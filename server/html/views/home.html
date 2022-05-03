@@ -2,12 +2,15 @@
   <div class="p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
       <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Hosts under monitoring</h5>
-      <a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
-          ➕ Add new host
-      </a>
+      <form method="post">
+        <button href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+            ➕ Add new host
+        </button>
+      </form>
  </div>
  <div class="flow-root">
     <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+      {{#each monitoringData}}
       <tr class="mt-6">
             <td class="pt-4 pr-4 flex-shrink-0">
                 <img class="w-8 h-8 rounded-full" src="/img/ubuntu.svg" alt="Neil image">
@@ -55,6 +58,7 @@
             </td>
         </div>
       </tr>
+      {{/each}}
 
       <tr>
         <div class="flex mt-6 items-center space-x-6">
@@ -104,7 +108,6 @@
             </td>
         </div>
       </tr>
-
     </table>
  </div>
 

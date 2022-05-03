@@ -9,7 +9,32 @@ datasource db {
 }
 
 model User {
-    id          String      @id
-    username    String
-    password    String
+  id          String      @id
+  username    String
+  password    String
+}
+
+model MonitoringData {
+  id              String      @id
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  hostname        String?
+  public_ip       String?
+
+  os_name         String?
+  os_version      String?
+
+  cpu_name        String?
+  cpu_core_count  Int?
+
+  ram_total       BigInt?
+  ram_available   BigInt?
+
+  swap_total      BigInt?
+  swap_available  BigInt?
+
+  disk_total      BigInt?
+  disk_available  BigInt?
 }

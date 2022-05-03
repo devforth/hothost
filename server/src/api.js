@@ -1,30 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const md5 = require('md5');
 const uuid = require('uuid');
-const jwt = require('jsonwebtoken');
 
 const prisma = require('./prisma');
-
-router.post('/login/', async (req, res) => {
-    const { username, password } = req.fields;
-
-    const passwordHash = md5(password);
-    const user = await prisma.user.findFirst({
-        select: { id: true, username: true },
-        where: { username, password: passwordHash }
-    });
-
-    if (user) {
-        const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.JWT_SECRET);
-        res.cookie('__hhjwt', jwtToken, { maxAge: 60 * 60 * 1000 });
-        res.redirect('/');
-    } else {
-        res.locals.error = 'Invalid username or password';
-        res.render('login');
-    }
-});
 
 router.post('/data/', async (req, res) => {
     res.send('TODO');

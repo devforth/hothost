@@ -34,7 +34,8 @@ async function main() {
     helpers: {
       or(a, b) { return a || b },
       not(a) { return !a },
-      and(a, b) { return a && b},
+      and(a, b) { return a && b },
+      eq(a, b) { return a.toString() === b.toString() },
     }
   });
 

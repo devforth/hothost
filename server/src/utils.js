@@ -1,4 +1,7 @@
+const md5 = require('md5');
 const uuid = require('uuid');
+const jwt = require('jsonwebtoken');
+
 const prisma = require('./prisma');
 
 module.exports = {
@@ -18,5 +21,33 @@ module.exports = {
                 throw Error('Not user is present and ADMIN_PASSWORD_HASH environment variable is missing.');
             }
         }
+    },
+    authorizeUser: async (username, password) => {
+        const passwordHash = md5(password);
+        const user = await prisma.user.findFirst({
+            select: { id: true, username: true },
+            where: { username, password: passwordHash }
+        });
+
+        if (user) {
+            const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.JWT_SECRET);
+            return jwtToken;
+        } else {
+            throw new Error('Invalid username or password');
+        }
+    },
+    mustNotBeAuthroizedView: (callback) => {
+        return (req, res) => {
+            if (req.user) res.redirect(req.query.next || '/');
+            else callback(req, res);
+        };
+    },
+    mustBeAuthorizedView: (callback) => {
+        return (req, res) => {
+            if (!req.user) res.redirect(`/login/?next=${req.path}`);
+            else callback(req, res);
+        };
+    },
+    mustBeAuthorizedApi: (callback) => {
     },
 }

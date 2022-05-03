@@ -1,24 +1,46 @@
+const uuid = require('uuid');
 const express = require('express');
 
-const router = express.Router();
+const prisma = require('./prisma');
+const {
+    authorizeUser,
+    mustBeAuthorizedView,
+    mustNotBeAuthroizedView,
+} = require('./utils');
 
+const router = express.Router();
 router.use(express.static('static'));
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) =>  {
+    res.locals.monitoringData = await prisma.monitoringData.findMany();
     res.render('home');
 });
+router.post('/', mustBeAuthorizedView(async (req, res) => {
+    const id = uuid.v4();
 
-router.get('/login/', (req, res) => {
-    if(req.user) {
-        res.redirect('/');
-    } else {
-        res.locals.hideLoginButton = true;
+    await prisma.monitoringData.create({ data: { id } });
+
+    res.locals.monitoringData = await prisma.monitoringData.findMany();
+    res.render('home');
+}));
+
+router.get('/login/', mustNotBeAuthroizedView((req, res) => res.render('login')));
+router.post('/login/', mustNotBeAuthroizedView(async (req, res) => {
+    try {
+        const { username, password } = req.fields;
+        if (username && password) {
+            const jwtToken = await authorizeUser(username, password);
+            res.cookie('__hhjwt', jwtToken, { maxAge: 60 * 60 * 1000 });
+            res.redirect(req.query.next || '/');
+        }
+    } catch (e) {
+        res.locals.error = e.message;
         res.render('login');
     }
-});
+}));
 
-router.get('/users/', (req, res) => {
-    res.render('users');
-});
+router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));
+router.post('/users/', mustBeAuthorizedView((req, res) => {
 
+}));
 module.exports = router;
