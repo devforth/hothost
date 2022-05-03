@@ -5,11 +5,6 @@ const router = express.Router();
 router.use(express.static('static'));
 
 router.get('/', (req, res) => {
-    res.locals = {
-        some_value: 'foo bar',
-        list: ['cat', 'dog']
-    }
-
     res.render('home');
 });
 

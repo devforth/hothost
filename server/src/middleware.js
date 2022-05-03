@@ -10,6 +10,7 @@ module.exports = {
             req.user = null;
         }
 
+        res.locals.authorized = !!req.user;
         next();
     }
 }
