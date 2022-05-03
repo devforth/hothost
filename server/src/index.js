@@ -30,7 +30,14 @@ async function main() {
     extname: 'html',
     defaultLayout: 'main',
     layoutsDir: path.join(path.dirname(__dirname), 'html', 'layouts'),
+
+    helpers: {
+      or(a, b) { return a || b },
+      not(a) { return !a },
+      and(a, b) { return a && b},
+    }
   });
+
 
   app.set('view engine', 'html');
   app.engine('html', hbs.engine);
