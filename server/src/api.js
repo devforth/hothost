@@ -10,7 +10,6 @@ const prisma = require('./prisma');
 router.post('/login/', async (req, res) => {
     const { username, password } = req.fields;
 
-    console.log(req.fields);
     const passwordHash = md5(password);
     const user = await prisma.user.findFirst({
         select: { id: true, username: true },

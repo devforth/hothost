@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 
+const { create } = require('express-handlebars');
+
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 const formidable = require('express-formidable');
@@ -24,9 +26,15 @@ async function main() {
   const app = express();
   const port = process.env.SERVER_PORT || 8007;
 
+  const hbs = create({
+    extname: 'html',
+    layoutsDir: path.join(path.dirname(__dirname), 'html'),
+  });
+
   app.set('view engine', 'html');
-  app.engine('html', require('hbs').__express);
+  app.engine('html', hbs.engine);
   app.set('views', path.join(path.dirname(__dirname), 'html'));
+
 
   app.use(formidable());
   app.use(cookieParser());
