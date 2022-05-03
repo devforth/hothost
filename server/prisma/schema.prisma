@@ -15,26 +15,53 @@ model User {
 }
 
 model MonitoringData {
-  id              String      @id
+  id                              String      @id
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt                       DateTime    @default(now())
+  updatedAt                       DateTime    @updatedAt
 
-  hostname        String?
-  public_ip       String?
+  CONTAINER_OS_NAME               String?
+  CONTAINER_OS_ID                 String?
+  CONTAINER_OS_ID_LIKE            String?
+  CONTAINER_OS_VERSION            String?
+  CONTAINER_OS_VERSION_ID         String?
+  CONTAINER_OS_DETECTION          String?
+  CONTAINER_IS_OFFICIAL_IMAGE     String?
 
-  os_name         String?
-  os_version      String?
+  HOST_NAME                       String?
+  HOST_OS_NAME                    String?
+  HOST_OS_ID                      String?
+  HOST_OS_ID_LIKE                 String?
+  HOST_OS_VERSION                 String?
+  HOST_OS_VERSION_ID              String?
+  HOST_OS_DETECTION               String?
+  HOST_IS_K8S_NODE                String?
 
-  cpu_name        String?
-  cpu_core_count  Int?
+  SYSTEM_KERNEL_NAME              String?
+  SYSTEM_KERNEL_VERSION           String?
+  SYSTEM_ARCHITECTURE             String?
+  SYSTEM_VIRTUALIZATION           String?
+  SYSTEM_VIRT_DETECTION           String?
+  SYSTEM_CONTAINER                String?
+  SYSTEM_CONTAINER_DETECTION      String?
+  SYSTEM_CPU_LOGICAL_CPU_COUNT    String?
+  SYSTEM_CPU_VENDOR               String?
+  SYSTEM_CPU_MODEL                String?
+  SYSTEM_CPU_FREQ                 String?
+  SYSTEM_CPU_DETECTION            String?
+  SYSTEM_TOTAL_RAM                String?
+  SYSTEM_FREE_RAM                 String?
+  SYSTEM_TOTAL_SWAP               String?
+  SYSTEM_FREE_SWAP                String?
+  SYSTEM_RAM_DETECTION            String?
+  SYSTEM_TOTAL_DISK_SIZE          String?
+  SYSTEM_DISK_DETECTION           String?
 
-  ram_total       BigInt?
-  ram_available   BigInt?
+  INSTANCE_CLOUD_TYPE             String?
+  INSTANCE_CLOUD_INSTANCE_TYPE    String?
+  INSTANCE_CLOUD_INSTANCE_REGION  String?
 
-  swap_total      BigInt?
-  swap_available  BigInt?
-
-  disk_total      BigInt?
-  disk_available  BigInt?
+  DISK_USED                       String?
+  DISK_AVAIL                      String?
+  HOST_PUBLIC_IP                  String?
 }

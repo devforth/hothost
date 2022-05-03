@@ -375,8 +375,8 @@ CLOUD_INSTANCE_REGION="unknown"
 
 if [ -z "$HOTHOST_MONITOR_INTERVAL" ]
 then
-  echo "You did not set MONITOR_INTERVAL, pulling every 60 seconds"
-  MONITOR_INTERVAL_SECONDS=60
+  echo "You did not set HOTHOST_MONITOR_INTERVAL, pulling every 60 seconds"
+  HOTHOST_MONITOR_INTERVAL=60
 fi
 
 if [ -z "$HOTHOST_AGENT_SECRET" ]
@@ -462,5 +462,5 @@ do
   curl -X POST $HOTHOST_SERVER_HOST/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$JSON_DATA"
-  sleep $MONITOR_INTERVAL_SECONDS
+  sleep $HOTHOST_MONITOR_INTERVAL
 done
