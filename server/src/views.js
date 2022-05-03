@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
         list: ['cat', 'dog']
     }
 
-    res.render('addhost');
+    res.render('home');
 });
 
 router.get('/login/', (req, res) => {
