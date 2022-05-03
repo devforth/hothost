@@ -24,5 +24,5 @@ Default local credentials:
 - admin:123456
 
 How to run:
-- Apply migrations using: `npm run prisma migrate dev`
+- Apply migrations using: `npm run migrate`
 - Run the server using: `npm start`

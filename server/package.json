@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cross-env ENV=local nodemon src/index.js",
     "watch-tailwindcss": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
-    "prisma": "prisma"
+    "prisma": "prisma",
+    "migrate": "npm run prisma migrate dev"
   },
   "author": "",
   "license": "ISC",
