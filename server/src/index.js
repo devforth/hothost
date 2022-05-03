@@ -3,6 +3,7 @@ const express = require('express');
 
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
+const formidable = require('express-formidable');
 
 const viewRouter = require('./views');
 const apiRouter = require('./api');
@@ -27,6 +28,7 @@ async function main() {
   app.engine('html', require('hbs').__express);
   app.set('views', path.join(path.dirname(__dirname), 'html'));
 
+  app.use(formidable());
   app.use(cookieParser());
   app.use(bodyParser.json());
 

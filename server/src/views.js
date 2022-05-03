@@ -14,7 +14,15 @@ router.get('/', (req, res) => {
 });
 
 router.get('/login/', (req, res) => {
-    res.render('login');
+    if(req.user) {
+        res.redirect('/');
+    } else {
+        res.render('login');
+    }
+});
+
+router.get('/users/', (req, res) => {
+    res.render('users');
 });
 
 module.exports = router;

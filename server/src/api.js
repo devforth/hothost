@@ -8,7 +8,9 @@ const jwt = require('jsonwebtoken');
 const prisma = require('./prisma');
 
 router.post('/login/', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password } = req.fields;
+
+    console.log(req.fields);
     const passwordHash = md5(password);
     const user = await prisma.user.findFirst({
         select: { id: true, username: true },
@@ -16,11 +18,12 @@ router.post('/login/', async (req, res) => {
     });
 
     if (user) {
-        const jwtToken = jwt.sign(user, process.env.JWT_SECRET);
-        res.setHeader('__hhjwt', jwtToken);
-        res.send({ success: true });
+        // const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.JWT_SECRET);
+        // res.cookie('__hhjwt', jwtToken, { expires: 60 * 1000 * 1000 });
+        res.redirect('/');
     } else {
-        res.send({ error: 'Invalid username pr password'});
+        res.locals.error = 'Invalid username or password';
+        res.render('login');
     }
 });
 
@@ -34,6 +37,7 @@ router.get('/users/', async (req, res) => {
     });
 
     res.send({ data: users });
+    res.redirect('/users/');
 });
 
 router.post('/user/', async (req, res) => {
@@ -47,7 +51,7 @@ router.post('/user/', async (req, res) => {
     };
 
     await prisma.user.create({ data: user });
-    res.send({ id: user.id, username: user.username });
+    res.redirect('/users/');
 });
 
 router.route('/user/:userId')
@@ -69,7 +73,7 @@ router.route('/user/:userId')
     .delete(async (req, res) => {
         const userId = req.params.userId;
         await prisma.user.delete({ where: { id: userId } });
-        res.send({ success: true });
+        res.redirect('/users/');
     });
 
 module.exports = router;
