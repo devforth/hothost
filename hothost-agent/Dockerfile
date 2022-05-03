@@ -1,4 +1,4 @@
 FROM alpine
 
-RUN apk update && apk add bash curl jo
+RUN apk update && apk add bash curl
 ADD getinfo.sh .
