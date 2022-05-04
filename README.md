@@ -16,6 +16,11 @@ For each host it allows to see:
 * RAM size and current RAM ussage
 * See whether SWAP is enabled and whether it is used
 
+# Preview
+
+![](preview.jpeg)
+
+# Installation
 
 First you need to run HotHost Web Server. It will then give you clear guide how to add agents. 
 You can use any host with public IP. You are responsible for setting up SSL. 
