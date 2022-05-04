@@ -14,8 +14,17 @@ const { authMiddleware } = require('./middleware');
 
 
 if (process.env.ENV === 'local') {
-  process.env.ADMIN_PASSWORD_HASH = 'e10adc3949ba59abbe56e057f20f883e';
-  process.env.JWT_SECRET = 'e10adc3949ba59abbe56e057f20f883e';
+  process.env.HOTHOST_WEB_ADMIN_USERNAME = 'admin';
+  process.env.HOTHOST_WEB_ADMIN_PASSWORD_MD5 = 'e10adc3949ba59abbe56e057f20f883e';
+  process.env.HOTHOST_WEB_PORT = '8007';
+  process.env.HOTHOST_WEB_JWT_SECRET = 'e10adc3949ba59abbe56e057f20f883e';
+} else {
+  const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD_MD5', 'HOTHOST_WEB_JWT_SECRET'];
+  requiredVariables.forEach(key => {
+    if (!process.env[key]) {
+      throw new Error(`Environment variable '${key}' is missing`);
+    }
+  });
 }
 
 
@@ -23,7 +32,7 @@ async function main() {
   await checkUserExistsOrCreate();
 
   const app = express();
-  const port = process.env.SERVER_PORT || 8007;
+  const port = +process.env.HOTHOST_WEB_PORT || 8007;
 
   const hbs = create({
     extname: 'html',
@@ -35,31 +44,6 @@ async function main() {
       not(a) { return !a },
       and(a, b) { return a && b },
       eq(a, b) { return a.toString() === b.toString() },
-
-      sizeFormat(a) {
-        let value = parseInt(a);
-        for (let unit of ['B', 'KiB', 'MiB', 'GiB', 'TiB']) {
-            if (Math.abs(value) < 1024) {
-                return `${value.toFixed(2)} ${unit}`;
-            }
-
-            value /= 1024;
-        }
-
-        return `${value.toFixed(2)} PiB`;
-      },
-      percentage(a, b) {
-        const aValue = parseFloat(a);
-        const bValue = parseFloat(b);
-
-        return ((aValue / bValue) * 100).toFixed(0);
-      },
-      add(a, b) {
-        return +a + +b;
-      },
-      gt(a, b) {
-        return +a > +b;
-      }
      }
   });
 

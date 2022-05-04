@@ -14,15 +14,16 @@ router.use(express.static('static'));
 
 router.get('/', async (req, res) =>  {
     const monitoringData = await prisma.monitoringData.findMany({ orderBy: { createdAt: 'desc' } });
-    res.locals.monitoringData = monitoringData.map(data => (data.createdAt.toISOString() === data.updatedAt.toISOString() ? 
-        { 
-            id: data.id,
+    res.locals.monitoringData = monitoringData.map(data => (data.createdAt.toISOString() === data.updatedAt.toISOString() ?
+        {
+            id: uuid.v4(),
             no_data: true,
             secret: res.locals.authorized && data.secret,
         }
         :
         {
-            id: data.id,
+            secret: res.locals.authorized && data.secret,
+            online: (data.updatedAt.getTime() + (+data.MONITOR_INTERVAL * 1000)) >= new Date().getTime(),
             hostname: data.HOST_NAME,
             public_ip: data.HOST_PUBLIC_IP,
             os_name: data.HOST_OS_NAME,
@@ -38,9 +39,6 @@ router.get('/', async (req, res) =>  {
             disk_warning: ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > 80,
         }
     ));
-    res.locals.hostname = `req. ${req.hostname}`;
-
-    console.log(res.locals);
     res.render('home');
 });
 
@@ -50,7 +48,7 @@ router.post('/login/', mustNotBeAuthroizedView(async (req, res) => {
         const { username, password } = req.fields;
         if (username && password) {
             const jwtToken = await authorizeUser(username, password);
-            res.cookie('__hhjwt', jwtToken, { 
+            res.cookie('__hhjwt', jwtToken, {
                 maxAge: 60 * 60 * 1000,
                 sameSite: 'Strict', // prevents from broader class of CSRF attacks then even Lax, no need in external CSRF handlers for 92.16% of browsers
                 secure: false, // some users might have non-SSL sites, probably should go from ENV var which gives greenlight

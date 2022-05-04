@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -66,4 +66,6 @@ model MonitoringData {
   DISK_USED                       String?
   DISK_AVAIL                      String?
   HOST_PUBLIC_IP                  String?
+
+  MONITOR_INTERVAL                String?
 }
