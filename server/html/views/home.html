@@ -176,11 +176,7 @@ services:
                   </p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
                     Public IP: 
-                    {{#if ../authorized}}
-                      {{ this.public_ip }}
-                    {{ else }}
-                      🔒 Unauthorized
-                    {{/if}}
+                    {{ this.public_ip }}
                   </p>
               </td>
               <td class="pr-5 flex-1 min-w-1">
@@ -188,21 +184,12 @@ services:
                   {{ this.os_name }}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                  {{#if ../authorized}}
-                    {{ this.os_version }}
-                  {{ else }}
-                    🔒 Unauthorized
-                  {{/if}}
+                  {{ this.os_version }}
                 </p>
               </td>
               <td class="pr-5 flex-1 min-w-1">
                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                  {{#if ../authorized}}
-                    💻 {{ this.cpu_name }}
-                  {{ else }}
-                    🔒 Unauthorized
-                  {{/if}}
-
+                  💻 {{ this.cpu_name }}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                   CPUs: {{ this.cpu_count }}
