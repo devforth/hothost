@@ -1,6 +1,13 @@
 # hothost
 
 
+First you need to run HotHost web. It will then give you clear guide how to add agents. 
+You can use any host with public IP. You are responsible for setting up SSL. 
+
+You can use one of next options:
+- Nginx or traefik with connected external certificate or free Let's Encrypt certificate
+- Free Cloudflare CDN which terminates SSL and gives additional layer of cecurity.
+
 
 docker run -d --name=hothost \
   -v /etc/passwd:/host/etc/passwd:ro \
