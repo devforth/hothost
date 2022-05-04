@@ -34,22 +34,23 @@ version: '3.5'
 services:
   hothost-web:
     image: devforth/hothost-web
-    network_mode: host
-    restart: always
     environment:
       - HOTHOST_WEB_USERNAME=admin
-      - HOTHOST_WEB_PASSWORD_MD5=dd63432b661e658155fac504513e4611
-      - HOTHOST_WEB_JWT_SECRET=cFx84YebGfRwu5Jwj47L4SSR
+      - HOTHOST_WEB_PASSWORD_MD5=<md5_hash>
+      - HOTHOST_WEB_JWT_SECRET=secret
+      - HOTHOST_WEB_PORT=8007
+    ports:
+      - 8007:8007
     volumes:
       - v-hothost-data:/var/lib/hothost/data/
 volumes:
   v-hothost-data:
 ```
 ## Environment variables
-HOTHOST_WEB_USERNAME - username for first created user
-HOTHOST_WEB_PASSWORD_MD5 - password md5 hash for the user;
-HOTHOST_WEB_PORT - porst on which web server is listening (default 8007);
-HOTHOST_WEB_JWT_SECRET - jwt secret used to generate auth tokens;
+- HOTHOST_WEB_ADMIN_USERNAME - username for first created user
+- HOTHOST_WEB_ADMIN_PASSWORD_MD5 - password md5 hash for the user;
+- HOTHOST_WEB_PORT - porst on which web server is listening (default 8007);
+- HOTHOST_WEB_JWT_SECRET - jwt secret used to generate auth tokens;
 
 Default local credentials:
 - admin:123456
