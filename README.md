@@ -84,12 +84,6 @@ docker run -d --name=hothost-web \
   devforth/hothost-web
 ```
 
-## Environment variables
-- HOTHOST_WEB_ADMIN_USERNAME - username for first created admin
-- HOTHOST_WEB_ADMIN_PASSWORD_MD5 - password md5 hash for the user;
-- HOTHOST_WEB_PORT - porst on which web server is listening (default 8007);
-- HOTHOST_WEB_JWT_SECRET - jwt secret used to generate auth tokens;
-
 # Development
 
 
