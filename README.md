@@ -49,8 +49,8 @@ services:
     environment:
       - HOTHOST_WEB_ADMIN_USERNAME=admin
       - HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
-      - HOTHOST_WEB_PUBLIC_BASIC_USERNAME=admin
-      - HOTHOST_WEB_PUBLIC_BASIC_PASSWORD=!!!CHANGE_ME!!!
+      - HOTHOST_WEB_BASIC_PUBLIC_USERNAME=admin
+      - HOTHOST_WEB_BASIC_PUBLIC_PASSWORD=!!!CHANGE_ME!!!
       - HOTHOST_WEB_PORT=8007
     ports:
       - 8007:8007
@@ -108,8 +108,8 @@ docker run -d --name=hothost-web \
   -v /www/hothostdata:/var/lib/hothost/data/
   --env HOTHOST_WEB_ADMIN_USERNAME=admin
   --env HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
-  --env HOTHOST_WEB_PUBLIC_BASIC_USERNAME=admin
-  --env HOTHOST_WEB_PUBLIC_BASIC_PASSWORD=!!!CHANGE_ME!!!
+  --env HOTHOST_WEB_BASIC_PUBLIC_USERNAME=admin
+  --env HOTHOST_WEB_BASIC_PUBLIC_PASSWORD=!!!CHANGE_ME!!!
   --env HOTHOST_WEB_PORT=8007
   -p 8007:8007
   devforth/hothost-web
