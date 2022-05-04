@@ -2,15 +2,10 @@ const uuid = require('uuid');
 const express = require('express');
 
 const prisma = require('./prisma');
-const { mustBeAuthorizedView } = require('./utils');
+const { mustBeAuthorizedView, readableRandomStringMaker } = require('./utils');
 
 const router = express.Router();
 
-
-function readableRandomStringMaker(length) {
-    for (var s=''; s.length < length; s += 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.charAt(Math.random()*62|0));
-    return s;
-}
 
 
 router.post('/add_monitor', mustBeAuthorizedView(async (req, res) => {

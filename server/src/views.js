@@ -12,9 +12,9 @@ const {
 const router = express.Router();
 router.use(express.static('static'));
 
-router.get('/', async (req, res) =>  {
+const getMonitoringData = async (req) => {
     const monitoringData = await prisma.monitoringData.findMany({ orderBy: { createdAt: 'desc' } });
-    res.locals.monitoringData = monitoringData
+    return monitoringData
         .filter(data => req.user || data.createdAt.toISOString() !== data.updatedAt.toISOString())
         .map(data => (
             data.createdAt.toISOString() === data.updatedAt.toISOString() ?
@@ -25,7 +25,7 @@ router.get('/', async (req, res) =>  {
             } :
             {
                 secret: req.user && data.secret,
-                online: (data.updatedAt.getTime() + (+data.MONITOR_INTERVAL * 1000)) >= new Date().getTime(),
+                online: (data.updatedAt.getTime() + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),
                 hostname: data.HOST_NAME,
                 public_ip: data.HOST_PUBLIC_IP,
                 os_name: data.HOST_OS_NAME,
@@ -42,7 +42,23 @@ router.get('/', async (req, res) =>  {
             }
         )
     );
+}
+
+router.get('/', mustBeAuthorizedView(async (req, res) =>  {
+    res.locals.monitoringData = await getMonitoringData(req);
     res.render('home');
+}));
+
+router.get('/public', async (req, res) => {
+    const basicAuth = 'Basic ' + Buffer.from(`${process.env.HOTHOST_WEB_BASIC_PUBLIC_USERNAME}:${process.env.HOTHOST_WEB_BASIC_PUBLIC_PASSWORD}`).toString('base64');
+    if (req.headers['authorization'] !== basicAuth) {
+        res.statusCode = 401;
+        res.header('WWW-Authenticate', 'Basic realm="restricted"');
+        res.end();
+    } else {
+        res.locals.monitoringData = await getMonitoringData(req);
+        res.render('home');
+    }
 });
 
 router.get('/login/', mustNotBeAuthroizedView((req, res) => res.render('login')));

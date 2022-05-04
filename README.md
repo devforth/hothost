@@ -35,9 +35,10 @@ services:
   hothost-web:
     image: devforth/hothost-web
     environment:
-      - HOTHOST_WEB_USERNAME=admin
-      - HOTHOST_WEB_PASSWORD_MD5=<md5_hash>
-      - HOTHOST_WEB_JWT_SECRET=secret
+      - HOTHOST_WEB_ADMIN_USERNAME=admin
+      - HOTHOST_WEB_ADMIN_PASSWORD=123456
+      - HOTHOST_WEB_PUBLIC_BASIC_USERNAME=admin
+      - HOTHOST_WEB_PUBLIC_BASICPASSWORD=123456
       - HOTHOST_WEB_PORT=8007
     ports:
       - 8007:8007
