@@ -18,7 +18,7 @@
  <div class="flow-root">
     <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700 w-full">
       {{#each monitoringData}}
-      {{#if (and this.no_data (not authorized))}}
+      {{#if this.no_data}}
       <tr>
         <td colspan="6">
           <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 w-full">
@@ -57,7 +57,7 @@
                     Copy
                   </button>
                 </p>
-                
+
                 <pre id="puredocpre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
 docker run -d \
   --env HOTHOST_SERVER_BASE=___CURRENT_URL___ \
@@ -75,7 +75,7 @@ docker run -d \
   -v /etc/hostname:/host/etc/hostname:ro \
   devforth/hothost-agent</pre>
               <script>
-                document.getElementById('puredocpre').innerHTML = 
+                document.getElementById('puredocpre').innerHTML =
                   document.getElementById('puredocpre').innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
               </script>
               </div>
@@ -114,14 +114,14 @@ services:
       - /sys:/host/sys:ro
       - /etc/os-release:/host/etc/os-release:ro</pre>
               <script>
-                document.getElementById('composepre').innerHTML = 
+                document.getElementById('composepre').innerHTML =
                   document.getElementById('composepre').innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
               </script>
               </div>
               <div class="hidden py-4 rounded-lg dark:bg-gray-800" id="settings-{{ this.id }}" role="tabpanel" aria-labelledby="settings-tab-{{ this.id }}">
                 <p class="text-sm text-gray-500 dark:text-gray-400">
                   If you want to run agent locally without Docker you can add cron job which starts on boot.
-                </p>  
+                </p>
                 <p class="text-sm text-gray-500 dark:text-gray-400 relative">
                   First make sure you have <code class="rounded bg-pink-100 text-red-900 p-1">bash</code> and <code class="rounded bg-pink-100 text-red-900 p-1">curl</code> installed then use <code class="rounded bg-pink-100 text-red-900 p-1">crontab -e</code>  and add next
                   <button
@@ -141,7 +141,7 @@ HOTHOST_MONITOR_INTERVAL=60 \
 HOTHOST_AGENT_SECRET={{ this.secret }} bash
 </pre>
 <script>
-  document.getElementById('bashpre').innerHTML = 
+  document.getElementById('bashpre').innerHTML =
     document.getElementById('bashpre').innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
 </script>
                 <p>
@@ -151,7 +151,7 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
 
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Refresh this page to see update.
-              
+
               <form action="/api/remove_monitor?id={{ this.id }}" method="POST">
                 <button
                   class="flex mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded items-center"
@@ -277,7 +277,7 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
     textArea.remove();
     document.getElementById('toast-copied').classList.remove('hidden');
     setTimeout(hideCOpyTost, 5000);
-    
+
   }
 </script>
 

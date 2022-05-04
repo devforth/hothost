@@ -1,7 +1,10 @@
 FROM node:16-alpine
 
-ENV DATABASE_URL="file:/var/lib/hothost/data.db"
 WORKDIR /code/
+
+ENV DATABASE_URL="file:/var/lib/hothost/data/hothost.db"
+VOLUME [/var/lib/hothost/data/]
+EXPOSE 8007
 
 ADD package.json .
 ADD package-lock.json .
