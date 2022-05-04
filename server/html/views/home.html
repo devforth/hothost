@@ -123,11 +123,8 @@ services:
                     Copy
                   </button>
                 </p>
-                <pre id="bashpre" data-pre-id="{{ this.id }}" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
-@reboot curl https://raw.githubusercontent.com/devforth/hothost/main/hothost-agent/getinfo.sh | \
-  HOTHOST_SERVER_BASE=___CURRENT_URL___ \
-  HOTHOST_MONITOR_INTERVAL=60 \
-  HOTHOST_AGENT_SECRET={{ this.secret }} bash</pre>
+                <pre id="bashpre" data-pre-id="{{ this.id }}" class="whitespace-pre-wrap py-4 pl-4 pr-20  mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
+@reboot curl https://raw.githubusercontent.com/devforth/hothost/main/hothost-agent/getinfo.sh | HOTHOST_SERVER_BASE=___CURRENT_URL___ HOTHOST_MONITOR_INTERVAL=60 HOTHOST_AGENT_SECRET={{ this.secret }} bash</pre>
                 <script>
                   document.querySelectorAll('[data-pre-id="{{ this.id }}"]').forEach(function (el) {
                     el.innerHTML = el.innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' + document.location.host);
