@@ -60,12 +60,6 @@ volumes:
   v-hothost-data:
 ```
 
-To create password MD5 hash for adyour user execute this command and it will show MD5:
-
-```
-docker run python:3-alpine python -c "import hashlib;print(hashlib.md5('YOUR_PASSWORD_HERE'.encode()).hexdigest())"
-```
-
 Now you should proxy https://subdomain.yourdomain.com to serve requests from 127.0.0.1:8007.
 
 * Use https://subdomain.yourdomain.com to view as admin and add new agents
