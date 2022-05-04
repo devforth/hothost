@@ -2,9 +2,9 @@
 
 Lightweight and minimalistic Open-Source hosts monitor. 
 
-* Shows used disk space percentage and WARNING badge if it exceeds some percentage (e.g. 80%)
-* Has public page authorized with Basic Auth to watch status with soem external monitor (E.g. UptimeRobot to show Slack notification when there is a WARNIGN keyword on page)
-* Agents could be easily installed with Docker/Compose/Pure bash+curl and crontab
+* Shows used disk space percentage and WARNING badge if it exceeds some threshold (e.g. 80%)
+* Has public page protected with Basic Auth to watch status with some external monitor (e.g. UptimeRobot to show Slack notification when there is a WARNIGN keyword on page)
+* Agents could be easily installed with Docker/Compose/Bash+curl+crontab. Super simple snippets are shown when you click one button on Web
 * Allows to monitor as many servers as needed
 * Configurable monitoring interval
 * Based on alpine minimalistic Docker images
@@ -19,6 +19,10 @@ For each host it allows to see:
 # Preview
 
 ![](preview.jpeg)
+
+Add new host form:
+
+![](preview-add-monitor.jpeg)
 
 # Installation
 
@@ -56,16 +60,43 @@ volumes:
   v-hothost-data:
 ```
 
-To create password MD5 hash for adyour user execute this command and it will show MD5:
-
-```
-docker run python:3-alpine python -c "import hashlib;print(hashlib.md5('YOUR_PASSWORD_HERE'.encode()).hexdigest())"
-```
-
 Now you should proxy https://subdomain.yourdomain.com to serve requests from 127.0.0.1:8007.
 
 * Use https://subdomain.yourdomain.com to view as admin and add new agents
 * Use https://subdomain.yourdomain.com/public/ with basic auth credentials. You can add this to setup e.g. UptimeRobot monitor and watch for `WARNING` keyword to prevent disk space issues
+
+Example Nginx Proxy:
+
+```
+server {
+  listen 443;
+  server_name subdomain.yourdomain.com;
+  ssl_certificate     wildcard.crt;
+  ssl_certificate_key   wildcard.key;
+
+  charset utf-8;
+  client_max_body_size 75M;
+
+  gzip on;
+  gzip_disable "msie6";
+  gzip_vary on;
+  gzip_proxied any;
+  gzip_comp_level 8;
+  gzip_buffers 16 8k;
+  gzip_http_version 1.1;
+  gzip_min_length 256;
+  gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml image/x-icon;
+
+  location / {
+      proxy_read_timeout 220s;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      proxy_pass http://127.0.0.1:8007;
+  }
+}
+```
+
 
 ## Pure Docker
 
