@@ -4,10 +4,10 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "cross-env ENV=local nodemon src/index.js",
+    "start": "cross-env ENV=local DATABASE_URL=./dev.db nodemon src/index.js",
     "watch-tailwindcss": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
     "prisma": "prisma",
-    "migrate": "npm run prisma migrate dev"
+    "migrate": "cross-env DATABASE_URL=./dev.db npm run prisma migrate dev"
   },
   "author": "",
   "license": "ISC",

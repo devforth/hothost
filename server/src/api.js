@@ -19,8 +19,8 @@ router.post('/add_monitor', mustBeAuthorizedView(async (req, res) => {
     const now = new Date();
 
     const secret = readableRandomStringMaker(64);
-    await prisma.monitoringData.create({ data: { id, createdAt: now, updatedAt: now, secret, } });
- 
+    await prisma.monitoringData.create({ data: { id, createdAt: now, updatedAt: now, secret } });
+
     res.redirect('/');
 }));
 

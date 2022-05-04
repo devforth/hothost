@@ -9,17 +9,13 @@ module.exports = {
         const count = await prisma.user.count();
 
         if (count === 0) {
-            if (process.env.ADMIN_PASSWORD_HASH) {
-                await prisma.user.create({
-                    data: {
-                        id: uuid.v4(),
-                        username: 'admin',
-                        password: process.env.ADMIN_PASSWORD_HASH
-                    }
-                });
-            } else {
-                throw Error('Not user is present and ADMIN_PASSWORD_HASH environment variable is missing.');
-            }
+            await prisma.user.create({
+                data: {
+                    id: uuid.v4(),
+                    username: process.env.HOTHOST_WEB_ADMIN_USERNAME,
+                    password: process.env.HOTHOST_WEB_ADMIN_PASSWORD_MD5
+                }
+            });
         }
     },
     authorizeUser: async (username, password) => {
@@ -30,7 +26,7 @@ module.exports = {
         });
 
         if (user) {
-            const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.JWT_SECRET);
+            const jwtToken = jwt.sign({ ...user, exp: Math.floor(Date.now() / 1000) + (60 * 60) }, process.env.HOTHOST_WEB_JWT_SECRET);
             return jwtToken;
         } else {
             throw new Error('Invalid username or password');

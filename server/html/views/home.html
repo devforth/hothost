@@ -2,7 +2,7 @@
   <div class="min-w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
       <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Hosts under monitoring</h5>
-      
+
       {{#if authorized}}
       <form action="/api/add_monitor" method="POST">
         <button  class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
@@ -18,7 +18,7 @@
  <div class="flow-root">
     <table role="list" class="divide-y divide-gray-200 dark:divide-gray-700 w-full">
       {{#each monitoringData}}
-      {{#if (and this.no_data ../authorized)}}
+      {{#if (and this.no_data (not authorized))}}
       <tr>
         <td colspan="6">
           <div class="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 w-full">
@@ -175,8 +175,8 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
                   <img class="w-8 h-8 rounded-full" src="/img/ubuntu.svg" alt="Neil image">
               </td>
               <td class="pr-5 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
-                {{#if 1}}
-                🟢 Online
+                {{#if this.online}}
+                🟢 On
                 {{else}}
                 🔴 Off
                 {{/if}}
