@@ -46,8 +46,17 @@ services:
 volumes:
   v-hothost-data:
 ```
+
+To create password MD5 hash for adyour user execute this command and it will show MD5:
+
+```
+docker run python:3-alpine python -c "import hashlib;print(hashlib.md5('YOUR_PASSWORD_HERE'.encode()).hexdigest())"
+```
+
+
+
 ## Environment variables
-- HOTHOST_WEB_ADMIN_USERNAME - username for first created user
+- HOTHOST_WEB_ADMIN_USERNAME - username for first created admin
 - HOTHOST_WEB_ADMIN_PASSWORD_MD5 - password md5 hash for the user;
 - HOTHOST_WEB_PORT - porst on which web server is listening (default 8007);
 - HOTHOST_WEB_JWT_SECRET - jwt secret used to generate auth tokens;
