@@ -13,7 +13,7 @@ module.exports = {
                 data: {
                     id: uuid.v4(),
                     username: process.env.HOTHOST_WEB_ADMIN_USERNAME,
-                    password: process.env.HOTHOST_WEB_ADMIN_PASSWORD_MD5
+                    password: md5(process.env.HOTHOST_WEB_ADMIN_PASSWORD),
                 }
             });
         }
@@ -58,4 +58,8 @@ module.exports = {
 
         return `${value.toFixed(2)} PiB`;
     },
+    readableRandomStringMaker: (length) => {
+        for (var s=''; s.length < length; s += 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.charAt(Math.random()*62|0));
+        return s;
+    }
 }

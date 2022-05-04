@@ -13,7 +13,5 @@ ADD . .
 RUN ./node_modules/.bin/tailwindcss -i ./static/css/input.css -o ./static/css/output.css
 RUN ./node_modules/.bin/prisma generate
 
-VOLUME [/var/lib/hothost/data/]
-EXPOSE 8007
-
 CMD [ "/bin/sh", "-c", "./node_modules/.bin/prisma migrate deploy && node src/index.js" ]
+ENTRYPOINT []

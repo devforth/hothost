@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
@@ -9,22 +10,33 @@ const formidable = require('express-formidable');
 const viewRouter = require('./views');
 const apiRouter = require('./api');
 
-const { checkUserExistsOrCreate } = require('./utils');
+const { checkUserExistsOrCreate, readableRandomStringMaker } = require('./utils');
 const { authMiddleware } = require('./middleware');
 
 
 if (process.env.ENV === 'local') {
   process.env.HOTHOST_WEB_ADMIN_USERNAME = 'admin';
-  process.env.HOTHOST_WEB_ADMIN_PASSWORD_MD5 = 'e10adc3949ba59abbe56e057f20f883e';
+  process.env.HOTHOST_WEB_ADMIN_PASSWORD = '123456';
+  process.env.HOTHOST_WEB_BASIC_PUBLIC_USERNAME = 'admin';
+  process.env.HOTHOST_WEB_BASIC_PUBLIC_PASSWORD = '123456';
   process.env.HOTHOST_WEB_PORT = '8007';
   process.env.HOTHOST_WEB_JWT_SECRET = 'e10adc3949ba59abbe56e057f20f883e';
 } else {
-  const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD_MD5', 'HOTHOST_WEB_JWT_SECRET'];
+  const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD', 'HOTHOST_WEB_BASIC_PUBLIC_USERNAME', 'HOTHOST_WEB_BASIC_PUBLIC_PASSWORD'];
   requiredVariables.forEach(key => {
     if (!process.env[key]) {
       throw new Error(`Environment variable '${key}' is missing`);
     }
   });
+
+  if (!process.env.HOTHOST_WEB_JWT_SECRET) {
+    const jwtSecretPath = path.join('/var/lib/hothost/jwt');
+    if (!fs.existsSync(jwtSecretPath)) {
+      const jwtSecret = readableRandomStringMaker(64);
+      fs.writeFileSync(jwtSecretPath, jwtSecret);
+    }
+    process.env.HOTHOST_WEB_JWT_SECRET = fs.readFileSync(jwtSecretPath);
+  }
 }
 
 
