@@ -20,6 +20,10 @@ For each host it allows to see:
 
 ![](preview.jpeg)
 
+Add new host form:
+
+![](preview-add-monitor.jpeg)
+
 # Installation
 
 First you need to run HotHost Web Server. It will then give you clear guide how to add agents. 
