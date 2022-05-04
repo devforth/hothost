@@ -1,2 +1,2 @@
-docker build . -t devforth/hothost-server
-docker push devforth/hothost-server
+docker build . -t devforth/hothost-web
+docker push devforth/hothost-web
