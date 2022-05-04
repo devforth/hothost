@@ -38,8 +38,8 @@ services:
     restart: always
     environment:
       - HOTHOST_WEB_USERNAME=admin
-      - HOTHOST_WEB_PASSWORD_MD5=dd63432b661e658155fac504513e4611
-      - HOTHOST_WEB_JWT_SECRET=cFx84YebGfRwu5Jwj47L4SSR
+      - HOTHOST_WEB_PASSWORD_MD5=<md5_hash>
+      - HOTHOST_WEB_JWT_SECRET=secret
     volumes:
       - v-hothost-data:/var/lib/hothost/data/
 volumes:
