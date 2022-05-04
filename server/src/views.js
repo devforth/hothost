@@ -12,6 +12,15 @@ const {
 const router = express.Router();
 router.use(express.static('static'));
 
+const getIconName = (osName) => {
+    const icons = {
+        'arch linux': 'arch',
+        'ubuntu': 'ubuntu',
+    };
+
+    return icons[osName?.toLowerCase()] ?? 'unknown';
+};
+
 const getMonitoringData = async (req) => {
     const monitoringData = await prisma.monitoringData.findMany({ orderBy: { createdAt: 'desc' } });
     return monitoringData
@@ -25,6 +34,7 @@ const getMonitoringData = async (req) => {
             } :
             {
                 secret: req.user && data.secret,
+                icon_name: getIconName(data.HOST_OS_NAME),
                 online: (data.updatedAt.getTime() + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),
                 hostname: data.HOST_NAME,
                 public_ip: data.HOST_PUBLIC_IP,
