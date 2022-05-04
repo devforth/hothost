@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # -------------------------------------------------------------------------------------------------
 # detect the kernel
@@ -237,7 +237,7 @@ else
     CPU_INFO_SOURCE="sysfs"
     # This is potentially more accurate than checking `/proc/cpuinfo`.
     LCPU_COUNT="$(find /sys/devices/system/cpu -mindepth 1 -maxdepth 1 -type d -name 'cpu*' | grep -cEv 'idle|freq')"
-  elif [ -r /proc/cpuinfo ]; then
+  elif [ -f /proc/cpuinfo ]; then
     CPU_INFO_SOURCE="procfs"
     LCPU_COUNT="$(grep -c ^processor /proc/cpuinfo)"
   fi
@@ -260,7 +260,7 @@ else
     fi
 
     CPU_MODEL="$(sysctl -n hw.model)"
-  elif [ -r /proc/cpuinfo ]; then
+  elif [ -f /proc/cpuinfo ]; then
     if (echo "${CPU_INFO_SOURCE}" | grep -qv procfs); then
       CPU_INFO_SOURCE="${CPU_INFO_SOURCE} procfs"
     fi
@@ -272,7 +272,7 @@ fi
 
 if [ "${KERNEL_NAME}" = Darwin ] && [ "${ARCHITECTURE}" = "x86_64" ]; then
   CPU_FREQ="$(sysctl -n hw.cpufrequency)"
-elif [ -r /sys/devices/system/cpu/cpu0/cpufreq/base_frequency ]; then
+elif [ -f /sys/devices/system/cpu/cpu0/cpufreq/base_frequency ]; then
   if (echo "${CPU_INFO_SOURCE}" | grep -qv sysfs); then
     CPU_INFO_SOURCE="${CPU_INFO_SOURCE} sysfs"
   fi
@@ -281,14 +281,14 @@ elif [ -r /sys/devices/system/cpu/cpu0/cpufreq/base_frequency ]; then
   CPU_FREQ="$((value * 1000))"
 elif [ -n "${possible_cpu_freq}" ]; then
   CPU_FREQ="${possible_cpu_freq}"
-elif [ -r /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq ]; then
+elif [ -f /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq ]; then
   if (echo "${CPU_INFO_SOURCE}" | grep -qv sysfs); then
     CPU_INFO_SOURCE="${CPU_INFO_SOURCE} sysfs"
   fi
 
   value="$(cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq)"
   CPU_FREQ="$((value * 1000))"
-elif [ -r /proc/cpuinfo ]; then
+elif [ -f /proc/cpuinfo ]; then
   if (echo "${CPU_INFO_SOURCE}" | grep -qv procfs); then
     CPU_INFO_SOURCE="${CPU_INFO_SOURCE} procfs"
   fi
@@ -411,7 +411,7 @@ do
   elif [ "${KERNEL_NAME}" = Darwin ]; then
     RAM_DETECTION="sysctl"
     TOTAL_RAM="$(sysctl -n hw.physmem)"
-  elif [ -r /proc/meminfo ]; then
+  elif [ -f /proc/meminfo ]; then
     RAM_DETECTION="procfs"
     TOTAL_RAM="$(grep -F MemTotal /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
     FREE_RAM="$(grep -F MemAvailable /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
@@ -468,6 +468,7 @@ do
     \"MONITOR_INTERVAL\":\"${HOTHOST_MONITOR_INTERVAL}\"
   }"
 
+  echo $JSON_DATA
   curl -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$JSON_DATA"
