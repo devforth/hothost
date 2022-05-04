@@ -60,15 +60,15 @@
                 
                 <pre id="puredocpre" class="p-4 mb-4 text-gray-500 dark:text-white text-xs text-white bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
 docker run -d \
+  --env HOTHOST_SERVER_BASE=___CURRENT_URL___ \
+  --env HOTHOST_AGENT_SECRET={{ this.secret }} \
+  --env HOTHOST_MONITOR_INTERVAL=60 \
   --name hothost-agent \
   -v /etc/passwd:/host/etc/passwd:ro \
   -v /etc/group:/host/etc/group:ro \
   -v /proc:/host/proc:ro \
   -v /sys:/host/sys:ro \
   -v /etc/os-release:/host/etc/os-release:ro \
-  --env HOTHOST_SERVER_BASE=___CURRENT_URL___ \
-  --env HOTHOST_AGENT_SECRET={{ this.secret }} \
-  --env HOTHOST_MONITOR_INTERVAL=60 \
   --restart unless-stopped \
   --cap-add SYS_PTRACE \
   --security-opt apparmor=unconfined \
@@ -97,11 +97,11 @@ version: '3'
 services:
   netdata:
     image: devforth/hothost-agent
-    container_name: hothost-agent
     environment:
-      - HOTHOST_SERVER_BASE: ___CURRENT_URL___
-      - HOTHOST_AGENT_SECRET: {{ this.secret }}
-      - HOTHOST_MONITOR_INTERVAL: 60
+    - HOTHOST_SERVER_BASE: ___CURRENT_URL___
+    - HOTHOST_AGENT_SECRET: {{ this.secret }}
+    - HOTHOST_MONITOR_INTERVAL: 60
+    container_name: hothost-agent
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
@@ -186,7 +186,12 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
                     {{ this.hostname }}
                   </p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Public IP: {{ this.public_ip }}
+                    Public IP: 
+                    {{#if ../authorized}}
+                      {{ this.public_ip }}
+                    {{ else }}
+                      🔒 Unauthorized
+                    {{/if}}
                   </p>
               </td>
               <td class="pr-5 flex-1 min-w-1">
@@ -194,12 +199,20 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
                   {{ this.os_name }}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                  {{ this.os_version }}
+                  {{#if ../authorized}}
+                    {{ this.os_version }}
+                  {{ else }}
+                    🔒 Unauthorized
+                  {{/if}}
                 </p>
               </td>
               <td class="pr-5 flex-1 min-w-1">
                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                  💻 {{ this.cpu_name }}
+                  {{#if ../authorized}}
+                    💻 {{ this.cpu_name }}
+                  {{ else }}
+                    🔒 Unauthorized
+                  {{/if}}
 
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
@@ -216,7 +229,7 @@ HOTHOST_AGENT_SECRET={{ this.secret }} bash
                   💽 Disk: {{ this.disk_total }}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                  {{ this.disk_used }}% use
+                  {{ this.disk_used }}% used
                   {{#if disk_warning }}
                     <span class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">WARNING</span>
                   {{else}}
