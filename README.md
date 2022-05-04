@@ -16,9 +16,15 @@ docker run -d --name=hothost \
 
 
 
-Debugging 
+Debugging
 
 # Server
+
+## Environment variables
+HOTHOST_WEB_USERNAME - username for first created user
+HOTHOST_WEB_PASSWORD_MD5 - password md5 hash for the user;
+HOTHOST_WEB_PORT - porst on which web server is listening (default 8007);
+HOTHOST_WEB_JWT_SECRET - jwt secret used to generate auth tokens;
 
 Default local credentials:
 - admin:123456

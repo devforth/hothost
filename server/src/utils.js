@@ -12,8 +12,8 @@ module.exports = {
             await prisma.user.create({
                 data: {
                     id: uuid.v4(),
-                    username: process.env.HOTHOST_WEB_ADMIN_USERNAME,
-                    password: process.env.HOTHOST_WEB_ADMIN_PASSWORD_MD5
+                    username: process.env.HOTHOST_WEB_USERNAME,
+                    password: process.env.HOTHOST_WEB_PASSWORD_MD5
                 }
             });
         }

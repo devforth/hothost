@@ -14,12 +14,12 @@ const { authMiddleware } = require('./middleware');
 
 
 if (process.env.ENV === 'local') {
-  process.env.HOTHOST_WEB_ADMIN_USERNAME = 'admin';
-  process.env.HOTHOST_WEB_ADMIN_PASSWORD_MD5 = 'e10adc3949ba59abbe56e057f20f883e';
+  process.env.HOTHOST_WEB_USERNAME = 'admin';
+  process.env.HOTHOST_WEB_PASSWORD_MD5 = 'e10adc3949ba59abbe56e057f20f883e';
   process.env.HOTHOST_WEB_PORT = '8007';
   process.env.HOTHOST_WEB_JWT_SECRET = 'e10adc3949ba59abbe56e057f20f883e';
 } else {
-  const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD_MD5', 'HOTHOST_WEB_JWT_SECRET'];
+  const requiredVariables = ['HOTHOST_WEB_USERNAME', 'HOTHOST_WEB_PASSWORD_MD5', 'HOTHOST_WEB_JWT_SECRET'];
   requiredVariables.forEach(key => {
     if (!process.env[key]) {
       throw new Error(`Environment variable '${key}' is missing`);
