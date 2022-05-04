@@ -2,9 +2,9 @@
 
 Lightweight and minimalistic Open-Source hosts monitor. 
 
-* Shows used disk space percentage and WARNING badge if it exceeds some percentage (e.g. 80%)
-* Has public page authorized with Basic Auth to watch status with soem external monitor (E.g. UptimeRobot to show Slack notification when there is a WARNIGN keyword on page)
-* Agents could be easily installed with Docker/Compose/Pure bash+curl and crontab
+* Shows used disk space percentage and WARNING badge if it exceeds some threshold (e.g. 80%)
+* Has public page protected with Basic Auth to watch status with some external monitor (e.g. UptimeRobot to show Slack notification when there is a WARNIGN keyword on page)
+* Agents could be easily installed with Docker/Compose/Bash+curl+crontab. Super simple snippets are shown when you click one button on Web
 * Allows to monitor as many servers as needed
 * Configurable monitoring interval
 * Based on alpine minimalistic Docker images
