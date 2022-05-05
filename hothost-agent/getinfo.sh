@@ -411,12 +411,12 @@ do
   elif [ "${KERNEL_NAME}" = Darwin ]; then
     RAM_DETECTION="sysctl"
     TOTAL_RAM="$(sysctl -n hw.physmem)"
-  elif [ -f /proc/meminfo ]; then
+  elif [ -f /host/proc/meminfo ]; then
     RAM_DETECTION="procfs"
-    TOTAL_RAM="$(grep -F MemTotal /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
-    FREE_RAM="$(grep -F MemAvailable /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
-    TOTAL_SWAP="$(grep -F SwapTotal /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
-    FREE_SWAP="$(grep -F SwapFree /proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
+    TOTAL_RAM="$(grep -F MemTotal /host/proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
+    FREE_RAM="$(grep -F MemAvailable /host/proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
+    TOTAL_SWAP="$(grep -F SwapTotal /host/proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
+    FREE_SWAP="$(grep -F SwapFree /host/proc/meminfo | cut -f 2 -d ':' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | cut -f 1 -d ' ')"
 
     TOTAL_RAM="$((TOTAL_RAM * 1024))"
     FREE_RAM="$((FREE_RAM * 1024))"
