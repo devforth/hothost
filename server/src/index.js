@@ -22,7 +22,7 @@ async function main() {
   await PluginManager().loadPlugins();
   await checkUserExistsOrCreate();
 
-  setInterval(calculateAsyncEvents, 1000);
+  setTimeout(() => setInterval(calculateAsyncEvents, 1000), 90 * 1000);
 
   const app = express();
   const port = env.WEB_PORT || 8007;
