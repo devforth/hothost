@@ -110,6 +110,8 @@ router.get('/plugin/:slug/', mustBeAuthorizedView((req, res) => {
     if (!plugin.descriptionFull) {
         plugin.descriptionFull = md().render(plugin.longDescriptionMD);
     }
+
+    res.locals.plugin = plugin;
     res.locals.params = [   
             ...plugin.supportedEvents.map((e) => {
                 return {

@@ -1,7 +1,7 @@
 <div class="container mx-auto flex justify-center ">
   <div class="min-w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
-      <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Configure {{ plugin.name }}</h5>
+      <h1 class="text-3xl font-bold leading-none text-gray-900 dark:text-white">{{ plugin.name }} plugin</h1>
 
       <!-- {{#if authorized}}
       <form action="/api/add_monitor" method="POST">
@@ -15,16 +15,17 @@
       </form>
       {{/if}} -->
     </div>
-    <div class="max-w-2/3 gap-y-5 gap-y-10 divide-gray-200 dark:divide-gray-700 flex flex-wrap">
+    <div class="max-w-2/3 gap-y-5 gap-y-10 divide-gray-200 dark:divide-gray-700 flex flex-wrap text-gray-800 dark:text-gray-400">
       {{ plugin.description }}
     </div>
 
-    <div class="dark:color-white color-black">
+    <article class="prose dark:prose-invert py-10 lg:prose-l ">
       {{{ descriptionFull }}}
-    </div>
-
+    </article>
     <div>
-      <form  method="POST">
+      <h2 class="text-3xl mb-10 font-bold leading-none text-gray-900 dark:text-white">Configure plugin</h2>
+
+      <form method="POST">
       {{#each params}}
         {{#if (eq this.type 'str' )}}
           <div class="mb-6">

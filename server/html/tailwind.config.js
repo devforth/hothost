@@ -4,5 +4,9 @@ module.exports = {
     extend: {},
   },
   darkMode: 'class',
-  plugins: [require('@tailwindcss/forms'), require('flowbite/plugin')],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('flowbite/plugin'),
+    require('@tailwindcss/typography'),
+  ],
 }
