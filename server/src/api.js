@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
 
 import database from './database.js';
-import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker } from './utils.js';
+import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat } from './utils.js';
 import PluginManager from './pluginManager.js';
 
 const router = express.Router();
@@ -49,7 +49,19 @@ router.post('/data/:secret', async (req, res) => {
             acc[key] = value !== undefined && value !== null ? value.toString() : value;
             return acc;
         }, {});
-        const newData = { ...database.data.monitoringData[index], ...data, updatedAt: new Date().getTime() };
+
+        const dataItem = database.data.monitoringData[index];
+        const newData = {
+            ...dataItem,
+            ...data,
+            updatedAt: new Date().getTime(),
+
+            // variables which might be used in templete
+            DISK_USED: sizeFormat(+dataItem.DISK_USED),
+            DISK_TOTAL: sizeFormat(+dataItem.DISK_USED + +dataItem.DISK_AVAIL),
+            RAM_USED: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM - +dataItem.SYSTEM_FREE_RAM),
+            RAM_TOTAL: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM),
+        };
         const events = calculateDataEvent(database.data.monitoringData[index], newData);
         await PluginManager().handleEvents(events, newData);
         database.data.monitoringData[index] = newData;
