@@ -26,18 +26,22 @@ Select a channel on which you want to receive notifications and copy webhook url
             id: "webhook",
             name: "Slack Web Hook URL",
             description: "Click Add to Slack on this page and copy WebHook ",
+            required: true,
+            inputType: "url",
             type: "str"
         },
         {
             id: "disk_is_almost_full_message",
             name: "What message will be visible when you get disk_is_almost_full alert",
             default_value: "⚠️ {{ HOST_NAME }}: Disk is almost full ({{ HOST_PUBLIC_IP }}) \n {{sizeFormat DISK_USED}} / {{sizeFormat (add DISK_USED DISK_AVAIL)}}. Please clean it up",
+            required: false,
             type: "text",
         },
         {
             id: "disk_usage_recovered_message",
             name: "What message will be visible when you get disk_usage_recovered alert",
             default_value: "👌🏼 {{ HOST_NAME }}: Disk usage recovered\n Now it is used {{sizeFormat DISK_USED}} / {{sizeFormat (add DISK_USED DISK_AVAIL)}}",
+            required: false,
             type: "text",
         },
     ],

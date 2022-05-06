@@ -32,18 +32,20 @@
             <label for="inp_{{ this.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ this.name }}</label>
             <textarea name="{{ this.inputName }}" id="inp_{{ this.id }}" rows="3"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              required
+              {{#if this.required}}required{{/if}}
             >{{this.value}}</textarea>
           </div>
         {{/if }}
         {{#if (eq this.type 'str' )}}
           <div class="mb-6">
             <label for="inp_{{ this.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ this.name }}</label>
-            <input name="{{ this.inputName }}" type="text" id="inp_{{ this.id }}"  
+            <input name="{{ this.inputName }}"
+              id="inp_{{ this.id }}"
               value="{{this.value}}"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              required
-            >
+              {{#if this.required}}required{{/if}}
+              {{#if this.inputType}}type="{{ this.inputType }}"{{else}}type="text"{{/if}}
+            />
           </div>
         {{/if }}
         {{#if (eq this.type 'bool' )}}
