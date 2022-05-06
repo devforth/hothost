@@ -110,7 +110,7 @@ router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
     const plugin = PluginManagerSingleton().plugins.find(p => p.id === req.params.id);
 
     if (!plugin) {
-        res.redirect('/');
+        res.redirect('/plugins/');
     } else {
         const pluginSettings = database.data.pluginSettings.find(ps => ps.id === plugin.id);
         res.locals.plugin = plugin;
@@ -118,7 +118,7 @@ router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
             ...plugin.supportedEvents.map((e) => {
                 return {
                     id: e,
-                    value: true,
+                    value: pluginSettings?.enabledEvents.includes(e) ?? true,
                     name: `Notify on ${e}`,
                     type: 'bool',
                     inputName: `events[${e}]`
@@ -130,13 +130,42 @@ router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
                 return {
                     ...p,
                     value: value || p.default_value,
-                    inputName: `params[${p.id}]`
+                    inputName: `params[${p.id}]`,
+                    required: p.required ?? true,
                 }
             }),
         ];
 
         res.locals.descriptionFull = plugin.longDescriptionMD && md().render(plugin.longDescriptionMD);
         res.render('plugin');
+    }
+}));
+router.post('/plugin/:id/', mustBeAuthorizedView(async (req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(p => p.id === req.params.id);
+
+    if (!plugin) {
+        res.redirect('/plugins/');
+    } else {
+        const input = parseNestedForm(req.fields);
+        console.log(input);
+
+        const psIndex = database.data.pluginSettings.findIndex(ps => ps.id === plugin.id);
+        const newPluginSetting = {
+            id: plugin.id,
+            params: input.params,
+            enabledEvents: Object.keys(input.events),
+            enabled: true,
+        };
+
+        if (psIndex !== -1) {
+            database.data.pluginSettings[psIndex] = newPluginSetting;
+        } else {
+            database.data.pluginSettings.push(newPluginSetting);
+        }
+
+        await database.write();
+
+        res.redirect(`/plugins/`);
     }
 }));
 
