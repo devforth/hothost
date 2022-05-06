@@ -1,0 +1,103 @@
+<div class="container mx-auto flex justify-center ">
+  <div class="min-w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
+    <div class="flex justify-between items-center mb-4">
+      <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Configure {{ plugin.name }}</h5>
+
+      <!-- {{#if authorized}}
+      <form action="/api/add_monitor" method="POST">
+        <button  class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+            focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Import from external file
+        </button>
+      </form>
+      {{/if}} -->
+    </div>
+    <div class="max-w-2/3 gap-y-5 gap-y-10 divide-gray-200 dark:divide-gray-700 flex flex-wrap">
+      {{ plugin.description }}
+    </div>
+
+    <div class="dark:color-white color-black">
+      {{{ descriptionFull }}}
+    </div>
+
+    <div>
+      <form  method="POST">
+      {{#each params}}
+        {{#if (eq this.type 'str' )}}
+          <div class="mb-6">
+            <label for="inp_{{ this.id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ this.name }}</label>
+            <input name="{{ this.inputName }}" type="text" id="inp_{{ this.id }}"  
+              value="{{this.value}}"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              required
+            >
+          </div>
+        {{/if }}
+        {{#if (eq this.type 'bool' )}}
+          <div class="mb-6">
+            <label for="inp_{{ this.id }}" class="relative inline-flex items-center mb-4 cursor-pointer">
+              <input 
+                name="{{ this.inputName }}"
+                type="checkbox" 
+                {{#if this.value}}checked{{/if}}
+                value="true"
+                id="inp_{{ this.id }}"
+                class="sr-only peer"
+              >
+              <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{{ this.name }}</span>
+            </label>
+          </div>
+        {{/if }}
+      {{/each}}
+      <button  class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+            focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Enable Plugin
+        </button>
+      </form>
+    </div>
+
+    
+
+
+  </div>
+</div>
+
+<div id="toast-copied" class=" fixed right-2 bottom-2 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-green-900 dark:bg-green-100" role="alert">
+  <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-100 dark:text-green-900">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+  </div>
+  <div class="ml-3 text-sm font-normal">Copied to clipboard!</div>
+  <button type="button" class="bg-transparent ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex h-8 w-8 dark:text-green-900 dark:hover:text-black " onclick="hideCOpyTost()" aria-label="Close">
+      <span class="sr-only">Close</span>
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+  </button>
+</div>
+
+
+<script>
+
+  function hideCOpyTost() {
+    document.getElementById('toast-copied').classList.add('hidden');
+  }
+
+  function copyToCb(idOfPre) {
+    const copyText = document.getElementById(idOfPre).textContent;
+    const textArea = document.createElement('textarea');
+    textArea.textContent = copyText;
+    document.body.append(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    textArea.remove();
+    document.getElementById('toast-copied').classList.remove('hidden');
+    setTimeout(hideCOpyTost, 5000);
+
+  }
+</script>
+

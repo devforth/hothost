@@ -13,18 +13,9 @@
       "runOptions": { "runOn": "folderOpen" }
     },
     {
-      "label": "Tilewind",
-      "type": "shell",
-      "command": "cd server && npm run migrate",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new",
-      },
-    },
-    {
       "label": "Server",
       "type": "shell",
-      "command": "cd server && npm run migrate && npm run start",
+      "command": "cd server && lsof -i :8007 -t | xargs kill ; npm run start",
       "presentation": {
         "reveal": "always",
         "panel": "new",

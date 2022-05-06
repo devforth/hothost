@@ -8,6 +8,9 @@ import {
     mustBeAuthorizedView,
     mustNotBeAuthorizedView,
 } from './utils.js';
+import PluginManagerSingleton from './pluginManager.js';
+import md from 'markdown-it';
+
 
 const router = express.Router();
 router.use(express.static('static'));
@@ -95,6 +98,39 @@ router.post('/login/', mustNotBeAuthorizedView(async (req, res) => {
         res.locals.error = e.message;
         res.render('login');
     }
+}));
+
+router.get('/plugins/', mustBeAuthorizedView((req, res) => {
+    res.locals.plugins = PluginManagerSingleton().plugins;
+    res.render('plugins');
+}));
+
+router.get('/plugin/:slug/', mustBeAuthorizedView((req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(p => p.id === req.params.slug);
+    if (!plugin.descriptionFull) {
+        plugin.descriptionFull = md().render(plugin.longDescriptionMD);
+    }
+    res.locals.params = [   
+            ...plugin.supportedEvents.map((e) => {
+                return {
+                    id: e,
+                    value: true,
+                    name: `Notify on ${e}`,
+                    type: 'bool',
+                    inputName: `events[${e}]`
+                }
+            }),
+            ...plugin.params.map((p) => {
+                return {
+                    ...p,
+                    value: p.default_value,
+                    inputName: `params[${p.id}]`
+                }
+            }),
+        ];
+        
+    res.locals.descriptionFull = plugin.descriptionFull;
+    res.render('plugin');
 }));
 
 router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));

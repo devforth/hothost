@@ -24,22 +24,19 @@ class PluginManager {
             .concat(thirdPartyPlugins.map(p => {
                 p.default.thirdParty = true;
                 return p.default;
-            }))
-            .map(plugin => {
-                return {
-                    ...plugin,
-                    configuration: database.data.pluginSettings.find(ps => ps.id === plugin.id) || {},
-                }
-            });
+            }));
 
-        await Promise.all(this.plugins.filter(p => p.configuration.enabled).map(p => p.onPluginEnabled()));
+        await Promise.all(this.plugins.map(p => p.onPluginEnabled && p.onPluginEnabled()));
     }
 
     async handleEvents(events, newData) {
         events.forEach(event => {
             const plugins = this.plugins
                 .filter(p => p.configuration.enabled && p.configuration.enabledEvents.includes(event));
-            plugins.forEach(p => p.handleEvent(event, newData));
+            plugins.forEach(p => {
+                const configuration = database.data.pluginSettings.find(ps => ps.id === plugin.id) || {};
+                p.handleEvent({ event, newData, configuration });
+            }); 
         });
     }
 }
