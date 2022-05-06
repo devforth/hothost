@@ -68,7 +68,7 @@ Select a channel on which you want to receive notifications and copy webhook url
         {
             id: "ram_usage_recovered",
             name: "What message will be shown when you get ram_usage_recovered alert",
-            default_value: "👌🏼 {{ HOST_NAME }}: RAM ussage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}",
+            default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}",
             required: false,
             type: "text",
         },
