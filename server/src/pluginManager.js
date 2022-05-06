@@ -39,12 +39,19 @@ class PluginManager {
     }
 
     async handleEvents(events, newData) {
-        events.forEach(event => {
+        events.forEach(eventType => {
             const plugins = this.plugins
-                .filter(p => p.configuration.enabled && p.configuration.enabledEvents.includes(event));
+                .map(p => {
+                    const settings = database.data.pluginSettings.find(ps => ps.id === p.id) || {};
+                    return {
+                        plugin: p,
+                        settings,
+                    }
+                })
+                .filter(p => p.plugin.enabled && p.settings.enabledEvents.includes(eventType));
+
             plugins.forEach(p => {
-                const configuration = database.data.pluginSettings.find(ps => ps.id === plugin.id) || {};
-                p.handleEvent({ event, newData, configuration });
+                p.plugin.handleEvent({ eventType, data: newData, settings: p.settings });
             }); 
         });
     }

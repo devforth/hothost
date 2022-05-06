@@ -158,9 +158,13 @@ router.post('/plugin/:id/', mustBeAuthorizedView(async (req, res) => {
         };
 
         if (psIndex !== -1) {
+            if (!database.data.pluginSettings[psIndex].enabled && newPluginSetting.enabled) {
+                await plugin.onPluginEnabled();
+            }
             database.data.pluginSettings[psIndex] = newPluginSetting;
         } else {
             database.data.pluginSettings.push(newPluginSetting);
+            await plugin.onPluginEnabled();
         }
 
         await database.write();

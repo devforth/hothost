@@ -49,7 +49,6 @@ router.post('/data/:secret', async (req, res) => {
             acc[key] = value !== undefined && value !== null ? value.toString() : value;
             return acc;
         }, {});
-
         const dataItem = database.data.monitoringData[index];
         const newData = {
             ...dataItem,
@@ -62,6 +61,7 @@ router.post('/data/:secret', async (req, res) => {
             RAM_USED: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM - +dataItem.SYSTEM_FREE_RAM),
             RAM_TOTAL: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM),
         };
+        // newData.DISK_AVAIL =  0;
         const events = calculateDataEvent(database.data.monitoringData[index], newData);
         await PluginManager().handleEvents(events, newData);
         database.data.monitoringData[index] = newData;
