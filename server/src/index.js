@@ -1,6 +1,4 @@
-import fs from 'fs';
 import path from 'path';
-import sqlite3 from 'sqlite3';
 import express from 'express';
 
 import { create } from 'express-handlebars';
@@ -20,21 +18,6 @@ import { authMiddleware } from './middleware.js';
 
 async function main() {
   await database.read();
-
-  if (fs.existsSync(env.SQLITE_DB_LOCATION)) {
-    const db = new sqlite3.Database(env.SQLITE_DB_LOCATION);
-    await (new Promise(resolve => {
-      db.serialize(() => {
-        db.all("SELECT * FROM MonitoringData", async (err, rows) => {
-          database.data.monitoringData = rows || [];
-          resolve();
-        });
-      });
-    }));
-    db.close();
-    await database.write();
-    fs.renameSync(env.SQLITE_DB_LOCATION, env.SQLITE_DB_LOCATION + '.bak');
-  }
 
   await checkUserExistsOrCreate();
 

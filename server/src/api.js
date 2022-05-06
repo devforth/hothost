@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
 
 import database from './database.js';
-import { mustBeAuthorizedView, readableRandomStringMaker } from './utils.js';
+import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker } from './utils.js';
 
 const router = express.Router();
 

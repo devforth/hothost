@@ -12,8 +12,7 @@ const env = {
     WEB_JWT_SECRET: process.env.HOTHOST_WEB_JWT_SECRET,
 };
 
-env.DATABASE_PATH = env.ENV === 'local' ? '..' : '/var/lib/hothost/data/';
-env.SQLITE_DB_LOCATION = path.join(env.DATABASE_PATH, 'hothost.db');
+env.DATA_PATH = env.ENV === 'local' ? './data/' : '/var/lib/hothost/data/';
 
 if (env.ENV === 'production') {
     const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD', 'HOTHOST_WEB_BASIC_PUBLIC_USERNAME', 'HOTHOST_WEB_BASIC_PUBLIC_PASSWORD'];
@@ -32,6 +31,9 @@ if (env.ENV === 'production') {
         env.WEB_JWT_SECRET = fs.readFileSync(jwtSecretPath);
     }
 } else {
+    if (!fs.existsSync(env.DATA_PATH)) {
+        fs.mkdirSync(env.DATA_PATH);
+    }
     env.WEB_ADMIN_USERNAME ||= 'admin';
     env.WEB_ADMIN_PASSWORD ||= '123456';
     env.WEB_BASIC_PUBLIC_USERNAME ||= 'admin';
@@ -39,5 +41,4 @@ if (env.ENV === 'production') {
     env.WEB_PORT ||= '8007';
     env.WEB_JWT_SECRET ||= 'e10adc3949ba59abbe56e057f20f883e';
 }
-
 export default env;

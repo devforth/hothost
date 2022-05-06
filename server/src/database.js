@@ -3,7 +3,7 @@ import { JSONFile, Low } from 'lowdb';
 
 import env from './env.js';
 
-const filePath = path.join(env.DATABASE_PATH, 'hothost.json');
+const filePath = path.join(env.DATA_PATH, 'hothost.json');
 const adapter = new JSONFile(filePath);
 const db = new Low(adapter);
 
