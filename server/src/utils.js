@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import env from './env.js';
 import database from './database.js';
+import PluginManager from './pluginManager.js';
 
 export const checkUserExistsOrCreate = async () => {
     if (database.data.users.length === 0) {
@@ -58,18 +59,19 @@ export const readableRandomStringMaker = (length) => {
     return s;
 };
 
+export const calculateEvent = (prevTrigger, newTrigger, eventOnValue, eventOffValue) => {
+    if (prevTrigger !== newTrigger) {
+        if (newTrigger) return eventOnValue;
+        else return eventOffValue;
+    }
+    return null;
+};
+
 export const calculateDataEvent = (prevData, newData) => {
     const events = [];
 
-    const calculateEvent = (prevTrigger, newTrigger, eventOnValue, eventOffValue) => {
-        if (prevTrigger !== newTrigger) {
-            if (newTrigger) return eventOnValue;
-            else return eventOffValue;
-        }
-        return null;
-    };
-
     const calculateDiskWarning = (data) => ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > 80;
+    const calculateRamWarning = (data) => (((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) / +data.SYSTEM_TOTAL_RAM) * 100) > 80;
 
     const diskSpaceEvent = calculateEvent(
         calculateDiskWarning(prevData),
@@ -79,7 +81,31 @@ export const calculateDataEvent = (prevData, newData) => {
     );
     events.push(diskSpaceEvent);
 
+    const ramEvent = calculateEvent(
+        calculateRamWarning(prevData),
+        calculateRamWarning(newData),
+        'ram_is_almost_full',
+        'ram_usage_recovered',
+    );
+    events.push(ramEvent);
+
+    if (!prevData.online && newData.online) {
+        events.push('host_is_online');
+    }
+
     return events.filter(e => e);
+};
+
+export const calculateAsyncEvents = async () => {
+    await Promise.all(database.data.monitoringData.map((data) => {
+        const events = [];
+        const online = (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime();
+        if (!online && data.online)  {
+            events.push('host_is_offline');
+            data.online = false;
+        }
+        PluginManager().handleEvents(events.filter(e => e), data);
+    }));
 };
 
 export const parseNestedForm = (fields) => {
