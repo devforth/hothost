@@ -78,21 +78,6 @@ Select a channel on which you want to receive notifications and copy webhook url
 
     async onPluginEnabled() {
         this.hbs = hbs.create();
-        this.hbs.registerHelper('add', (a, b) => {
-            return +a + +b;
-        });
-        this.hbs.registerHelper('sizeFormat', (a) => {
-            let value = parseInt(a);
-            for (let unit of ['B', 'KiB', 'MiB', 'GiB', 'TiB']) {
-                if (Math.abs(value) < 1024) {
-                    return `${value.toFixed(2)} ${unit}`;
-                }
-
-                value /= 1024;
-            }
-
-            return `${value.toFixed(2)} PiB`;
-        });
     },
     async onPluginDisable() {
     },
