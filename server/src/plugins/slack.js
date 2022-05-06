@@ -77,10 +77,11 @@ Select a channel on which you want to receive notifications and copy webhook url
     configuration: {},
 
     async onPluginEnabled() {
-        hbs.registerHelper('add', (a, b) => {
+        this.hbs = hbs.create();
+        this.hbs.registerHelper('add', (a, b) => {
             return +a + +b;
         });
-        hbs.registerHelper('sizeFormat', (a) => {
+        this.hbs.registerHelper('sizeFormat', (a) => {
             let value = parseInt(a);
             for (let unit of ['B', 'KiB', 'MiB', 'GiB', 'TiB']) {
                 if (Math.abs(value) < 1024) {
@@ -95,9 +96,9 @@ Select a channel on which you want to receive notifications and copy webhook url
     },
     async onPluginDisable() {
     },
-    async handleEvent({ eventType, data, configuration }) {
-        const webhookUrl = configuration.params.webhook;
-        const template = hbs.compile(configuration.params[`${eventType}_message`]);
+    async handleEvent({ eventType, data, settings }) {
+        const webhookUrl = settings.params.webhook;
+        const template = this.hbs.compile(settings.params[`${eventType}_message`]);
         const text = template(data);
 
         await fetch(webhookUrl, {

@@ -49,7 +49,6 @@ router.post('/data/:secret', async (req, res) => {
             acc[key] = value !== undefined && value !== null ? value.toString() : value;
             return acc;
         }, {});
-
         const dataItem = database.data.monitoringData[index];
         const newData = {
             ...dataItem,
@@ -63,7 +62,7 @@ router.post('/data/:secret', async (req, res) => {
             DISK_USED: sizeFormat(+dataItem.DISK_USED),
             DISK_TOTAL: sizeFormat(+dataItem.DISK_USED + +dataItem.DISK_AVAIL),
             RAM_USED: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM - +dataItem.SYSTEM_FREE_RAM),
-            RAM_TOTAL: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM),    
+            RAM_TOTAL: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM),
         });
         database.data.monitoringData[index] = newData;
         await database.write();
