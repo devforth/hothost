@@ -9,10 +9,10 @@ export default {
     longDescriptionMD: `
 # Setup guide
 
-Go to https://t.me/@BotFather and type
+Go to [https://t.me/@BotFather](https://t.me/@BotFather) and type
 
 
-  /newbot
+    /newbot
 
 
 Enter name like a hothost and username like hothost_bot
@@ -20,8 +20,9 @@ Enter name like a hothost and username like hothost_bot
 
 Copy bot token e.g.
 
-   512345678:AABBCC11DD2233AGDGGji11Y1e32r8W124Eq0
+    512345678:AABBCC11DD2233AGDGGji11Y1e32r8W124Eq0
 
+And paste in setting below:
 
   `,
     supportedEvents: [
@@ -34,7 +35,55 @@ Copy bot token e.g.
     ],
 
     params: [
-    
+      {
+        id: "botToken",
+        name: "Telegram Token created by BotFather",
+        required: true,
+        inputType: "url",
+        type: "str"
+      },
+      {
+          id: "disk_is_almost_full_message",
+          name: "What message will be shown when you get disk_is_almost_full alert",
+          default_value: "⚠️ {{ HOST_NAME }}: Disk is almost full ({{ HOST_PUBLIC_IP }}) \n {{DISK_USED}} / {{DISK_TOTAL}}. Please clean it up",
+          required: false,
+          type: "text",
+      },
+      {
+          id: "disk_usage_recovered_message",
+          name: "What message will be shown when you get disk_usage_recovered alert",
+          default_value: "👌🏼 {{ HOST_NAME }}: Disk usage recovered\n Now it is used {{DISK_USED}} / {{DISK_TOTAL}}",
+          required: false,
+          type: "text",
+      },
+      {
+          id: "host_is_offline_message",
+          name: "What message will be shown when you get host_is_offline alert",
+          default_value: "⚠️ {{ HOST_NAME }}: Host is offline",
+          required: false,
+          type: "text",
+      },
+      {
+          id: "host_is_online_message",
+          name: "What message will be shown when you get host_is_online_message alert",
+          default_value: "👌🏼 {{ HOST_NAME }}: Host back online",
+          required: false,
+          type: "text",
+      },
+      {
+          id: "ram_is_almost_full_message",
+          name: "What message will be shown when you get ram_is_almost_full alert",
+          default_value: "⚠️ {{ HOST_NAME }}: RAM is almost full\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}",
+          required: false,
+          type: "text",
+      },
+      {
+          id: "ram_usage_recovered_message",
+          name: "What message will be shown when you get ram_usage_recovered alert",
+          default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}",
+          required: false,
+          type: "text",
+      },
     ],
 
     async handleEvent({ eventType, data, settings }) {
