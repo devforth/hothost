@@ -55,15 +55,16 @@ router.post('/data/:secret', async (req, res) => {
             ...dataItem,
             ...data,
             updatedAt: new Date().getTime(),
-
+        };
+        const events = calculateDataEvent(database.data.monitoringData[index], newData);
+        await PluginManager().handleEvents(events, {
+            ...newData,
             // variables which might be used in templete
             DISK_USED: sizeFormat(+dataItem.DISK_USED),
             DISK_TOTAL: sizeFormat(+dataItem.DISK_USED + +dataItem.DISK_AVAIL),
             RAM_USED: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM - +dataItem.SYSTEM_FREE_RAM),
-            RAM_TOTAL: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM),
-        };
-        const events = calculateDataEvent(database.data.monitoringData[index], newData);
-        await PluginManager().handleEvents(events, newData);
+            RAM_TOTAL: sizeFormat(+dataItem.SYSTEM_TOTAL_RAM),    
+        });
         database.data.monitoringData[index] = newData;
         await database.write();
 
