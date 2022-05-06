@@ -13,6 +13,7 @@ const env = {
 };
 
 env.DATA_PATH = env.ENV === 'local' ? './data/' : '/var/lib/hothost/data/';
+env.THIRD_PARTY_PLUGINS_LOCATION = path.join(env.DATA_PATH, 'plugins');
 
 if (env.ENV === 'production') {
     const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD', 'HOTHOST_WEB_BASIC_PUBLIC_USERNAME', 'HOTHOST_WEB_BASIC_PUBLIC_PASSWORD'];

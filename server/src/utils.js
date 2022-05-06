@@ -29,7 +29,7 @@ export const authorizeUser = async (username, password) => {
         throw new Error('Invalid username or password');
     }
 };
-export const mustNotBeAuthroizedView = (callback) => {
+export const mustNotBeAuthorizedView = (callback) => {
     return (req, res) => {
         if (req.user) res.redirect(req.query.next || '/');
         else callback(req, res);
@@ -56,4 +56,28 @@ export const sizeFormat = (a) => {
 export const readableRandomStringMaker = (length) => {
     for (var s = ''; s.length < length; s += 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.charAt(Math.random() * 62 | 0)) ;
     return s;
+};
+
+export const calculateDataEvent = (prevData, newData) => {
+    const events = [];
+
+    const calculateEvent = (prevTrigger, newTrigger, eventOnValue, eventOffValue) => {
+        if (prevTrigger !== newTrigger) {
+            if (newTrigger) return eventOnValue;
+            else return eventOffValue;
+        }
+        return null;
+    };
+
+    const calculateDiskWarning = (data) => ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > 80;
+
+    const diskSpaceEvent = calculateEvent(
+        calculateDiskWarning(prevData),
+        calculateDiskWarning(newData),
+        'disk_is_almost_full',
+        'disk_usage_recovered',
+    );
+    events.push(diskSpaceEvent);
+
+    return events.filter(e => e);
 };

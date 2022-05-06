@@ -2,7 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
 
 import database from './database.js';
-import { mustBeAuthorizedView, readableRandomStringMaker } from './utils.js';
+import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker } from './utils.js';
+import PluginManager from './pluginManager.js';
 
 const router = express.Router();
 
@@ -48,8 +49,10 @@ router.post('/data/:secret', async (req, res) => {
             acc[key] = value !== undefined && value !== null ? value.toString() : value;
             return acc;
         }, {});
-        database.data.monitoringData[index] = { ...database.data.monitoringData[index], ...data };
-        database.data.monitoringData[index].updatedAt = new Date().getTime();
+        const newData = { ...database.data.monitoringData[index], ...data, updatedAt: new Date().getTime() };
+        const events = calculateDataEvent(database.data.monitoringData[index], newData);
+        await PluginManager().handleEvents(events, newData);
+        database.data.monitoringData[index] = newData;
         await database.write();
 
         res.send('OK');

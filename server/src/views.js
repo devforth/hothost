@@ -6,7 +6,7 @@ import {
     sizeFormat,
     authorizeUser,
     mustBeAuthorizedView,
-    mustNotBeAuthroizedView,
+    mustNotBeAuthorizedView,
 } from './utils.js';
 
 const router = express.Router();
@@ -78,8 +78,8 @@ router.get('/public', async (req, res) => {
     }
 });
 
-router.get('/login/', mustNotBeAuthroizedView((req, res) => res.render('login')));
-router.post('/login/', mustNotBeAuthroizedView(async (req, res) => {
+router.get('/login/', mustNotBeAuthorizedView((req, res) => res.render('login')));
+router.post('/login/', mustNotBeAuthorizedView(async (req, res) => {
     try {
         const { username, password } = req.fields;
         if (username && password) {
