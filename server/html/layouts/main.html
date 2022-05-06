@@ -19,7 +19,7 @@
 
 </head>
 <body class="bg-white dark:bg-gray-500">
-  <nav class="bg-white fixed w-full shadow-md z-50 min-w-full border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-800">
+  <nav class="bg-white sticky top-0 mb-4 w-full shadow-md z-50 min-w-full border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-800">
     <div class="container flex flex-wrap justify-between items-center mx-auto">
       <a href="/" class="flex items-center">
         <!-- <img src="/static/logo.svg" class="mr-3 h-6 sm:h-9" alt="HotHost Logo" /> -->
@@ -35,7 +35,39 @@
         {{#if (and (not authorized) (not hideLoginButton))}}
         <a href="/login/" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</a>
         {{else}}
-        <div class="px-12"></div>
+        <div class="px-8">
+          <svg xmlns="http://www.w3.org/2000/svg" id="userManage" class="text-gray-500 h-10 w-10 cursor-pointer hover:text-gray-600" data-dropdown-toggle="userManageDropdown" data-dropdown-placement="bottom-end" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div id="userManageDropdown" class="hidden bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 mt-28"> 
+          <div class="py-3 block">
+            <a href="/users/" class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white ">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Manage users
+            </a>
+          </div>
+          <div class="py-3 block">
+            <a href="/plugins" class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white ">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              Plugins
+            </a>
+          </div>
+          <div class="py-3">
+            <form action="/api/logout" method="POST">
+            <button class="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </form>
+          </div>           
+      </div>
         {{/if}}
         <!-- <button data-collapse-toggle="mobile-menu-4" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="mobile-menu-4" aria-expanded="false">
           <span class="sr-only">Open main menu</span>
