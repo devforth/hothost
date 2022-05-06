@@ -10,5 +10,6 @@ export const authMiddleware = (req, res, next) => {
     }
 
     res.locals.authorized = !!req.user;
+    if(env.ENV === 'local') res.locals.local = true;
     next();
 };

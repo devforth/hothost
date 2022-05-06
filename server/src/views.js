@@ -5,6 +5,7 @@ import database from './database.js';
 import {
     sizeFormat,
     authorizeUser,
+    parseNestedForm,
     mustBeAuthorizedView,
     mustNotBeAuthorizedView,
 } from './utils.js';
@@ -105,12 +106,14 @@ router.get('/plugins/', mustBeAuthorizedView((req, res) => {
     res.render('plugins');
 }));
 
-router.get('/plugin/:slug/', mustBeAuthorizedView((req, res) => {
-    const plugin = PluginManagerSingleton().plugins.find(p => p.id === req.params.slug);
-    if (!plugin.descriptionFull) {
-        plugin.descriptionFull = md().render(plugin.longDescriptionMD);
-    }
-    res.locals.params = [   
+router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(p => p.id === req.params.id);
+
+    if (!plugin) {
+        res.redirect('/');
+    } else {
+        const pluginSettings = database.data.pluginSettings.find(ps => ps.id === plugin.id);
+        res.locals.params = [
             ...plugin.supportedEvents.map((e) => {
                 return {
                     id: e,
@@ -121,21 +124,20 @@ router.get('/plugin/:slug/', mustBeAuthorizedView((req, res) => {
                 }
             }),
             ...plugin.params.map((p) => {
+                const value = pluginSettings.params[p.id];
                 return {
                     ...p,
-                    value: p.default_value,
+                    value: value || p.default_value,
                     inputName: `params[${p.id}]`
                 }
             }),
         ];
-        
-    res.locals.descriptionFull = plugin.descriptionFull;
-    res.render('plugin');
+
+        res.locals.descriptionFull = plugin.longDescriptionMD && md().render(plugin.longDescriptionMD);
+        res.render('plugin');
+    }
 }));
 
 router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));
-router.post('/users/', mustBeAuthorizedView((req, res) => {
-
-}));
 
 export default router;

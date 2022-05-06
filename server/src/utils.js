@@ -81,3 +81,25 @@ export const calculateDataEvent = (prevData, newData) => {
 
     return events.filter(e => e);
 };
+
+export const parseNestedForm = (fields) => {
+    return Object.keys(fields).reduce((acc, key) => {
+        const nestedStartIndex = key.indexOf('[');
+
+        if (nestedStartIndex !== -1) {
+            const rootKey = key.substring(0, nestedStartIndex);
+            const nestedKeys = key.substring(nestedStartIndex + 1, key.length - 1).split('][');
+            const lastKey = nestedKeys.pop();
+
+            acc[rootKey] ||= {};
+            const lastObj = nestedKeys.reduce((acc, nestedKey) => {
+                acc[nestedKey] ||= {};
+                return acc[nestedKey];
+            }, acc[rootKey]);
+            lastObj[lastKey] = fields[key];
+        } else {
+            acc[key] = fields[key];
+        }
+        return acc;
+    }, {});
+};
