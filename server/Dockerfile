@@ -1,17 +1,24 @@
+FROM node:16-alpine as cssBuilder
+WORKDIR /code/
+
+ADD html .
+
+RUN npm ci
+RUN ./node_modules/.bin/tailwindcss -i input.css -o dist/css/output.css
+
 FROM node:16-alpine
 
 WORKDIR /code/
-
-ENV DATABASE_URL="file:/var/lib/hothost/data/hothost.db"
 
 ADD package.json .
 ADD package-lock.json .
 
 RUN npm ci
 
-ADD . .
-RUN ./node_modules/.bin/tailwindcss -i ./static/css/input.css -o ./static/css/output.css
-RUN ./node_modules/.bin/prisma generate
+ADD html html
+COPY --from=cssBuilder /code/dist/ static/
 
-CMD [ "/bin/sh", "-c", "./node_modules/.bin/prisma migrate deploy && node src/index.js" ]
+ADD . .
+
+CMD [ "/bin/sh", "-c", "node src/index.js" ]
 ENTRYPOINT []

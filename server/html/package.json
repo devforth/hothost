@@ -1,0 +1,18 @@
+{
+  "name": "html",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "watch-tailwindcss": "npx tailwindcss -i ../static/css/input.css -o ../static/css/output.css --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "flowbite": "^1.4.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.1",
+    "tailwindcss": "^3.0.24"
+  }
+}

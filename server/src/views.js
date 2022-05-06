@@ -1,13 +1,13 @@
-const uuid = require('uuid');
-const express = require('express');
+import express from 'express';
 
-const prisma = require('./prisma');
-const {
+import env from './env.js';
+import database from './database.js';
+import {
     sizeFormat,
     authorizeUser,
     mustBeAuthorizedView,
     mustNotBeAuthroizedView,
-} = require('./utils');
+} from './utils.js';
 
 const router = express.Router();
 router.use(express.static('static'));
@@ -26,11 +26,14 @@ const ifUnknown = (value, trueValue, falseValue) => {
 };
 
 const getMonitoringData = async (req) => {
-    const monitoringData = await prisma.monitoringData.findMany({ orderBy: { createdAt: 'desc' } });
+    const monitoringData = database.data.monitoringData
+        // Return all if user logged in or only those that have data
+        .filter((data) => req.user || data.createdAt !== data.updatedAt)
+        .sort((a, b) => b.createdAt - a.createdAt);
+
     return monitoringData
-        .filter(data => req.user || data.createdAt.toISOString() !== data.updatedAt.toISOString())
         .map(data => (
-            data.createdAt.toISOString() === data.updatedAt.toISOString() ?
+            data.createdAt === data.updatedAt ?
             {
                 id: data.id,
                 no_data: true,
@@ -39,7 +42,7 @@ const getMonitoringData = async (req) => {
             {
                 secret: req.user && data.secret,
                 icon_name: getIconName(data.HOST_OS_NAME),
-                online: (data.updatedAt.getTime() + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),
+                online: (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),
                 hostname: data.HOST_NAME,
                 public_ip: data.HOST_PUBLIC_IP,
                 os_name: data.HOST_OS_NAME,
@@ -64,7 +67,7 @@ router.get('/', mustBeAuthorizedView(async (req, res) =>  {
 }));
 
 router.get('/public', async (req, res) => {
-    const basicAuth = 'Basic ' + Buffer.from(`${process.env.HOTHOST_WEB_BASIC_PUBLIC_USERNAME}:${process.env.HOTHOST_WEB_BASIC_PUBLIC_PASSWORD}`).toString('base64');
+    const basicAuth = 'Basic ' + Buffer.from(`${env.WEB_BASIC_PUBLIC_USERNAME}:${env.WEB_BASIC_PUBLIC_PASSWORD}`).toString('base64');
     if (req.headers['authorization'] !== basicAuth) {
         res.statusCode = 401;
         res.header('WWW-Authenticate', 'Basic realm="restricted"');
@@ -98,4 +101,5 @@ router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));
 router.post('/users/', mustBeAuthorizedView((req, res) => {
 
 }));
-module.exports = router;
+
+export default router;

@@ -1,16 +1,14 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import env from './env.js';
 
-module.exports = {
-    authMiddleware: (req, res, next) => {
-        const jwtToken = req.cookies['__hhjwt'];
-        try {
-            const user = jwt.decode(jwtToken, process.env.HOTHOST_WEB_JWT_SECRET);
-            req.user = user;
-        } catch(e) {
-            req.user = null;
-        }
-
-        res.locals.authorized = !!req.user;
-        next();
+export const authMiddleware = (req, res, next) => {
+    const jwtToken = req.cookies['__hhjwt'];
+    try {
+        req.user = jwt.decode(jwtToken, env.WEB_JWT_SECRET);
+    } catch (e) {
+        req.user = null;
     }
-}
+
+    res.locals.authorized = !!req.user;
+    next();
+};

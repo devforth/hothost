@@ -1,55 +1,50 @@
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
+import fs from 'fs';
+import path from 'path';
+import sqlite3 from 'sqlite3';
+import express from 'express';
 
-const { create } = require('express-handlebars');
+import { create } from 'express-handlebars';
 
-const cookieParser = require("cookie-parser");
-const formidable = require('express-formidable');
+import cookieParser from 'cookie-parser';
+import formidable from 'express-formidable';
 
-const viewRouter = require('./views');
-const apiRouter = require('./api');
+import viewRouter from './views.js';
+import apiRouter from './api.js';
 
-const { checkUserExistsOrCreate, readableRandomStringMaker } = require('./utils');
-const { authMiddleware } = require('./middleware');
+import env from './env.js';
+import database from './database.js';
 
-
-if (process.env.ENV === 'local') {
-  process.env.HOTHOST_WEB_ADMIN_USERNAME = 'admin';
-  process.env.HOTHOST_WEB_ADMIN_PASSWORD = '123456';
-  process.env.HOTHOST_WEB_BASIC_PUBLIC_USERNAME = 'admin';
-  process.env.HOTHOST_WEB_BASIC_PUBLIC_PASSWORD = '123456';
-  process.env.HOTHOST_WEB_PORT = '8007';
-  process.env.HOTHOST_WEB_JWT_SECRET = 'e10adc3949ba59abbe56e057f20f883e';
-} else {
-  const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD', 'HOTHOST_WEB_BASIC_PUBLIC_USERNAME', 'HOTHOST_WEB_BASIC_PUBLIC_PASSWORD'];
-  requiredVariables.forEach(key => {
-    if (!process.env[key]) {
-      throw new Error(`Environment variable '${key}' is missing`);
-    }
-  });
-
-  if (!process.env.HOTHOST_WEB_JWT_SECRET) {
-    const jwtSecretPath = path.join('/var/lib/hothost/jwt');
-    if (!fs.existsSync(jwtSecretPath)) {
-      const jwtSecret = readableRandomStringMaker(64);
-      fs.writeFileSync(jwtSecretPath, jwtSecret);
-    }
-    process.env.HOTHOST_WEB_JWT_SECRET = fs.readFileSync(jwtSecretPath);
-  }
-}
+import { checkUserExistsOrCreate } from './utils.js';
+import { authMiddleware } from './middleware.js';
 
 
 async function main() {
+  await database.read();
+
+  if (fs.existsSync(env.SQLITE_DB_LOCATION)) {
+    const db = new sqlite3.Database(env.SQLITE_DB_LOCATION);
+    await (new Promise(resolve => {
+      db.serialize(() => {
+        db.all("SELECT * FROM MonitoringData", async (err, rows) => {
+          database.data.monitoringData = rows || [];
+          resolve();
+        });
+      });
+    }));
+    db.close();
+    await database.write();
+    fs.renameSync(env.SQLITE_DB_LOCATION, env.SQLITE_DB_LOCATION + '.bak');
+  }
+
   await checkUserExistsOrCreate();
 
   const app = express();
-  const port = +process.env.HOTHOST_WEB_PORT || 8007;
+  const port = env.WEB_PORT || 8007;
 
   const hbs = create({
     extname: 'html',
     defaultLayout: 'main',
-    layoutsDir: path.join(path.dirname(__dirname), 'html', 'layouts'),
+    layoutsDir: path.join('html', 'layouts'),
 
     helpers: {
       or(a, b) { return a || b },
@@ -62,7 +57,7 @@ async function main() {
 
   app.set('view engine', 'html');
   app.engine('html', hbs.engine);
-  app.set('views', path.join(path.dirname(__dirname), 'html', 'views'));
+  app.set('views', path.join('html', 'views'));
 
 
   app.use(formidable());
