@@ -1,7 +1,7 @@
 <div class="container mx-auto flex justify-center ">
   <div class="min-w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
-      <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Available plugins</h5>
+      <h5 class="text-xl mb-5 font-bold leading-none text-gray-900 dark:text-white">Available plugins</h5>
 
       <!-- {{#if authorized}}
       <form action="/api/add_monitor" method="POST">
@@ -49,10 +49,10 @@
                   {{/if}}
 
                   {{#if this.pluginEnabled}}
-                  <form method="POST">
-                    <a href="/plugin/disable/{{ this.id }}/" class="ml-5 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                  <form method="POST" action="/plugin/disable/{{ this.id }}/">
+                    <button class="ml-5 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                       Disable
-                    </a>
+                    </button>
                   </form>
                   {{/if}}
               </div>

@@ -177,6 +177,28 @@ router.post('/plugin/:id/', mustBeAuthorizedView(async (req, res) => {
     }
 }));
 
+router.post('/plugin/disable/:id/', mustBeAuthorizedView(async (req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(p => p.id === req.params.id);
+
+    if (!plugin) {
+        res.redirect('/plugins/');
+    } else {
+        const psIndex = database.data.pluginSettings.findIndex(ps => ps.id === plugin.id);
+        const newPluginSetting = {
+            enabled: false,
+        };
+
+        if (psIndex !== -1) {
+            if (database.data.pluginSettings[psIndex].enabled) {
+                plugin.onPluginDisabled && await plugin.onPluginDisabled();
+            }
+            database.data.pluginSettings[psIndex] = newPluginSetting;
+        }
+        await database.write();
+        res.redirect(`/plugins/`);
+    }
+}));
+
 router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));
 
 export default router;
