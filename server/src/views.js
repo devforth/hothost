@@ -102,7 +102,12 @@ router.post('/login/', mustNotBeAuthorizedView(async (req, res) => {
 }));
 
 router.get('/plugins/', mustBeAuthorizedView((req, res) => {
-    res.locals.plugins = PluginManagerSingleton().plugins;
+    res.locals.plugins = PluginManagerSingleton().plugins.map((p) => {
+        return {
+            ...p,
+            pluginEnabled: database.data.pluginSettings.find(ps => ps.id === p.id)?.enabled
+        }
+    });
     res.render('plugins');
 }));
 
