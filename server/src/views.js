@@ -113,6 +113,7 @@ router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
         res.redirect('/');
     } else {
         const pluginSettings = database.data.pluginSettings.find(ps => ps.id === plugin.id);
+        res.locals.plugin = plugin;
         res.locals.params = [
             ...plugin.supportedEvents.map((e) => {
                 return {
