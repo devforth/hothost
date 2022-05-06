@@ -24,16 +24,12 @@ class PluginManager {
             .concat(thirdPartyPlugins.map(p => {
                 p.default.thirdParty = true;
                 return p.default;
-            }))
-            .map(plugin => {
-                return {
-                    ...plugin,
-                    enabled: database.data.pluginSettings.find(ps => ps.id === plugin.id)?.enabled ?? false,
-                }
-            });
+            }));
 
         await Promise.all(this.plugins
-            .filter(p => p.enabled)
+            .filter(p => {
+                return database.data.pluginSettings.find(ps => ps.id === p.id)?.enabled ?? false
+            })
             .map(p => p.onPluginEnabled && p.onPluginEnabled())
         );
     }
@@ -48,7 +44,7 @@ class PluginManager {
                         settings,
                     }
                 })
-                .filter(p => p.plugin.enabled && p.settings.enabledEvents.includes(eventType));
+                .filter(p => p.settings.enabled && p.settings.enabledEvents.includes(eventType));
 
             plugins.forEach(p => {
                 p.plugin.handleEvent({ eventType, data: newData, settings: p.settings });

@@ -71,7 +71,9 @@ docker run -d \
   --restart unless-stopped \
   --cap-add SYS_PTRACE \
   --security-opt apparmor=unconfined \
-  {{#if ../local }}--network=host{{/if}}
+  {{#if ../local }}
+  --network=host \
+  {{/if}}
   devforth/hothost-agent</pre>
               </div>
               <div class="hidden py-4 rounded-lg dark:bg-gray-800" id="dashboard-{{ this.id }}" role="tabpanel" aria-labelledby="dashboard-tab-{{ this.id }}">
