@@ -125,7 +125,7 @@ router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
                 }
             }),
             ...plugin.params.map((p) => {
-                const value = pluginSettings.params[p.id];
+                const value = pluginSettings?.params[p.id];
                 return {
                     ...p,
                     value: value || p.default_value,
