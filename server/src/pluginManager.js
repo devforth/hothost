@@ -24,9 +24,18 @@ class PluginManager {
             .concat(thirdPartyPlugins.map(p => {
                 p.default.thirdParty = true;
                 return p.default;
-            }));
+            }))
+            .map(plugin => {
+                return {
+                    ...plugin,
+                    enabled: database.data.pluginSettings.find(ps => ps.id === plugin.id)?.enabled ?? false,
+                }
+            });
 
-        await Promise.all(this.plugins.map(p => p.onPluginEnabled && p.onPluginEnabled()));
+        await Promise.all(this.plugins
+            .filter(p => p.enabled)
+            .map(p => p.onPluginEnabled && p.onPluginEnabled())
+        );
     }
 
     async handleEvents(events, newData) {
