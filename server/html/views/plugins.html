@@ -1,7 +1,22 @@
 <div class="container mx-auto flex justify-center ">
-  <div class="min-w-2/3 p-4 mt-28 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
+  <div class="min-w-2/3 p-4 my-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
+
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <a href="/" class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+          focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
+          text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to hosts list  
+        </a>
+      </div>
+    </div>
+
     <div class="flex justify-between items-center mb-4">
-      <h5 class="text-xl mb-5 font-bold leading-none text-gray-900 dark:text-white">Available plugins</h5>
+      <h5 class="mb-5 text-3xl font-bold leading-none text-gray-900 dark:text-white">Available plugins</h5>
 
       <!-- {{#if authorized}}
       <form action="/api/add_monitor" method="POST">
@@ -17,7 +32,7 @@
     </div>
     <div class="max-w-2/3 gap-x-10 gap-y-10 divide-gray-200 dark:divide-gray-700 flex flex-wrap">
       {{#each plugins}}
-        <div class=" max-w-sm bg-white rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+        <div class="w-60 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
           <img class="w-40 my-6 mx-auto rounded-t-lg" src="{{ this.iconUrlOrBase64 }}" alt="product image" />
           <div class="px-6 pb-6">
               <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{ this.name }}</h5>

@@ -10,7 +10,13 @@ export default {
 ## Setup guide
 
 First of all go to [Slack Webhooks App page](https://devforth.slack.com/apps/A0F7XDUAZ-incoming-webhooks) and add click "Add to Slack" button.
-Select a channel on which you want to receive notifications and copy webhook url to field below
+Select a channel on which you want to receive notifications and copy webhook url to field below.
+
+Webhook is URL which look like this:
+
+    https://hooks.slack.com/services/T00000/B00000/XXXXXXXXXXXXXXXXXXXXX
+
+
   `,
     supportedEvents: [
         'disk_is_almost_full',

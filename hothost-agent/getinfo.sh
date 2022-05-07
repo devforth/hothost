@@ -9,6 +9,9 @@ ARCHITECTURE="$(uname -m)"
 
 HOST_PUBLIC_IP=`curl ifconfig.me`
 
+HOST_PUBLIC_IP_COUNTRY=`curl -s https://www.cloudflare.com/cdn-cgi/trace | grep loc | cut -f 2 -d '='`
+
+
 # -------------------------------------------------------------------------------------------------
 # detect the virtualization and possibly the container technology
 

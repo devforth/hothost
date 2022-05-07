@@ -9,22 +9,26 @@ export default {
     longDescriptionMD: `
 # Setup guide
 
-Go to [https://t.me/@BotFather](https://t.me/@BotFather) and type
+1\\. Go to [https://t.me/BotFather](https://t.me/BotFather) and type
 
 
     /newbot
 
 
-Enter name like a hothost and username like hothost_bot
+2\\. Enter name like a *hothost* and username like *hothost_bot*. 
 
-
-Copy bot token e.g.
+3\\. Copy bot token e.g.
 
     512345678:AABBCC11DD2233AGDGGji11Y1e32r8W124Eq0
 
-And paste in setting below:
+Paste in setting called "Telegram Token created by BotFather" located below.
+
+4\\. Invite bot to some group and **type any message there**, or just **type message in Direct Messages** with bot.
+
+Chat in which you send message will be used to publish notifications.
 
   `,
+
     supportedEvents: [
         'disk_is_almost_full',
         'disk_usage_recovered',
@@ -39,7 +43,6 @@ And paste in setting below:
         id: "botToken",
         name: "Telegram Token created by BotFather",
         required: true,
-        inputType: "url",
         type: "str"
       },
       {
@@ -86,6 +89,10 @@ And paste in setting below:
       },
     ],
 
+    async onPluginEnabled() {
+      this.hbs = hbs.create();
+    },
+
     async handleEvent({ eventType, data, settings }) {
       const botToken = settings.params.botToken;
       const template = this.hbs.compile(settings.params[`${eventType}_message`]);
@@ -94,14 +101,17 @@ And paste in setting below:
       const firstResp = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-      });
-
-      const chatId = firstResp.result.r[0]?.chat?.id;
+      }).then(r => r.json());
+      console.log('TG First resp', firstResp);
+      const chatId = firstResp.result[0]?.message?.chat?.id;
 
       const secondResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-      });
+      }).then(r => r.json());
+
+      console.log('TG secode resp', secondResp);
+
 
     },
 

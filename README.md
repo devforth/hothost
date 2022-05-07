@@ -115,6 +115,15 @@ docker run -d --name=hothost-web \
   devforth/hothost-web
 ```
 
+# Plugin development
+
+Every plugin is a standalone .js file.
+
+If you need to have some dedicated module 
+
+
+
+
 # Development
 
 

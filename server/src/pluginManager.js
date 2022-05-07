@@ -16,7 +16,12 @@ class PluginManager {
         const internalPluginFiles = await fsReaddirAsync('src/plugins');
         const thirdPartyFiles = await fsReaddirAsync(path.join(env.DATA_PATH, 'plugins')).catch(e => []);
 
-        const internalPlugins = await Promise.all(internalPluginFiles.map(f => import('./' + path.join('plugins', f))));
+        const internalPlugins = await Promise.all(
+            internalPluginFiles.filter(
+                (f) => !f.endsWith('.src')
+            ).map(f => import('./' + path.join('plugins', f)))
+        );
+
         const thirdPartyPlugins = await Promise.all(thirdPartyFiles.map(f => import('./' + path.join('plugins', f))));
 
         this.plugins = []
@@ -25,7 +30,6 @@ class PluginManager {
                 p.default.thirdParty = true;
                 return p.default;
             }));
-
         await Promise.all(this.plugins
             .filter(p => {
                 return database.data.pluginSettings.find(ps => ps.id === p.id)?.enabled ?? false

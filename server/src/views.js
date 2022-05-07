@@ -119,6 +119,7 @@ router.get('/plugin/:id/', mustBeAuthorizedView((req, res) => {
     } else {
         const pluginSettings = database.data.pluginSettings.find(ps => ps.id === plugin.id);
         res.locals.plugin = plugin;
+        res.locals.pluginSettings = pluginSettings;
         res.locals.params = [
             ...plugin.supportedEvents.map((e) => {
                 return {
@@ -163,12 +164,12 @@ router.post('/plugin/:id/', mustBeAuthorizedView(async (req, res) => {
 
         if (psIndex !== -1) {
             if (!database.data.pluginSettings[psIndex].enabled && newPluginSetting.enabled) {
-                await plugin.onPluginEnabled();
+                await plugin.onPluginEnabled?.();
             }
             database.data.pluginSettings[psIndex] = newPluginSetting;
         } else {
             database.data.pluginSettings.push(newPluginSetting);
-            await plugin.onPluginEnabled();
+            await plugin.onPluginEnabled?.();
         }
 
         await database.write();
@@ -190,7 +191,7 @@ router.post('/plugin/disable/:id/', mustBeAuthorizedView(async (req, res) => {
 
         if (psIndex !== -1) {
             if (database.data.pluginSettings[psIndex].enabled) {
-                plugin.onPluginDisabled && await plugin.onPluginDisabled();
+               await plugin.onPluginDisabled?.();
             }
             database.data.pluginSettings[psIndex] = newPluginSetting;
         }

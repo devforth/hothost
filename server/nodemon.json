@@ -1,0 +1,5 @@
+{
+  "events": {
+    "crash": "sh -c 'lsof -i :${PORT:-8007} -t | xargs kill'"
+  }
+}

@@ -56,7 +56,8 @@ router.post('/data/:secret', async (req, res) => {
             updatedAt: new Date().getTime(),
             online: true,
         };
-        // newData.DISK_AVAIL = 0;
+        // for testing
+        // newData.DISK_AVAIL = Math.round(Math.random()) * 10_0000000000000;
         // newData.SYSTEM_FREE_RAM = 0;
         const events = calculateDataEvent(database.data.monitoringData[index], newData);
         await PluginManager().handleEvents(events, {
