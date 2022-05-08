@@ -117,9 +117,11 @@ docker run -d --name=hothost-web \
 
 # Plugin development
 
-Every plugin is a standalone .js file.
+Every plugin is a standalone .js of ESM format (with exports/imports, CommonJS with require is not supported). File should have a defined structure. Use `server/src/plugins/slack.js` for a Hello-World example. It is well documented
 
-If you need to have some dedicated module 
+Currently plugin file should be placed into `server/src/plugins` directory.
+
+If you want to bundle some dedicated node modules then you need to compile them using webpack or other bundler which supports ESM outputs. Please see `server/src/plugins/gmail.src/gmail.src.js` - it bundels node-mailer into plugin.
 
 
 

@@ -1,6 +1,6 @@
 export default {
   entry: './gmail.src.js',
-  target: 'node',
+  target: 'node16',
   output: {
     filename: '../../gmail.js',
     chunkFormat: 'module', // for ESM
@@ -10,7 +10,4 @@ export default {
   experiments: {
     outputModule: true,
   },
-  // optimization: {
-  //   usedExports: true,
-  // },
 };

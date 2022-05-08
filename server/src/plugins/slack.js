@@ -2,10 +2,15 @@ import hbs from 'handlebars';
 import fetch from 'node-fetch';
 
 export default {
-    id: 'slack-notifications',
-    name: 'Slack Notifications',
-    description: 'Get host alerts via Slack',
+    id: 'slack-notifications',  // this is just ID of plugin, should have slug format
+    name: 'Slack Notifications',  // Plugin name
+    description: 'Get host alerts via Slack',  // short description of what plugin allows to do
+    
+    // icon of plugin, here we use SVG coverted to base64
     iconUrlOrBase64: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI3IiBoZWlnaHQ9IjEyNyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMjcuMiA4MGMwIDcuMy01LjkgMTMuMi0xMy4yIDEzLjJDNi43IDkzLjIuOCA4Ny4zLjggODBjMC03LjMgNS45LTEzLjIgMTMuMi0xMy4yaDEzLjJWODB6bTYuNiAwYzAtNy4zIDUuOS0xMy4yIDEzLjItMTMuMiA3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjJ2MzNjMCA3LjMtNS45IDEzLjItMTMuMiAxMy4yLTcuMyAwLTEzLjItNS45LTEzLjItMTMuMlY4MHoiIGZpbGw9IiNFMDFFNUEiLz4KICA8cGF0aCBkPSJNNDcgMjdjLTcuMyAwLTEzLjItNS45LTEzLjItMTMuMkMzMy44IDYuNSAzOS43LjYgNDcgLjZjNy4zIDAgMTMuMiA1LjkgMTMuMiAxMy4yVjI3SDQ3em0wIDYuN2M3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjIgMCA3LjMtNS45IDEzLjItMTMuMiAxMy4ySDEzLjlDNi42IDYwLjEuNyA1NC4yLjcgNDYuOWMwLTcuMyA1LjktMTMuMiAxMy4yLTEzLjJINDd6IiBmaWxsPSIjMzZDNUYwIi8+CiAgPHBhdGggZD0iTTk5LjkgNDYuOWMwLTcuMyA1LjktMTMuMiAxMy4yLTEzLjIgNy4zIDAgMTMuMiA1LjkgMTMuMiAxMy4yIDAgNy4zLTUuOSAxMy4yLTEzLjIgMTMuMkg5OS45VjQ2Ljl6bS02LjYgMGMwIDcuMy01LjkgMTMuMi0xMy4yIDEzLjItNy4zIDAtMTMuMi01LjktMTMuMi0xMy4yVjEzLjhDNjYuOSA2LjUgNzIuOC42IDgwLjEuNmM3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjJ2MzMuMXoiIGZpbGw9IiMyRUI2N0QiLz4KICA8cGF0aCBkPSJNODAuMSA5OS44YzcuMyAwIDEzLjIgNS45IDEzLjIgMTMuMiAwIDcuMy01LjkgMTMuMi0xMy4yIDEzLjItNy4zIDAtMTMuMi01LjktMTMuMi0xMy4yVjk5LjhoMTMuMnptMC02LjZjLTcuMyAwLTEzLjItNS45LTEzLjItMTMuMiAwLTcuMyA1LjktMTMuMiAxMy4yLTEzLjJoMzMuMWM3LjMgMCAxMy4yIDUuOSAxMy4yIDEzLjIgMCA3LjMtNS45IDEzLjItMTMuMiAxMy4ySDgwLjF6IiBmaWxsPSIjRUNCMjJFIi8+Cjwvc3ZnPgo=",
+    
+    // detailed description for users how to integrate a plugin, should have info how to get security tokens, what to click and so on.
+    // Markdown format
     longDescriptionMD: `
 ## Setup guide
 
@@ -18,6 +23,8 @@ Webhook is URL which look like this:
 
 
   `,
+
+    // list of events which plugin receives
     supportedEvents: [
         'disk_is_almost_full',
         'disk_usage_recovered',
@@ -27,11 +34,12 @@ Webhook is URL which look like this:
         'ram_usage_recovered',
     ],
 
+    // parameters which should be configured by user
     params: [
         {
             id: "webhook",
             name: "Slack Web Hook URL",
-            description: "Click Add to Slack on this page and copy WebHook ",
+            notes: "See guide above to understand how to get it",
             required: true,
             inputType: "url",
             type: "str"
@@ -80,22 +88,25 @@ Webhook is URL which look like this:
         },
     ],
 
-    configuration: {},
-
+    // executed once when plugin is enabled, could be used to perform some initialization of plugin
     async onPluginEnabled() {
         this.hbs = hbs.create();
     },
+
+    // executed once when plugin is disabled
     async onPluginDisable() {
     },
+
+    // main event handling is done here
     async handleEvent({ eventType, data, settings }) {
-        const webhookUrl = settings.params.webhook;
+        const { webhook } = settings.params;
         const template = this.hbs.compile(settings.params[`${eventType}_message`]);
         const text = template(data);
 
-        await fetch(webhookUrl, {
+        await fetch(webhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text }),
-        })
+        });
     },
 };
