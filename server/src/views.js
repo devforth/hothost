@@ -107,7 +107,7 @@ router.get('/plugins/', mustBeAuthorizedView((req, res) => {
             ...p,
             pluginEnabled: database.data.pluginSettings.find(ps => ps.id === p.id)?.enabled
         }
-    });
+    }).reverse();
     res.render('plugins');
 }));
 

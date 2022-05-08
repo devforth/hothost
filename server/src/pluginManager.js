@@ -51,7 +51,9 @@ class PluginManager {
                 .filter(p => p.settings.enabled && p.settings.enabledEvents.includes(eventType));
 
             plugins.forEach(p => {
-                p.plugin.handleEvent({ eventType, data: newData, settings: p.settings });
+                p.plugin.handleEvent({ eventType, data: newData, settings: p.settings }).catch((e) => {
+                    console.error('Error in plugin', p.id, e, 'stack:', e.stack)
+                });
             }); 
         });
     }

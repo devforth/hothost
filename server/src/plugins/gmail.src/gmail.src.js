@@ -46,12 +46,12 @@ Just copy the password and use it here.
 
   params: [
         {
-            id: "gmail_email",
-            name: "Your Google E-mail address",
-            notes: "Example: mymail@gmail.com",
-            required: true,
-            inputType: "email",
-            type: "str"
+          id: "gmail_email",
+          name: "Your Google E-mail address",
+          notes: "Example: mymail@gmail.com",
+          required: true,
+          inputType: "email",
+          type: "str"
         },
         {
           id: "google_account_passwod",
