@@ -2,12 +2,14 @@
 
 Lightweight and minimalistic Open-Source hosts monitor. 
 
-* Shows used disk space percentage and WARNING badge if it exceeds some threshold (e.g. 80%)
-* Has public page protected with Basic Auth to watch status with some external monitor (e.g. UptimeRobot to show Slack notification when there is a WARNIGN keyword on page)
+* Shows used disk space percentage and ALERT badge if it exceeds some threshold (e.g. 80%)
+* Shows used RAM percentage and ALERT badge if it exceeds some threshold (e.g. 80%)
+* Allows to setup Email/Slack/Telegram notifications
 * Agents could be easily installed with Docker/Compose/Bash+curl+crontab. Super simple snippets are shown when you click one button on Web
 * Allows to monitor as many servers as needed
 * Configurable monitoring interval
 * Based on alpine minimalistic Docker images
+* You can add a public page protected with Basic Auth to watch status with some external monitor (e.g. UptimeRobot can trigger own notifications when there is a ALERT keyword on page)
 
 For each host it allows to see:
 
@@ -49,8 +51,6 @@ services:
     environment:
       - HOTHOST_WEB_ADMIN_USERNAME=admin
       - HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
-      - HOTHOST_WEB_BASIC_PUBLIC_USERNAME=admin
-      - HOTHOST_WEB_BASIC_PUBLIC_PASSWORD=!!!CHANGE_ME!!!
       - HOTHOST_WEB_PORT=8007
     ports:
       - 8007:8007
@@ -63,7 +63,7 @@ volumes:
 Now you should proxy https://subdomain.yourdomain.com to serve requests from 127.0.0.1:8007.
 
 * Use https://subdomain.yourdomain.com to view as admin and add new agents
-* Use https://subdomain.yourdomain.com/public/ with basic auth credentials. You can add this to setup e.g. UptimeRobot monitor and watch for `WARNING` keyword to prevent disk space issues
+
 
 Example Nginx Proxy:
 
@@ -105,15 +105,30 @@ In case if you want to use pure docker:
 ```
 mkdir -p /www/hothostdata
 docker run -d --name=hothost-web \
-  -v /www/hothostdata:/var/lib/hothost/data/
-  --env HOTHOST_WEB_ADMIN_USERNAME=admin
-  --env HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
-  --env HOTHOST_WEB_BASIC_PUBLIC_USERNAME=admin
-  --env HOTHOST_WEB_BASIC_PUBLIC_PASSWORD=!!!CHANGE_ME!!!
-  --env HOTHOST_WEB_PORT=8007
-  -p 8007:8007
+  -v /www/hothostdata:/var/lib/hothost/data/  \
+  --env HOTHOST_WEB_ADMIN_USERNAME=admin  \
+  --env HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!  \
+  --restart=always  \
+  --env HOTHOST_WEB_PORT=8007  \
+  -p 8007:8007  \
   devforth/hothost-web
 ```
+
+# Updating Web
+
+```
+docker pull devforth/hothost-server:latest
+```
+
+
+# Optional Environment variables
+
+If you want to create a public page with Basic Auth access, then provide next two environment variables to web:
+
+* HOTHOST_WEB_BASIC_PUBLIC_USERNAME
+* HOTHOST_WEB_BASIC_PUBLIC_PASSWORD
+
+Then use https://subdomain.yourdomain.com/public/ with basic auth credentials. You can add this to setup e.g. UptimeRobot monitor and watch for `WARNING` keyword to prevent disk space issues
 
 # Plugin development
 

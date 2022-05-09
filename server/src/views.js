@@ -71,6 +71,11 @@ router.get('/', mustBeAuthorizedView(async (req, res) =>  {
 }));
 
 router.get('/public', async (req, res) => {
+    if (!env.WEB_BASIC_PUBLIC_PASSWORD || !env.WEB_BASIC_PUBLIC_USERNAME) {
+        res.statusCode = 400;
+        res.end();
+        return ;
+    }
     const basicAuth = 'Basic ' + Buffer.from(`${env.WEB_BASIC_PUBLIC_USERNAME}:${env.WEB_BASIC_PUBLIC_PASSWORD}`).toString('base64');
     if (req.headers['authorization'] !== basicAuth) {
         res.statusCode = 401;

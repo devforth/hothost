@@ -36,7 +36,7 @@ async function main() {
       or(a, b) { return a || b },
       not(a) { return !a },
       and(a, b) { return a && b },
-      eq(a, b) { return a.toString() === b.toString() },
+      eq(a, b) { return a?.toString() === b?.toString() },
      }
   });
 

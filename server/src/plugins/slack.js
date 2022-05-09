@@ -106,7 +106,11 @@ Webhook is URL which look like this:
         await fetch(webhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text }),
+            body: JSON.stringify({ 
+                icon_emoji: ":fire:",
+                username: "HotHost",
+                text: text,
+            }),
         });
     },
 };

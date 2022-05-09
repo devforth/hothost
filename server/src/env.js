@@ -16,7 +16,7 @@ env.DATA_PATH = env.ENV === 'local' ? './data/' : '/var/lib/hothost/data/';
 env.THIRD_PARTY_PLUGINS_LOCATION = path.join(env.DATA_PATH, 'plugins');
 
 if (env.ENV === 'production') {
-    const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD', 'HOTHOST_WEB_BASIC_PUBLIC_USERNAME', 'HOTHOST_WEB_BASIC_PUBLIC_PASSWORD'];
+    const requiredVariables = ['HOTHOST_WEB_ADMIN_USERNAME', 'HOTHOST_WEB_ADMIN_PASSWORD',];
     requiredVariables.forEach(key => {
         if (!process.env[key]) {
             throw new Error(`Environment variable '${key}' is missing`);
