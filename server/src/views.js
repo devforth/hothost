@@ -49,6 +49,7 @@ const getMonitoringData = async (req) => {
                 online: (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),
                 hostname: data.HOST_NAME,
                 public_ip: data.HOST_PUBLIC_IP,
+                country: data.HOST_PUBLIC_IP_COUNTRY,
                 os_name: data.HOST_OS_NAME,
                 os_version: ifUnknown(data.HOST_OS_VERSION, data.SYSTEM_KERNEL_VERSION, data.HOST_OS_VERSION),
                 cpu_name: `${data.SYSTEM_CPU_MODEL}`,
@@ -205,6 +206,9 @@ router.post('/plugin/disable/:id/', mustBeAuthorizedView(async (req, res) => {
     }
 }));
 
-router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));
+router.get('/users/', mustBeAuthorizedView((req, res) => {
+    res.locals.userInfo = database.data.users;
+    res.render('users')
+}));
 
 export default router;
