@@ -120,6 +120,7 @@ docker run -d --name=hothost-web \
 docker pull devforth/hothost-server:latest
 ```
 
+then recreate a contaner
 
 # Optional Environment variables
 
