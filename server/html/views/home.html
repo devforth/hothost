@@ -174,9 +174,11 @@ services:
                   <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
                     {{ this.hostname }}
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    <span class="flex text-center items-center">Public IP <img class="h-4 w-4 m-1" src="{{getFlag this.country}}" data-tooltip-placement="bottom" data-tooltip-target="tooltip" alt="country">: </span>
-                    {{ this.public_ip }}
+                  <p class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
+                    <span class="flex text-center items-center">Public IP:&nbsp;
+                      {{#if (getFlag this.country)}}<img class="h-4 w-4 m-1" src="{{getFlag this.country}}" data-tooltip-placement="bottom" data-tooltip-target="tooltip" alt="country">{{/if}}
+                    </span>
+                    &nbsp;{{ this.public_ip }}
                   </p>
                   <div id="tooltip" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
                     {{getCountryName this.country}}

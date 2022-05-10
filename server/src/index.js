@@ -38,8 +38,11 @@ async function main() {
       and(a, b) { return a && b },
       eq(a, b) { return a?.toString() === b?.toString() },
       isNotAdmin(a) {return a.toString() !== env.WEB_ADMIN_USERNAME.toString()},
-      getFlag(country) { return '/img/flags/' + country.toLowerCase() + '.svg' },
+      getFlag(country) { return !country ? null: '/img/flags/' + country.toLowerCase() + '.svg' },
       getCountryName(country) { 
+        if (!country) {
+          return null;
+        }
         const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
         return regionNames.of(country); },
      }
