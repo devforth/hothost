@@ -200,7 +200,11 @@ services:
                   &nbsp;&nbsp;&nbsp;
                   RAM: {{ this.ram_total }} ({{ this.ram_used }}% used)
                   &nbsp;&nbsp;&nbsp;
+                  {{#if this.isSwap }}
                   SWAP {{ this.swap_total }} ({{ this.swap_used }}% used)
+                  {{else}}
+                  SWAP Off
+                  {{/if}}
                 </p>
               </td>
 
