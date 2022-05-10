@@ -474,7 +474,8 @@ do
   echo $JSON_DATA
   curl -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
-   -d "$JSON_DATA"
+   -d "$JSON_DATA" \
+   -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"
 
   sleep $HOTHOST_MONITOR_INTERVAL
 done

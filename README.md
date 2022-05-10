@@ -114,10 +114,11 @@ docker run -d --name=hothost-web \
   devforth/hothost-web
 ```
 
+
 # Updating Web
 
 ```
-docker pull devforth/hothost-server:latest
+docker pull devforth/hothost-web:latest
 ```
 
 then recreate a contaner
