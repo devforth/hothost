@@ -49,12 +49,15 @@ const getMonitoringData = async (req) => {
                 online: (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),
                 hostname: data.HOST_NAME,
                 public_ip: data.HOST_PUBLIC_IP,
+                country: data.HOST_PUBLIC_IP_COUNTRY,
                 os_name: data.HOST_OS_NAME,
                 os_version: ifUnknown(data.HOST_OS_VERSION, data.SYSTEM_KERNEL_VERSION, data.HOST_OS_VERSION),
                 cpu_name: `${data.SYSTEM_CPU_MODEL}`,
                 cpu_count: data.SYSTEM_CPU_LOGICAL_CPU_COUNT,
                 ram_total: ifUnknown(data.SYSTEM_TOTAL_RAM, "unknown", sizeFormat(data.SYSTEM_TOTAL_RAM)),
                 ram_used: ((((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) / +data.SYSTEM_TOTAL_RAM) * 100) || 0).toFixed(0),
+                ram_warning: ((+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100) < 20,
+                isSwap: !!data.SYSTEM_TOTAL_SWAP,
                 swap_total: ifUnknown(data.SYSTEM_TOTAL_SWAP, "unknown", sizeFormat(data.SYSTEM_TOTAL_SWAP)),
                 swap_used: ((((+data.SYSTEM_TOTAL_SWAP - +data.SYSTEM_FREE_SWAP) / +data.SYSTEM_TOTAL_SWAP) * 100) || 0).toFixed(0),
                 disk_total: sizeFormat(+data.DISK_AVAIL + +data.DISK_USED),
@@ -205,6 +208,9 @@ router.post('/plugin/disable/:id/', mustBeAuthorizedView(async (req, res) => {
     }
 }));
 
-router.get('/users/', mustBeAuthorizedView((req, res) => res.render('users')));
+router.get('/users/', mustBeAuthorizedView((req, res) => {
+    res.locals.userInfo = database.data.users;
+    res.render('users')
+}));
 
 export default router;

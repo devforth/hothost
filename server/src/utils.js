@@ -12,6 +12,7 @@ export const checkUserExistsOrCreate = async () => {
             id: uuidv4(),
             username: env.WEB_ADMIN_USERNAME,
             password: md5(env.WEB_ADMIN_PASSWORD),
+            createdAt: new Date().toDateString(),
         });
         await database.write();
     }

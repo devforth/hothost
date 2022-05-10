@@ -1,9 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
+import md5 from 'md5';
 
 import database from './database.js';
 import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat } from './utils.js';
 import PluginManager from './pluginManager.js';
+import env from './env.js';
 
 const router = express.Router();
 
@@ -74,5 +76,37 @@ router.post('/data/:secret', async (req, res) => {
         res.send('OK');
     }
 });
+
+router.post('/add_user', mustBeAuthorizedView( async(req,res) => {
+    const user = req.fields;
+    const {users} = database.data;
+
+    const existedLogin = users.findIndex(el => el.username === user.username);
+
+    if (existedLogin === -1) {
+        users.push({
+            id: uuidv4(),
+            username: user.username,
+            password: md5(user.password),
+            createdAt: new Date().toDateString(),
+        })
+        await database.write();
+    } else {
+        res.statusCode = 400;
+    }
+
+    res.redirect('/users/')
+}
+));
+
+router.post('/remove_user', mustBeAuthorizedView( async(req, res) => {
+    const {id} = req.query;
+    const {users} = database.data;
+    
+    const index = users.findIndex(el => el.id === id);
+    users.splice(index, 1);
+    await database.write();
+    res.redirect('/users/');
+}))
 
 export default router;
