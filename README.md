@@ -140,7 +140,7 @@ If you want to create a public page with Basic Auth access, then provide next tw
 * HOTHOST_WEB_BASIC_PUBLIC_USERNAME
 * HOTHOST_WEB_BASIC_PUBLIC_PASSWORD
 
-Then use https://subdomain.yourdomain.com/public/ with basic auth credentials. You can add this to setup e.g. UptimeRobot monitor and watch for `WARNING` keyword to prevent disk space issues
+Then use https://subdomain.yourdomain.com/public/ with basic auth credentials. You can add this to setup e.g. UptimeRobot monitor and watch for `ALERT` keyword to prevent disk space issues
 
 # Plugin development
 
