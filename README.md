@@ -2,11 +2,11 @@
 
 Lightweight and minimalistic Open-Source hosts monitor. 
 
-* Shows used disk space percentage and ALERT badge if it exceeds some threshold (e.g. 80%)
-* Shows used RAM percentage and ALERT badge if it exceeds some threshold (e.g. 80%)
+* Shows used disk space percentage and ALERT badge if it exceeds some threshold (90% by default)
+* Shows used RAM percentage and ALERT badge if it exceeds some threshold (90% by default)
 * Allows to setup Email/Slack/Telegram notifications
-* Agents could be easily installed with Docker/Compose/Bash+curl+crontab. Super simple snippets are shown when you click one button on Web
-* Allows to monitor as many servers as needed
+* Agents could be easily installed with Docker/Compose/Bash+curl+crontab. Super simple snippets are shown when you click one button
+* Allows to monitor as many hosts as needed
 * Configurable monitoring interval
 * Based on alpine minimalistic Docker images
 * You can add a public page protected with Basic Auth to watch status with some external monitor (e.g. UptimeRobot can trigger own notifications when there is a ALERT keyword on page)
@@ -30,6 +30,10 @@ Available plugins:
 
 ![image](https://user-images.githubusercontent.com/1838656/167828992-d15dc19e-409d-491d-a2c7-c713786bf9a0.png)
 
+# RoadMap
+
+* HTTP URLs monitoring and keywords check
+* Probably porting UI from server-side to Vue.js
 
 # Installation
 
