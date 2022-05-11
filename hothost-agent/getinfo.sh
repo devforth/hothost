@@ -7,9 +7,12 @@ KERNEL_NAME="$(uname -s)"
 KERNEL_VERSION="$(uname -r)"
 ARCHITECTURE="$(uname -m)"
 
-HOST_PUBLIC_IP=`curl ifconfig.me`
 
-HOST_PUBLIC_IP_COUNTRY=`curl -s https://www.cloudflare.com/cdn-cgi/trace | grep loc | cut -f 2 -d '='`
+CLOUDFLARE_RESPONSE=$( curl -s https://www.cloudflare.com/cdn-cgi/trace )
+HOST_PUBLIC_IP_COUNTRY=`echo "$CLOUDFLARE_RESPONSE" | grep loc | cut -f 2 -d '='`
+HOST_PUBLIC_IP=`echo "$CLOUDFLARE_RESPONSE" | grep ip | cut -f 2 -d '='`
+
+HOST_PUBLIC_IP_FALLBACK=`curl -s ifconfig.me`
 
 
 # -------------------------------------------------------------------------------------------------
@@ -468,11 +471,13 @@ do
     \"DISK_USED\":\"${DISK_USED}\",
     \"DISK_AVAIL\":\"${DISK_AVAILABLE}\",
     \"HOST_PUBLIC_IP\":\"${HOST_PUBLIC_IP}\",
+    \"HOST_PUBLIC_IP_FALLBACK\":\"${HOST_PUBLIC_IP_FALLBACK}\",
     \"HOST_PUBLIC_IP_COUNTRY\":\"${HOST_PUBLIC_IP_COUNTRY}\",
     \"MONITOR_INTERVAL\":\"${HOTHOST_MONITOR_INTERVAL}\"
   }"
 
-  curl -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
+  curl --silent --output /dev/null --show-error --fail \
+   -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$JSON_DATA" \
    -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
