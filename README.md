@@ -24,7 +24,8 @@ For each host it allows to see:
 
 Add new host form:
 
-![](preview-add-monitor.jpeg)
+![image](https://user-images.githubusercontent.com/1838656/167829631-54ae182f-87f9-4a3d-85dd-b2bb47b37329.png)
+
 
 Available plugins:
 
