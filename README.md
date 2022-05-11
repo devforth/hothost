@@ -20,11 +20,16 @@ For each host it allows to see:
 
 # Preview
 
-![](preview.jpeg)
+![image](https://user-images.githubusercontent.com/1838656/167828815-25082ef0-c0b7-45dd-881a-f4f63b0861ea.png)
 
 Add new host form:
 
 ![](preview-add-monitor.jpeg)
+
+Available plugins:
+
+![image](https://user-images.githubusercontent.com/1838656/167828992-d15dc19e-409d-491d-a2c7-c713786bf9a0.png)
+
 
 # Installation
 
