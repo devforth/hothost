@@ -57,7 +57,7 @@ const getMonitoringData = async (req) => {
                 ram_total: ifUnknown(data.SYSTEM_TOTAL_RAM, "unknown", sizeFormat(data.SYSTEM_TOTAL_RAM)),
                 ram_used: ((((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) / +data.SYSTEM_TOTAL_RAM) * 100) || 0).toFixed(0),
                 ram_warning: ((+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100) < 20,
-                isSwap: !!data.SYSTEM_TOTAL_SWAP,
+                isSwap: (!!data.SYSTEM_TOTAL_SWAP && data.SYSTEM_TOTAL_SWAP !== '0'),
                 swap_total: ifUnknown(data.SYSTEM_TOTAL_SWAP, "unknown", sizeFormat(data.SYSTEM_TOTAL_SWAP)),
                 swap_used: ((((+data.SYSTEM_TOTAL_SWAP - +data.SYSTEM_FREE_SWAP) / +data.SYSTEM_TOTAL_SWAP) * 100) || 0).toFixed(0),
                 disk_total: sizeFormat(+data.DISK_AVAIL + +data.DISK_USED),

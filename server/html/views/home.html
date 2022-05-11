@@ -182,16 +182,21 @@ services:
                   </p>
                   <div id="tooltip" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
                     {{getCountryName this.country}}
-                  <div class="tooltip-arrow" data-popper-arrow></div>
+                    <div class="tooltip-arrow" data-popper-arrow></div>
                   </div>
               </td>
               <td class="pr-5 flex-1 min-w-1">
                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
                   {{ this.os_name }}
                 </p>
-                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400 w-20" title="{{ this.os_version }}" data-tooltip-placement="bottom" data-tooltip-target="tooltip-os">
                   {{ this.os_version }}
                 </p>
+                <div id="tooltip-os" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
+                  {{ this.os_version }}
+                  <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
+                
               </td>
               <td class="pr-5 flex-1 min-w-1">
                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
@@ -202,7 +207,7 @@ services:
                   &nbsp;&nbsp;&nbsp;
                   RAM: {{ this.ram_total }} ({{ this.ram_used }}% used)
                   {{#if this.ram_warning}}
-                    <span class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
+                    <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
                   {{/if}}
                   &nbsp;&nbsp;&nbsp;
                   {{#if this.isSwap }}
