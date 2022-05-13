@@ -82,6 +82,9 @@ export const calculateDataEvent = (prevData, newData) => {
     );
     events.push(diskSpaceEvent);
 
+    if (diskSpaceEvent === 'disk_is_almost_full') {
+        newData.DISK_ISSUE = new Date().getTime();
+    }
     const ramEvent = calculateEvent(
         calculateRamWarning(prevData),
         calculateRamWarning(newData),
@@ -89,6 +92,9 @@ export const calculateDataEvent = (prevData, newData) => {
         'ram_usage_recovered',
     );
     events.push(ramEvent);
+    if (ramEvent === 'ram_is_almost_full' ) {
+        newData.RAM_ISSUE = new Date().getTime();
+    }
 
     if (!prevData.online && newData.online) {
         events.push('host_is_online');
@@ -104,6 +110,7 @@ export const calculateAsyncEvents = async () => {
         if (!online && data.online)  {
             events.push('host_is_offline');
             data.online = false;
+            data.ONLINE_ISSUE = new Date().getTime();
         }
         PluginManager().handleEvents(events.filter(e => e), data);
     }));

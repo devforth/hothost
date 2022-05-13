@@ -167,7 +167,11 @@ services:
                 {{#if this.online}}
                 🟢 On
                 {{else}}
-                🔴 Off
+                <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_online_alert">🔴 Off</span>
+                <div id="tooltip_online_alert" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
+                  {{alertDuration this.online_issue}}
+                  <div class="tooltip-arrow" data-popper-arrow></div>
+                </div>
                 {{/if}}
               </td>
               <td class="pr-5 flex-1 min-w-1">
@@ -207,7 +211,7 @@ services:
                   &nbsp;&nbsp;&nbsp;
                   RAM: {{ this.ram_total }} ({{ this.ram_used }}% used)
                   {{#if this.ram_warning}}
-                    <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
+                    <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_ram_alert" class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
                   {{/if}}
                   &nbsp;&nbsp;&nbsp;
                   {{#if this.isSwap }}
@@ -217,7 +221,10 @@ services:
                   {{/if}}
                 </p>
               </td>
-
+              <div id="tooltip_ram_alert" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
+                {{alertDuration this.ram_issue}}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+              </div>
               <td class="flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
                 <p class="text-sm">
                   💽 Disk: {{ this.disk_total }}
@@ -225,7 +232,11 @@ services:
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                   {{ this.disk_used }}% used
                   {{#if disk_warning }}
-                    <span class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
+                    <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_disk_alert" class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
+                    <div id="tooltip_disk_alert" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
+                      {{alertDuration this.disk_issue}}
+                      <div class="tooltip-arrow" data-popper-arrow></div>
+                    </div>
                   {{else}}
                     <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">OK</span>
                   {{/if}}
