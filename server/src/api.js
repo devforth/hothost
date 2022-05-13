@@ -6,6 +6,7 @@ import database from './database.js';
 import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat } from './utils.js';
 import PluginManager from './pluginManager.js';
 import env from './env.js';
+import { eventDuration } from './utils.js';
 
 const router = express.Router();
 
@@ -69,6 +70,7 @@ router.post('/data/:secret', async (req, res) => {
             DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
             RAM_USED: sizeFormat(+newData.SYSTEM_TOTAL_RAM - +newData.SYSTEM_FREE_RAM),
             RAM_TOTAL: sizeFormat(+newData.SYSTEM_TOTAL_RAM),
+            EVENT_DURATION: eventDuration(newData, events)
         });
         database.data.monitoringData[index] = newData;
         await database.write();
@@ -80,7 +82,6 @@ router.post('/data/:secret', async (req, res) => {
 router.post('/add_user', mustBeAuthorizedView( async(req,res) => {
     const user = req.fields;
     const {users} = database.data;
-
     const existedLogin = users.findIndex(el => el.username === user.username);
 
     if (existedLogin === -1) {

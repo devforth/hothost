@@ -76,7 +76,7 @@ Just copy the password and use it here.
         {
             id: "disk_usage_recovered_message",
             name: "What message will be shown when you get disk_usage_recovered alert",
-            default_value: "👌🏼 {{ HOST_NAME }}: Disk usage recovered\n Now it is used {{DISK_USED}} / {{DISK_TOTAL}}. Time require to fix: {{ alertDuration this.DISK_ISSUE }}",
+            default_value: "👌🏼 {{ HOST_NAME }}: Disk usage recovered\n Now it is used {{DISK_USED}} / {{DISK_TOTAL}}. Time require to fix: {{ EVENT_DURATION }}",
             required: false,
             type: "text",
         },
@@ -90,7 +90,7 @@ Just copy the password and use it here.
         {
             id: "host_is_online_message",
             name: "What message will be shown when you get host_is_online_message alert",
-            default_value: "👌🏼 {{ HOST_NAME }}: Host back online, Downtime: {{ alertDuration this.ONLINE_ISSUE }}",
+            default_value: "👌🏼 {{ HOST_NAME }}: Host back online, Downtime: {{ EVENT_DURATION }}",
             required: false,
             type: "text",
         },
@@ -104,7 +104,7 @@ Just copy the password and use it here.
         {
             id: "ram_usage_recovered_message",
             name: "What message will be shown when you get ram_usage_recovered alert",
-            default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}. Time require to fix: {{ alertDuration this.RAM_ISSUE }}",
+            default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}. Time require to fix: {{ EVENT_DURATION }}",
             required: false,
             type: "text",
         },
@@ -114,31 +114,6 @@ Just copy the password and use it here.
 
   async onPluginEnabled() {
       this.hbs = hbs.create();
-      this.hbs.registerHelper('alertDuration', (lastAlert) => {
-        const now = new Date().getTime();
-        let time = (now - lastAlert) / 1000;
-    
-        const interval = {
-          days: '',
-          hours: '',
-          minutes: '',
-          seconds: '',
-        }
-    
-        interval.days = Math.floor(time/(3600 * 24)) + ' days ';
-        time %= 3600 * 24
-        interval.hours = Math.floor(time / 3600) + ' hours ';
-        time %= 3600;
-        interval.minutes = Math.floor(time / 60) + ' minutes ';
-        interval.seconds = (time % 60).toFixed(0) + ' seconds ';
-    
-        return Object.keys(interval).reduce((prev, cur) => {
-            const timeValue = interval[cur].split(' ')[0];
-            if (timeValue && timeValue !== '0') {return prev + interval[cur]}
-            return prev;
-        }, '')
-    }
-    )
   },
   async onPluginDisable() {
   },

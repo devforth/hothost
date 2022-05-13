@@ -5,6 +5,7 @@ import { create } from 'express-handlebars';
 
 import cookieParser from 'cookie-parser';
 import formidable from 'express-formidable';
+import humanizeDuration from 'humanize-duration';
 
 import viewRouter from './views.js';
 import apiRouter from './api.js';
@@ -45,33 +46,26 @@ async function main() {
         }
         const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
         return regionNames.of(country); },
-        alertDuration(lastAlert) {
-          if (!lastAlert) {
-            return 'No data'
-          }
-          console.log(lastAlert);
-          const now = new Date().getTime();
-          let time = (now - lastAlert) / 1000;
-          const interval = {
-            days: '',
-            hours: '',
-            minutes: '',
-            seconds: '',
-          }
-      
-          interval.days = Math.floor(time/(3600 * 24)) + ' days ';
-          time %= 3600 * 24
-          interval.hours = Math.floor(time / 3600) + ' hours ';
-          time %= 3600;
-          interval.minutes = Math.floor(time / 60) + ' minutes ';
-          interval.seconds = (time % 60).toFixed(0) + ' seconds ';
-      
-          return Object.keys(interval).reduce((prev, cur) => {
-              const timeValue = interval[cur].split(' ')[0];
-              if (timeValue && timeValue !== '0') {return prev + interval[cur]}
-              return prev;
-          }, '')
-      }
+      getDuration(eventLastTs) {
+        const now = new Date().getTime();
+        const configs = {
+          round: true,
+          language: "shortEn",
+          languages: {
+            shortEn: {
+              y: () => "y",
+              mo: () => "mo",
+              w: () => "w",
+              d: () => "d",
+              h: () => "h",
+              m: () => "m",
+              s: () => "s",
+              ms: () => "ms",
+            }}};
+ 
+          const duration = now - eventLastTs;
+          return humanizeDuration(duration, configs);
+       }  
      }
   });
 

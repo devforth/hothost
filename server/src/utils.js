@@ -1,6 +1,7 @@
 import md5 from 'md5';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
+import humanizeDuration from 'humanize-duration';
 
 import env from './env.js';
 import database from './database.js';
@@ -83,7 +84,7 @@ export const calculateDataEvent = (prevData, newData) => {
     events.push(diskSpaceEvent);
 
     if (diskSpaceEvent === 'disk_is_almost_full') {
-        newData.DISK_ISSUE = new Date().getTime();
+        newData.DISK_EVENT_TS = new Date().getTime();
     }
     const ramEvent = calculateEvent(
         calculateRamWarning(prevData),
@@ -93,7 +94,7 @@ export const calculateDataEvent = (prevData, newData) => {
     );
     events.push(ramEvent);
     if (ramEvent === 'ram_is_almost_full' ) {
-        newData.RAM_ISSUE = new Date().getTime();
+        newData.RAM_EVENT_TS = new Date().getTime();
     }
 
     if (!prevData.online && newData.online) {
@@ -110,7 +111,7 @@ export const calculateAsyncEvents = async () => {
         if (!online && data.online)  {
             events.push('host_is_offline');
             data.online = false;
-            data.ONLINE_ISSUE = new Date().getTime();
+            data.ONLINE_EVENT_TS = new Date().getTime();
         }
         PluginManager().handleEvents(events.filter(e => e), data);
     }));
@@ -137,3 +138,38 @@ export const parseNestedForm = (fields) => {
         return acc;
     }, {});
 };
+
+export const eventDuration = (data, events) => {
+    if (!data) {
+        return;
+    }
+    const configs = {
+        round: true,
+        language: "shortEn",
+        languages: {
+          shortEn: {
+            y: () => "y",
+            mo: () => "mo",
+            w: () => "w",
+            d: () => "d",
+            h: () => "h",
+            m: () => "m",
+            s: () => "s",
+            ms: () => "ms",
+          }}}
+    const now = new Date().getTime();
+    let duration;
+    switch(events[0]) {
+        case 'host_is_online':
+            duration = now - data.ONLINE_EVENT_TS;
+            break;
+        case 'ram_usage_recovered':
+            duration = now - data.RAM_EVENT_TS;
+            break;
+        case 'disk_usage_recovered':
+            duration = now - data.DISK_EVENT_TS;
+            break;
+    }
+
+    return humanizeDuration(duration, configs);
+}

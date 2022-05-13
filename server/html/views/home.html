@@ -169,7 +169,7 @@ services:
                 {{else}}
                 <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_online_alert">🔴 Off</span>
                 <div id="tooltip_online_alert" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
-                  {{alertDuration this.online_issue}}
+                  {{getDuration online_event_ts}}
                   <div class="tooltip-arrow" data-popper-arrow></div>
                 </div>
                 {{/if}}
@@ -222,7 +222,7 @@ services:
                 </p>
               </td>
               <div id="tooltip_ram_alert" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
-                {{alertDuration this.ram_issue}}
+                {{getDuration ram_event_ts}}
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
               <td class="flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
@@ -234,7 +234,7 @@ services:
                   {{#if disk_warning }}
                     <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_disk_alert" class="bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
                     <div id="tooltip_disk_alert" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
-                      {{alertDuration this.disk_issue}}
+                      {{getDuration disk_event_ts}}
                       <div class="tooltip-arrow" data-popper-arrow></div>
                     </div>
                   {{else}}
