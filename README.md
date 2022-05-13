@@ -18,6 +18,8 @@ For each host it allows to see:
 * RAM size and current RAM ussage
 * See whether SWAP is enabled and whether it is used
 
+## [👉🏼 STEP BY STEP INSTALLATION GUIDE](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
+
 # Preview
 
 ![image](https://user-images.githubusercontent.com/1838656/167828815-25082ef0-c0b7-45dd-881a-f4f63b0861ea.png)
@@ -38,19 +40,21 @@ Available plugins:
 
 # Installation
 
-First you need to run HotHost Web Server. It will then give you clear guide how to add agents. 
-You can use any host with public IP. You are responsible for setting up SSL. 
+First you need to run HotHost Web Server. Web-server itself, when will be started, will give you clear guide how to add agents. 
+
+You can use any host with public IP. You are responsible for setting up HTTPS.
 
 You can use one of next options:
-- Nginx or traefik with connected external certificate or free Let's Encrypt certificate
+- Nginx or Rraefik with connected external certificate or free Let's Encrypt certificate
 - Free Cloudflare CDN which terminates SSL and gives additional layer of cecurity.
 
+We recommend you to check this guide how to [setup HotHost with free Cloudflare plan and EC2 Nano](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
 
-# Web Server
+If you have existing Docker/Compose stacks, you can use snippets below:
 
 ## Docker Compose
 
-First setup HotHost Web, for example to add it into existing compose stack:
+Add to your existing compose stack:
 
 ```
 version: '3.5'
@@ -71,9 +75,6 @@ volumes:
 ```
 
 Now you should proxy https://subdomain.yourdomain.com to serve requests from 127.0.0.1:8007.
-
-* Use https://subdomain.yourdomain.com to view as admin and add new agents
-
 
 Example Nginx Proxy:
 
@@ -108,7 +109,11 @@ server {
 ```
 
 
-## Pure Docker
+* After that Use https://subdomain.yourdomain.com to view as admin and add new agents
+
+
+
+### Pure Docker
 
 In case if you want to use pure docker:
 
@@ -149,8 +154,6 @@ Every plugin is a standalone .js of ESM format (with exports/imports, CommonJS w
 Currently plugin file should be placed into `server/src/plugins` directory.
 
 If you want to bundle some dedicated node modules then you need to compile them using webpack or other bundler which supports ESM outputs. Please see `server/src/plugins/gmail.src/gmail.src.js` - it bundels node-mailer into plugin.
-
-
 
 
 # Development
