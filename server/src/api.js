@@ -110,4 +110,15 @@ router.post('/remove_user', mustBeAuthorizedView( async(req, res) => {
     res.redirect('/users/');
 }))
 
+router.post('/remove_host', mustBeAuthorizedView( async(req,res) => {
+    const {id} = req.query;
+
+    const index = database.data.monitoringData.findIndex(host => host.id === id);
+    if (index !== -1) {
+        database.data.monitoringData.splice(index, 1);
+        await database.write();
+    }
+    res.redirect('/');
+}))
+
 export default router;

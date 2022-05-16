@@ -44,6 +44,7 @@ const getMonitoringData = async (req) => {
                 secret: req.user && data.secret,
             } :
             {
+                id: data.id,
                 secret: req.user && data.secret,
                 icon_name: getIconName(data.HOST_OS_NAME),
                 online: (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime(),

@@ -54,7 +54,7 @@ Webhook is URL which look like this:
         {
             id: "disk_usage_recovered_message",
             name: "What message will be shown when you get disk_usage_recovered alert",
-            default_value: "👌🏼 {{ HOST_NAME }}: Disk usage recovered\n Now it is used {{DISK_USED}} / {{DISK_TOTAL}}. Time require to fix: {{ EVENT_DURATION }}",
+            default_value: "👌🏼 {{ HOST_NAME }}: Disk usage recovered\n Now it is used {{DISK_USED}} / {{DISK_TOTAL}}. Time required to fix: {{ EVENT_DURATION }}",
             required: false,
             type: "text",
         },
@@ -82,7 +82,7 @@ Webhook is URL which look like this:
         {
             id: "ram_usage_recovered_message",
             name: "What message will be shown when you get ram_usage_recovered alert",
-            default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}. Time require to fix: {{ EVENT_DURATION }}",
+            default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}. Time required to fix: {{ EVENT_DURATION }}",
             required: false,
             type: "text",
         },

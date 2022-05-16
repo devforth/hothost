@@ -7,6 +7,21 @@ import env from './env.js';
 import database from './database.js';
 import PluginManager from './pluginManager.js';
 
+export const DATE_HUMANIZER_CONFIG = {
+    round: true,
+    language: "shortEn",
+    languages: {
+      shortEn: {
+        y: () => "y",
+        mo: () => "mo",
+        w: () => "w",
+        d: () => "d",
+        h: () => "h",
+        m: () => "m",
+        s: () => "s",
+        ms: () => "ms",
+      }}};
+
 export const checkUserExistsOrCreate = async () => {
     if (database.data.users.length === 0) {
         database.data.users.push({
@@ -143,20 +158,6 @@ export const eventDuration = (data, events) => {
     if (!data) {
         return;
     }
-    const configs = {
-        round: true,
-        language: "shortEn",
-        languages: {
-          shortEn: {
-            y: () => "y",
-            mo: () => "mo",
-            w: () => "w",
-            d: () => "d",
-            h: () => "h",
-            m: () => "m",
-            s: () => "s",
-            ms: () => "ms",
-          }}}
     const now = new Date().getTime();
     let duration;
     switch(events[0]) {
@@ -171,5 +172,5 @@ export const eventDuration = (data, events) => {
             break;
     }
 
-    return humanizeDuration(duration, configs);
+    return humanizeDuration(duration, DATE_HUMANIZER_CONFIG);
 }

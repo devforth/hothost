@@ -14,7 +14,7 @@ import env from './env.js';
 import database from './database.js';
 import PluginManager from "./pluginManager.js";
 
-import { calculateAsyncEvents, checkUserExistsOrCreate } from './utils.js';
+import { calculateAsyncEvents, checkUserExistsOrCreate, DATE_HUMANIZER_CONFIG } from './utils.js';
 import { authMiddleware } from './middleware.js';
 
 
@@ -48,23 +48,9 @@ async function main() {
         return regionNames.of(country); },
       getDuration(eventLastTs) {
         const now = new Date().getTime();
-        const configs = {
-          round: true,
-          language: "shortEn",
-          languages: {
-            shortEn: {
-              y: () => "y",
-              mo: () => "mo",
-              w: () => "w",
-              d: () => "d",
-              h: () => "h",
-              m: () => "m",
-              s: () => "s",
-              ms: () => "ms",
-            }}};
  
           const duration = now - eventLastTs;
-          return humanizeDuration(duration, configs);
+          return humanizeDuration(duration, DATE_HUMANIZER_CONFIG);
        }  
      }
   });
