@@ -89,33 +89,37 @@ Chat in which you send message will be used to publish notifications.
       },
     ],
 
-    async onPluginEnabled() {
-      this.hbs = hbs.create();
-    },
-
-    async handleEvent({ eventType, data, settings }) {
+    async sendMessage(settings, text) {
       const botToken = settings.params.botToken;
-      const template = this.hbs.compile(settings.params[`${eventType}_message`]);
-      const text = template(data);
-
+    if(!text) {
+        text = '🔥 This is a test notification from HotHost';
+      }
       const firstResp = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
       }).then(r => r.json());
       console.log('TG First resp', firstResp);
       const chatId = firstResp.result[0]?.message?.chat?.id;
-
       const secondResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
       }).then(r => r.json());
-
       console.log('TG secode resp', secondResp);
-
-
     },
 
-    
+    async onPluginEnabled(settings) {
+      this.hbs = hbs.create();
+      if(settings){
+      const text = '🔥 This is a test notification from HotHost';
 
+      this.sendMessage(settings, text);
+      }
+    },
 
+    async handleEvent({ eventType, data, settings }) {
+      const template = this.hbs.compile(settings.params[`${eventType}_message`]);
+      const text = template(data);
+
+      this.sendMessage(settings, text);
+    },
 };

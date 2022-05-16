@@ -111,18 +111,11 @@ Just copy the password and use it here.
   ],
 
   configuration: {},
-
-  async onPluginEnabled() {
-      this.hbs = hbs.create();
-  },
-  async onPluginDisable() {
-  },
-  async handleEvent({ eventType, data, settings }) {
-    const template = this.hbs.compile(settings.params[`${eventType}_message`]);
-    const text = template(data);
-
+    async sendMessage(settings, text) {
+    if(!text) {
+        text = '🔥 This is a test notification from HotHost';
+    }
     const { gmail_email, google_account_passwod, notify_emails } = settings.params;
-    
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -136,5 +129,21 @@ Just copy the password and use it here.
       subject: text.slice(0, 60) + '...', // Subject line
       text: text, // plain text body
     });
+  },
+
+  async onPluginEnabled() {
+      this.hbs = hbs.create();
+      if(settings){
+        const text = '🔥 This is a test notification from HotHost';
+        this.sendMessage(settings, text);
+        }
+  },
+  async onPluginDisable() {
+  },
+  async handleEvent({ eventType, data, settings }) {
+    const template = this.hbs.compile(settings.params[`${eventType}_message`]);
+    const text = template(data);
+
+    this.sendMessage(settings, text);    
   },
 };

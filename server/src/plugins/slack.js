@@ -88,21 +88,11 @@ Webhook is URL which look like this:
         },
     ],
 
-    // executed once when plugin is enabled, could be used to perform some initialization of plugin
-    async onPluginEnabled() {
-        this.hbs = hbs.create();
-    },
-
-    // executed once when plugin is disabled
-    async onPluginDisable() {
-    },
-
-    // main event handling is done here
-    async handleEvent({ eventType, data, settings }) {
+    async sendMessage(settings, text) {
+        if(!text) {
+            text = '🔥 This is a test notification from HotHost';
+        }
         const { webhook } = settings.params;
-        const template = this.hbs.compile(settings.params[`${eventType}_message`]);
-        const text = template(data);
-
         await fetch(webhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -112,5 +102,25 @@ Webhook is URL which look like this:
                 text: text,
             }),
         });
+    },
+    // executed once when plugin is enabled, could be used to perform some initialization of plugin
+    async onPluginEnabled(settings) {
+        this.hbs = hbs.create();
+        if(settings){
+            const text = '🔥 This is a test notification from HotHost';
+            this.sendMessage(settings, text);
+        }
+    },
+
+    // executed once when plugin is disabled
+    async onPluginDisable() {
+    },
+
+    // main event handling is done here
+    async handleEvent({ eventType, data, settings }) {
+        const template = this.hbs.compile(settings.params[`${eventType}_message`]);
+        const text = template(data);
+
+        this.sendMessage(settings, text);
     },
 };

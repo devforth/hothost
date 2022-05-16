@@ -28,7 +28,7 @@
     <div>
       <h2 class="text-3xl mb-10 font-bold leading-none text-gray-900 dark:text-white">Configure plugin</h2>
 
-      <form method="POST">
+      <form id="plugin_form" method="POST">
       {{#each params}}
         {{#if (eq this.type 'text' )}}
           <div class="mb-6">
@@ -82,7 +82,8 @@
         {{/if }}
 
       {{/each}}
-        <button class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+      <div class="flex items-center ">
+        <button type="submit" class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
               focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center">
             {{#if pluginSettings.enabled}}
               Save settings
@@ -90,6 +91,10 @@
               Enable Plugin
             {{/if}}
         </button>
+        <span id="notification" class="invisible ml-4 text-red-500 transition-all">
+          Save & send test notification
+        </span>
+      </div>
       </form>
     </div>
 
@@ -117,5 +122,14 @@
     setTimeout(hideCOpyTost, 5000);
 
   }
+
+  const notification = document.getElementById('notification');
+  document.getElementById("plugin_form").onsubmit = function() {
+    notification.classList.toggle('invisible');
+    setTimeout(()=>{
+      window.location = "/plugins/"
+    },1000)
+  };
+
 </script>
 

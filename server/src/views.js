@@ -176,17 +176,18 @@ router.post('/plugin/:id/', mustBeAuthorizedView(async (req, res) => {
 
         if (psIndex !== -1) {
             if (!database.data.pluginSettings[psIndex].enabled && newPluginSetting.enabled) {
-                await plugin.onPluginEnabled?.();
+                await plugin.onPluginEnabled?.(newPluginSetting);
             }
             database.data.pluginSettings[psIndex] = newPluginSetting;
+                await plugin.sendMessage?.(newPluginSetting);
         } else {
             database.data.pluginSettings.push(newPluginSetting);
-            await plugin.onPluginEnabled?.();
+            await plugin.onPluginEnabled?.(newPluginSetting);
         }
 
         await database.write();
+        // res.redirect('/plugins/');
 
-        res.redirect(`/plugins/`);
     }
 }));
 

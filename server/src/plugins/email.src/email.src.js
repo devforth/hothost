@@ -104,18 +104,11 @@ E.g. by googling Nodemailer mailgun you can find this answer https://stackoverfl
   ],
 
   configuration: {},
-
-  async onPluginEnabled() {
-    this.hbs = hbs.create();
-  },
-  async onPluginDisable() {
-  },
-  async handleEvent({ eventType, data, settings }) {
-    const template = this.hbs.compile(settings.params[`${eventType}_message`]);
-    const text = template(data);
-
+  async sendMessage(settings,text) {
+    if(!text) {
+      text = '🔥 This is a test notification from HotHost';
+  }
     const { username, password, provider, notify_emails } = settings.params;
-    
     const transporter = nodemailer.createTransport({
       service: provider,
       auth: {
@@ -129,5 +122,20 @@ E.g. by googling Nodemailer mailgun you can find this answer https://stackoverfl
       subject: text.slice(0, 60) + '...', // Subject line
       text: text, // plain text body
     });
+  },
+  async onPluginEnabled() {
+    this.hbs = hbs.create();
+    if(settings){
+      const text = '🔥 This is a test notification from HotHost';
+      this.sendMessage(settings, text);
+      }
+  },
+  async onPluginDisable() {
+  },
+  async handleEvent({ eventType, data, settings }) {
+    const template = this.hbs.compile(settings.params[`${eventType}_message`]);
+    const text = template(data);
+
+    this.sendMessage(settings, text);
   },
 };
