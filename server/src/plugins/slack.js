@@ -97,7 +97,7 @@ Webhook is URL which look like this:
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                icon_emoji: ":fire:",
+                icon_url: "https://raw.githubusercontent.com/devforth/hothost/main/server/static/img/slack_ico.png",
                 username: "HotHost",
                 text: text,
             }),
