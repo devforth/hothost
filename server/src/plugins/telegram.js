@@ -107,13 +107,8 @@ Chat in which you send message will be used to publish notifications.
       console.log('TG secode resp', secondResp);
     },
 
-    async onPluginEnabled(settings) {
+    async onPluginEnabled() {
       this.hbs = hbs.create();
-      if(settings){
-      const text = '🔥 This is a test notification from HotHost';
-
-      this.sendMessage(settings, text);
-      }
     },
 
     async handleEvent({ eventType, data, settings }) {

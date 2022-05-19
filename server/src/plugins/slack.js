@@ -104,12 +104,8 @@ Webhook is URL which look like this:
         });
     },
     // executed once when plugin is enabled, could be used to perform some initialization of plugin
-    async onPluginEnabled(settings) {
+    async onPluginEnabled() {
         this.hbs = hbs.create();
-        if(settings){
-            const text = '🔥 This is a test notification from HotHost';
-            this.sendMessage(settings, text);
-        }
     },
 
     // executed once when plugin is disabled

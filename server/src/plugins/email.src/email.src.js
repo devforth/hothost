@@ -125,10 +125,6 @@ E.g. by googling Nodemailer mailgun you can find this answer https://stackoverfl
   },
   async onPluginEnabled() {
     this.hbs = hbs.create();
-    if(settings){
-      const text = '🔥 This is a test notification from HotHost';
-      this.sendMessage(settings, text);
-      }
   },
   async onPluginDisable() {
   },
