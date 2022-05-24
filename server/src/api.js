@@ -121,4 +121,17 @@ router.post('/remove_host', mustBeAuthorizedView( async(req,res) => {
     res.redirect('/');
 }))
 
+router.post('/add_label', mustBeAuthorizedView( async(req,res) => {
+    const {id} = req.query;
+    const {label} = req.fields;
+
+    const index = database.data.monitoringData.findIndex(el => el.id === id);
+
+    if (index !== -1) {
+        database.data.monitoringData[index].HOST_LABEL = label;
+        await database.write();
+    }
+    res.redirect('/');
+}))
+
 export default router;

@@ -52,6 +52,7 @@ const getMonitoringData = async (req) => {
                 ram_event_ts: data.RAM_EVENT_TS,
                 disk_event_ts: data.DISK_EVENT_TS,
                 hostname: data.HOST_NAME,
+                label: data.HOST_LABEL,
                 public_ip: data.HOST_PUBLIC_IP,
                 country: data.HOST_PUBLIC_IP_COUNTRY,
                 os_name: data.HOST_OS_NAME,
