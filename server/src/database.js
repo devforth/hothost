@@ -17,7 +17,12 @@ db.read = async function () {
 
     db.data.users ||= [];
     db.data.monitoringData ||= [];
-    db.data.settings ||= [];
+    db.data.settings ||= {
+        RAM_THRESHOLD: 90,
+        RAM_STABILIZATION_LEVEL: 3,
+        DISK_THRESHOLD: 90,
+        DISK_STABILIZATION_LEVEL: 1,
+    };
     db.data.pluginSettings ||= [];
 };
 
