@@ -17,6 +17,7 @@ db.read = async function () {
 
     db.data.users ||= [];
     db.data.monitoringData ||= [];
+    db.data.settings ||= [];
     db.data.pluginSettings ||= [];
 };
 

@@ -30,6 +30,7 @@ const ifUnknown = (value, trueValue, falseValue) => {
 };
 
 const getMonitoringData = async (req) => {
+    const {RAM_THRESHOLD, DISK_THRESHOLD} = database.data.settings;
     const monitoringData = database.data.monitoringData
         // Return all if user logged in or only those that have data
         .filter((data) => req.user || data.createdAt !== data.updatedAt)
@@ -61,16 +62,26 @@ const getMonitoringData = async (req) => {
                 cpu_count: data.SYSTEM_CPU_LOGICAL_CPU_COUNT,
                 ram_total: ifUnknown(data.SYSTEM_TOTAL_RAM, "unknown", sizeFormat(data.SYSTEM_TOTAL_RAM)),
                 ram_used: ((((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) / +data.SYSTEM_TOTAL_RAM) * 100) || 0).toFixed(0),
-                ram_warning: ((+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100) < 20,
+                ram_warning: ((+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100) < 100 - RAM_THRESHOLD,
                 isSwap: (!!data.SYSTEM_TOTAL_SWAP && data.SYSTEM_TOTAL_SWAP !== '0'),
                 swap_total: ifUnknown(data.SYSTEM_TOTAL_SWAP, "unknown", sizeFormat(data.SYSTEM_TOTAL_SWAP)),
                 swap_used: ((((+data.SYSTEM_TOTAL_SWAP - +data.SYSTEM_FREE_SWAP) / +data.SYSTEM_TOTAL_SWAP) * 100) || 0).toFixed(0),
                 disk_total: sizeFormat(+data.DISK_AVAIL + +data.DISK_USED),
                 disk_used: ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100).toFixed(0),
-                disk_warning: ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > 80,
+                disk_warning: ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > DISK_THRESHOLD,
             }
         )
     );
+}
+
+const getSettings = () => {
+    const settings = database.data.settings;
+    return {
+        ram_threshold: settings.RAM_THRESHOLD,
+        ram_stabilization_lvl: settings.RAM_STABILIZATION_LEVEL,
+        disk_threshold: settings.DISK_THRESHOLD,
+        disk_stabilization_lvl:settings.DISK_STABILIZATION_LEVEL,
+    }
 }
 
 router.get('/', mustBeAuthorizedView(async (req, res) =>  {
@@ -223,6 +234,11 @@ router.post('/plugin/disable/:id/', mustBeAuthorizedView(async (req, res) => {
 router.get('/users/', mustBeAuthorizedView((req, res) => {
     res.locals.userInfo = database.data.users;
     res.render('users')
+}));
+
+router.get('/settings', mustBeAuthorizedView((req, res) => {
+    res.locals.settings = getSettings();
+    res.render('settings')
 }));
 
 export default router;

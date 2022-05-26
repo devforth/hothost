@@ -6,7 +6,7 @@ import database from './database.js';
 import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat } from './utils.js';
 import PluginManager from './pluginManager.js';
 import env from './env.js';
-import { eventDuration } from './utils.js';
+import { eventDuration, setWarning } from './utils.js';
 
 const router = express.Router();
 
@@ -53,6 +53,7 @@ router.post('/data/:secret', async (req, res) => {
             return acc;
         }, {});
         const dataItem = database.data.monitoringData[index];
+        setWarning(data, dataItem);
         const newData = {
             ...dataItem,
             ...data,
@@ -132,6 +133,18 @@ router.post('/add_label', mustBeAuthorizedView( async(req,res) => {
         await database.write();
     }
     res.redirect('/');
+}))
+
+router.post('/edit_settings', mustBeAuthorizedView( async(req,res) => { 
+    const {disk_threshold, disk_stabilization_lvl, ram_threshold, ram_stabilization_lvl} = req.fields;
+    
+    database.data.settings = {
+        RAM_THRESHOLD: +ram_threshold,
+        RAM_STABILIZATION_LEVEL: +ram_stabilization_lvl,
+        DISK_THRESHOLD:  +disk_threshold,
+        DISK_STABILIZATION_LEVEL: +disk_stabilization_lvl
+    }
+    res.redirect('/settings');
 }))
 
 export default router;

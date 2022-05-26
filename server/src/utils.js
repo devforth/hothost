@@ -76,6 +76,18 @@ export const readableRandomStringMaker = (length) => {
     return s;
 };
 
+export const setDefaultSettings = async () => {
+    if (database.data.settings.length === 0) {
+        database.data.settings.push({
+            RAM_THRESHOLD: 90,
+            RAM_STABILIZATION_LEVEL: 3,
+            DISK_THRESHOLD: 90,
+            DISK_STABILIZATION_LEVEL: 1,
+        });
+        await database.write();
+    }
+}
+
 export const calculateEvent = (prevTrigger, newTrigger, eventOnValue, eventOffValue) => {
     if (prevTrigger !== newTrigger) {
         if (newTrigger) return eventOnValue;
@@ -84,11 +96,37 @@ export const calculateEvent = (prevTrigger, newTrigger, eventOnValue, eventOffVa
     return null;
 };
 
+export const calculateWarning = (usage, lastEvent, threshold, stabilizationLvl) => {
+    const onEventBound = threshold + stabilizationLvl;
+    const offEventBound = threshold - stabilizationLvl;
+
+    if(usage  > onEventBound) {
+        return true;
+    } else if (usage < offEventBound) {
+        return false;
+    } else if (usage <= onEventBound && usage >= offEventBound) {
+        return lastEvent;
+    }
+}
+
 export const calculateDataEvent = (prevData, newData) => {
     const events = [];
+    const { RAM_THRESHOLD, RAM_STABILIZATION_LEVEL, DISK_THRESHOLD, DISK_STABILIZATION_LEVEL} = database.data.settings;
 
-    const calculateDiskWarning = (data) => ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > 80;
-    const calculateRamWarning = (data) => (((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) / +data.SYSTEM_TOTAL_RAM) * 100) > 80;
+    const calculateDiskWarning = (data) => {
+        const diskUsage = ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100);
+        const warning = calculateWarning(diskUsage, data.last_disk_event, DISK_THRESHOLD, DISK_STABILIZATION_LEVEL);
+
+        data.last_disk_event = warning;
+        return warning;
+    }
+    const calculateRamWarning = (data) => {
+        const ramUsage =  (((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) / +data.SYSTEM_TOTAL_RAM) * 100);
+        const warning = calculateWarning(ramUsage, data.last_ram_event, RAM_THRESHOLD, RAM_STABILIZATION_LEVEL);
+        
+        data.last_ram_event = warning;
+        return warning;
+    }
 
     const diskSpaceEvent = calculateEvent(
         calculateDiskWarning(prevData),
@@ -98,9 +136,6 @@ export const calculateDataEvent = (prevData, newData) => {
     );
     events.push(diskSpaceEvent);
 
-    if (diskSpaceEvent === 'disk_is_almost_full') {
-        newData.DISK_EVENT_TS = new Date().getTime();
-    }
     const ramEvent = calculateEvent(
         calculateRamWarning(prevData),
         calculateRamWarning(newData),
@@ -108,9 +143,6 @@ export const calculateDataEvent = (prevData, newData) => {
         'ram_usage_recovered',
     );
     events.push(ramEvent);
-    if (ramEvent === 'ram_is_almost_full' ) {
-        newData.RAM_EVENT_TS = new Date().getTime();
-    }
 
     if (!prevData.online && newData.online) {
         events.push('host_is_online');
@@ -173,4 +205,17 @@ export const eventDuration = (data, events) => {
     }
 
     return humanizeDuration(duration, DATE_HUMANIZER_CONFIG);
+}
+
+export const setWarning = (data, prevData) => {
+    const {RAM_THRESHOLD, DISK_THRESHOLD} = database.data.settings;
+    const isRamWarning =  ((+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100) < 100 - RAM_THRESHOLD;
+    const isDiskWarning = ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100) > DISK_THRESHOLD;
+
+    if(isRamWarning && !prevData.last_ram_event){
+        data.RAM_EVENT_TS = new Date().getTime();
+    }
+    if(isDiskWarning && !prevData.last_disk_event){
+        data.DISK_EVENT_TS = new Date().getTime();
+    }
 }
