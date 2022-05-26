@@ -212,7 +212,7 @@ services:
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                   CPUs: {{ this.cpu_count }}
                   &nbsp;&nbsp;&nbsp;
-                  RAM: {{ this.ram_total }} ({{ this.ram_used }}% used)
+                  <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_ram_used-{{@index}}">RAM: {{ this.ram_total }} ({{ this.ram_used_percentage }}% used)</span>
                   {{#if this.ram_warning}}
                     <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_ram_alert-{{@index}}" class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">ALERT</span>
                   {{/if}}
@@ -226,6 +226,10 @@ services:
               </td>
               <div id="tooltip_ram_alert-{{@index}}" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
                 {{getDuration this.ram_event_ts}}
+                <div class="tooltip-arrow" data-popper-arrow></div>
+              </div>
+              <div id="tooltip_ram_used-{{@index}}" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700">
+                Used RAM: {{this.ram_used}}
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
               <td class="flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">

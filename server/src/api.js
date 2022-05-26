@@ -126,10 +126,10 @@ router.post('/add_label', mustBeAuthorizedView( async(req,res) => {
     const {id} = req.query;
     const {label} = req.fields;
 
-    const index = database.data.monitoringData.findIndex(el => el.id === id);
+    const monData = database.data.monitoringData.find(el => el.id === id);
 
-    if (index !== -1) {
-        database.data.monitoringData[index].HOST_LABEL = label;
+    if (monData) {
+        monData.HOST_LABEL = label;
         await database.write();
     }
     res.redirect('/');
