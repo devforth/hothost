@@ -61,12 +61,18 @@ router.post('/data/:secret', async (req, res) => {
             online: true,
         };
         // for testing
-        // newData.DISK_AVAIL = Math.round(Math.random()) * 10_0000000000000;
-        // newData.SYSTEM_FREE_RAM = 0;
+        // const DIST_TOTAL = +newData.DISK_AVAIL + +newData.DISK_USED;
+        // const DISK_USED_PERCENT = 0.87;
+        // newData.DISK_AVAIL = DIST_TOTAL * ( 1 - DISK_USED_PERCENT );
+        // newData.DISK_USED = DIST_TOTAL * DISK_USED_PERCENT;
+
+        // const RAM_USED_PERCENT = 0.80;
+        // newData.SYSTEM_FREE_RAM = +newData.SYSTEM_TOTAL_RAM * (1 - RAM_USED_PERCENT);
+
         const events = calculateDataEvent(database.data.monitoringData[index], newData);
         await PluginManager().handleEvents(events, {
             ...newData,
-            // variables which might be used in templete
+            // variables which might be used in template
             DISK_USED: sizeFormat(+newData.DISK_USED),
             DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
             RAM_USED: sizeFormat(+newData.SYSTEM_TOTAL_RAM - +newData.SYSTEM_FREE_RAM),
