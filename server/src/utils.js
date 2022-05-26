@@ -111,7 +111,7 @@ export const calculateWarning = (usage, lastEvent, threshold, stabilizationLvl) 
 
 export const calculateDataEvent = (prevData, newData) => {
     const events = [];
-    const { RAM_THRESHOLD, RAM_STABILIZATION_LEVEL, DISK_THRESHOLD, DISK_STABILIZATION_LEVEL} = database.data.settings;
+    const { RAM_THRESHOLD, RAM_STABILIZATION_LEVEL, DISK_THRESHOLD, DISK_STABILIZATION_LEVEL } = database.data.settings;
 
     const calculateDiskWarning = (data) => {
         const diskUsage = ((+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100);
