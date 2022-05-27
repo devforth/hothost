@@ -76,18 +76,6 @@ export const readableRandomStringMaker = (length) => {
     return s;
 };
 
-export const setDefaultSettings = async () => {
-    if (database.data.settings.length === 0) {
-        database.data.settings.push({
-            RAM_THRESHOLD: 90,
-            RAM_STABILIZATION_LEVEL: 3,
-            DISK_THRESHOLD: 90,
-            DISK_STABILIZATION_LEVEL: 1,
-        });
-        await database.write();
-    }
-}
-
 export const calculateEvent = (prevTrigger, newTrigger, eventOnValue, eventOffValue) => {
     if (prevTrigger !== newTrigger) {
         if (newTrigger) return eventOnValue;
