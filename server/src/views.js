@@ -90,6 +90,11 @@ router.get('/', mustBeAuthorizedView(async (req, res) =>  {
     res.render('home');
 }));
 
+router.get('/update', async (req,res) => {
+    res.locals.monitoringData = await getMonitoringData(req);
+    res.render('monitoring_table', {layout: false});
+});
+
 router.get('/public', async (req, res) => {
     if (!env.WEB_BASIC_PUBLIC_PASSWORD || !env.WEB_BASIC_PUBLIC_USERNAME) {
         res.statusCode = 400;

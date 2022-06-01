@@ -32,6 +32,7 @@ async function main() {
     extname: 'html',
     defaultLayout: 'main',
     layoutsDir: path.join('html', 'layouts'),
+    partialsDir: path.join('html', 'views'),
 
     helpers: {
       or(a, b) { return a || b },
