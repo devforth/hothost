@@ -196,16 +196,14 @@ services:
     window.location = "/"
   }
 
-  const monitoring_table = document.getElementById('monitoring');
-  const myRow = document.getElementById('myRow')
+  const monitoringTable = document.getElementById('monitoring');
   setInterval(async () => {
     const response = await fetch('/update');
     const data = await response.text();
-    if (monitoring_table) {
-      monitoring_table.innerHTML = "";
-      monitoring_table.innerHTML = data;
+    if (monitoringTable) {
+      monitoringTable.innerHTML = data;
 
-    window.document.dispatchEvent(new Event("DOMContentLoaded"));
+      window.document.dispatchEvent(new Event("DOMContentLoaded"));
     }
   }, 10000);
 </script>
