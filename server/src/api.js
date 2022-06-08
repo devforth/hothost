@@ -3,10 +3,8 @@ import express from 'express';
 import md5 from 'md5';
 
 import database from './database.js';
-import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat } from './utils.js';
+import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat, eventDuration, setWarning, createMonitorDataset, stopScheduleJob, createScheduleJob} from './utils.js';
 import PluginManager from './pluginManager.js';
-import env from './env.js';
-import { eventDuration, setWarning } from './utils.js';
 
 const router = express.Router();
 
@@ -135,7 +133,7 @@ router.post('/add_label', mustBeAuthorizedView( async(req,res) => {
     const monData = database.data.monitoringData.find(el => el.id === id);
 
     if (monData) {
-        monData.HOST_LABEL = label;
+        monData.HOST_LABEL = label.trim();
         await database.write();
     }
     res.redirect('/');
@@ -152,5 +150,42 @@ router.post('/edit_settings', mustBeAuthorizedView( async(req,res) => {
     }
     res.redirect('/settings');
 }))
+
+router.post('/add_http_monitor', mustBeAuthorizedView( async(req,res) => {
+    const httpMonitorData = req.fields;
+
+    const monitor = createMonitorDataset(httpMonitorData);
+    database.data.httpMonitoringData.push(monitor);
+    await database.write();
+    createScheduleJob(monitor);
+
+    res.redirect('/http-monitor');
+}));
+
+router.post('/remove_http_monitor',  mustBeAuthorizedView( async(req,res) => {
+    const {id} = req.query;
+
+    stopScheduleJob(id);
+    const index = database.data.httpMonitoringData.findIndex(host => host.id === id);
+    if (index !== -1) {
+        database.data.httpMonitoringData.splice(index, 1);
+        await database.write();
+    }
+    
+    res.redirect('/http-monitor');
+}));
+
+router.post('/add_http_label', mustBeAuthorizedView( async(req,res) => {
+    const {id} = req.query;
+    const {label} = req.fields;
+
+    const data = database.data.httpMonitoringData.find(el => el.id === id);
+    if (data) {
+        data.label = label.trim();
+        await database.write();
+    }
+    
+    res.redirect('/http-monitor');
+}));
 
 export default router;

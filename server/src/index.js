@@ -14,7 +14,7 @@ import env from './env.js';
 import database from './database.js';
 import PluginManager from "./pluginManager.js";
 
-import { calculateAsyncEvents, checkUserExistsOrCreate, DATE_HUMANIZER_CONFIG } from './utils.js';
+import { calculateAsyncEvents, checkUserExistsOrCreate, DATE_HUMANIZER_CONFIG, startScheduler } from './utils.js';
 import { authMiddleware } from './middleware.js';
 
 
@@ -22,7 +22,7 @@ async function main() {
   await database.read();
   await PluginManager().loadPlugins();
   await checkUserExistsOrCreate();
-
+  startScheduler();
   setTimeout(() => setInterval(calculateAsyncEvents, 1000), 90 * 1000);
 
   const app = express();

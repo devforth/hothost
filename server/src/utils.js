@@ -2,6 +2,7 @@ import md5 from 'md5';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import humanizeDuration from 'humanize-duration';
+import fetch from 'node-fetch';
 
 import env from './env.js';
 import database from './database.js';
@@ -206,4 +207,69 @@ export const setWarning = (data, prevData) => {
     if(isDiskWarning && !prevData.last_disk_event){
         data.DISK_EVENT_TS = new Date().getTime();
     }
+}
+
+export const createMonitorDataset = (data) => {
+    const now = new Date().getTime();
+    const monitor = {
+        id: uuidv4(),
+        event_created: now,
+    };
+    for (const key in data) {
+        if (data[key] !== '') {
+            monitor[key] = data[key].trim();
+        }
+    }
+    return monitor;
+}
+
+export const checkStatus = async (url, monitorType, keyWord, enableBaseAuth, login, password) => { 
+    const basicAuth = 'Basic ' + Buffer.from(`${login}:${password}`).toString('base64');
+
+    const response = enableBaseAuth ? 
+                        await fetch(url, {method:'GET', headers: {Authorization: basicAuth}}).catch(() => null) : 
+                        await fetch(url).catch(() => null);
+
+    switch(monitorType) {
+        case 'status_code':
+            return !!(response?.status == '200');
+        case 'keyword_exist':
+            return response.text()
+                .then((res) => res.includes(keyWord));
+        case 'keyword_not_exist':
+            return response.text()
+                .then((res) => !res.includes(keyWord));
+    }
+}
+
+export const startScheduler = () => {
+    database.data.httpMonitoringData.map((data) => {
+        createScheduleJob(data);
+    });
+}
+
+export const schedulerTask = [];
+
+export const createScheduleJob = (data) => {
+    const job = setInterval( async ()=> {
+        let status;
+        await checkStatus(data.URL, data.monitor_type, data?.key_word, data?.enable_auth, data?.login, data?.password)
+            .then(res => {
+                if(res !== data.okStatus) {
+                    data.event_created = new Date().getTime();
+                }
+                status = res;
+            })
+        data.okStatus = status;
+        await database.write();
+    }, data.monitor_interval * 1000);
+    schedulerTask.push({
+        id: data.id,
+        scheduleJob: job,
+    });
+}
+
+export const stopScheduleJob = (id) => {
+    const task = schedulerTask.find(el => el.id === id);
+    clearInterval(task?.scheduleJob)
 }

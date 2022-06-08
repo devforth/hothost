@@ -85,6 +85,19 @@ const getSettings = () => {
     }
 }
 
+const getHttpMonitor = () => {
+    const data = database.data.httpMonitoringData;
+
+    return data.map(data => (
+         {
+            id: data.id,
+            url: data.URL,
+            label: data.label,
+            status: data.okStatus,
+            lastEventTs: data.event_created,
+        }))
+}
+
 router.get('/', mustBeAuthorizedView(async (req, res) =>  {
     res.locals.monitoringData = await getMonitoringData(req);
     res.render('home');
@@ -93,6 +106,11 @@ router.get('/', mustBeAuthorizedView(async (req, res) =>  {
 router.get('/update', async (req,res) => {
     res.locals.monitoringData = await getMonitoringData(req);
     res.render('monitoring_table', {layout: false});
+});
+
+router.get('/http_update', async (req,res) => {
+    res.locals.httpMonitoringData = getHttpMonitor(req);
+    res.render('httpMonitoring_table', {layout: false});
 });
 
 router.get('/public', async (req, res) => {
@@ -245,6 +263,11 @@ router.get('/users/', mustBeAuthorizedView((req, res) => {
 router.get('/settings', mustBeAuthorizedView((req, res) => {
     res.locals.settings = getSettings();
     res.render('settings')
+}));
+
+router.get('/http-monitor',  mustBeAuthorizedView((req, res) => {
+    res.locals.httpMonitoringData = getHttpMonitor();
+    res.render('httpMonitor');
 }));
 
 export default router;

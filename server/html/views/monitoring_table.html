@@ -22,9 +22,11 @@
       <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
         {{ this.hostname }}
         {{#if this.label}}
+        {{#if (not (eq this.label ""))}}
         <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
           {{this.label}}
         </span>
+        {{/if}}
         {{/if}}
       </p>
       <p class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
@@ -176,7 +178,7 @@
           </h3>
           <div class="justify-center">
             <form action="/api/add_label?id={{ this.id }}" method="post">
-              <input name="label" class="w-max mx-auto mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+              <input name="label" class="w-max mx-auto mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
               <div>
                 <button data-modal-toggle="modal_label-{{@index}}" type="submit" class="w-20 mb-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                   Ok
