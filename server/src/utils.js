@@ -150,8 +150,8 @@ export const calculateAsyncEvents = async () => {
         }
         PluginManager().handleEvents(events.filter(e => e), 
         {
-            HOST_NAME: (data.HOST_LABEL && data.HOST_LABEL !== '') ? `*${data.HOST_LABEL}*` : '',
-            HOST_LABEL: data.HOST_LABEL,
+            HOST_NAME: data.HOST_NAME,
+            HOST_LABEL: (data.HOST_LABEL && data.HOST_LABEL !== '') ? `*${data.HOST_LABEL}*` : '',
         });
     }));
 };
