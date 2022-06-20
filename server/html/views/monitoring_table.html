@@ -22,9 +22,11 @@
       <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
         {{ this.hostname }}
         {{#if this.label}}
+        {{#if (not (eq this.label ""))}}
         <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
           {{this.label}}
         </span>
+        {{/if}}
         {{/if}}
       </p>
       <p class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
@@ -118,7 +120,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
           </svg>
-          Add label
+          {{#if (not this.label)}}
+            Add label
+          {{else}}
+            Change label
+          {{/if}}
         </button>
         <button type="button" data-modal-toggle="modal_delete-{{@index}}" class="mx-3 my-2 flex text-left text-red-600 hover:underline">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
