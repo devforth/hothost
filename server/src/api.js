@@ -77,7 +77,7 @@ router.post('/data/:secret', async (req, res) => {
             DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
             RAM_USED: sizeFormat(+newData.SYSTEM_TOTAL_RAM - +newData.SYSTEM_FREE_RAM),
             RAM_TOTAL: sizeFormat(+newData.SYSTEM_TOTAL_RAM),
-            HOST_LABEL: (newData.HOST_LABEL && newData.HOST_LABEL !== '') ? `*${newData.HOST_LABEL}*` : '',
+            HOST_LABEL: (newData.HOST_LABEL && newData.HOST_LABEL !== '') ? `\`${newData.HOST_LABEL}\`` : '',
             EVENT_DURATION: eventDuration(newData, events)
         });
         database.data.monitoringData[index] = newData;

@@ -114,7 +114,7 @@ Webhook is URL which look like this:
 
     // main event handling is done here
     async handleEvent({ eventType, data, settings }) {
-        const template = this.hbs.compile(settings.params[`${eventType}_message`]);
+        const template = this.hbs.compile(settings.params[`${eventType}_message`], {noEscape: true});
         const text = template(data);
 
         this.sendMessage(settings, text);
