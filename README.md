@@ -62,6 +62,7 @@ version: '3.5'
 services:
   hothost-web:
     image: devforth/hothost-web
+    restart: always
     environment:
       - HOTHOST_WEB_ADMIN_USERNAME=admin
       - HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
