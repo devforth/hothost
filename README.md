@@ -1,6 +1,6 @@
 # HotHost
 
-Lightweight and minimalistic Open-Source hosts monitor. 
+Lightweight and minimalistic FOSS hosts monitor. 
 
 * Shows used disk space percentage and ALERT badge if it exceeds some threshold (90% by default)
 * Shows used RAM percentage and ALERT badge if it exceeds some threshold (90% by default)
