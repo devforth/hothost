@@ -8,9 +8,11 @@ import {
     parseNestedForm,
     mustBeAuthorizedView,
     mustNotBeAuthorizedView,
+    roundToNearestMinute,
 } from './utils.js';
 import PluginManagerSingleton from './pluginManager.js';
 import md from 'markdown-it';
+import db from './levelDB.js';
 
 
 const router = express.Router();
@@ -85,6 +87,19 @@ const getSettings = () => {
     }
 }
 
+const getHttpMonitor = () => {
+    const data = database.data.httpMonitoringData;
+
+    return data.map(data => (
+         {
+            id: data.id,
+            url: data.URL,
+            label: data.label,
+            status: data.okStatus,
+            lastEventTs: data.event_created,
+        }))
+}
+
 router.get('/', mustBeAuthorizedView(async (req, res) =>  {
     res.locals.monitoringData = await getMonitoringData(req);
     res.render('home');
@@ -93,6 +108,11 @@ router.get('/', mustBeAuthorizedView(async (req, res) =>  {
 router.get('/update', async (req,res) => {
     res.locals.monitoringData = await getMonitoringData(req);
     res.render('monitoring_table', {layout: false});
+});
+
+router.get('/http_update', async (req,res) => {
+    res.locals.httpMonitoringData = getHttpMonitor(req);
+    res.render('httpMonitoring_table', {layout: false});
 });
 
 router.get('/public', async (req, res) => {
@@ -246,5 +266,51 @@ router.get('/settings', mustBeAuthorizedView((req, res) => {
     res.locals.settings = getSettings();
     res.render('settings')
 }));
+
+router.get('/http-monitor',  mustBeAuthorizedView((req, res) => {
+    res.locals.httpMonitoringData = getHttpMonitor();
+    res.render('httpMonitor');
+}));
+
+const generateProcessData = (data) => {
+    const colors = ['#458cff', '#b145ff', '#ff4545', '#45f6ff', '#45ff89', '#bbff45', '#ffff45', '#ffb145', '#ff4596', '#ff45c4'];
+    let processEntries = [];
+    let id = 0;
+    for (const [key, value] of Object.entries(data)) {
+        processEntries.push({
+            id: id + 1,
+            data: value,
+            total_usage: key,
+            ram_usage: sizeFormat(key*1024),
+            color: colors[id]
+        });
+        id++;
+    }
+    return processEntries;
+}
+
+router.get('/getProcess/:id/:timeStep/', mustBeAuthorizedView( async (req, res) => {
+    const {id, timeStep} = req.params;
+    const minutesLeft = timeStep*1000*60;
+    const now = new Date().getTime()
+    const time = roundToNearestMinute(now - minutesLeft);
+    
+    const dbIndex = db.sublevel(id, { valueEncoding: 'json' });
+    const dbHostState = db.sublevel('options', { valueEncoding: 'json' });
+
+    const restartTime = await dbHostState.get(id)
+        .then(res => res.restartTime)
+        .catch(() => 0);
+
+    const processByTime = await dbIndex.get(+time)
+        .then(res => generateProcessData(res).reverse())
+        .catch(err => []);
+
+    res.json({
+        restartTime: restartTime,
+        process: processByTime,
+    });
+}));
+
 
 export default router;
