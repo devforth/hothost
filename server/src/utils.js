@@ -150,7 +150,11 @@ export const calculateAsyncEvents = async () => {
             data.online = false;
             data.ONLINE_EVENT_TS = new Date().getTime();
         }
-        PluginManager().handleEvents(events.filter(e => e), data);
+        PluginManager().handleEvents(events.filter(e => e), 
+        {
+            HOST_NAME: data.HOST_NAME,
+            HOST_LABEL: (data.HOST_LABEL && data.HOST_LABEL !== '') ? `\`${data.HOST_LABEL}\`` : '',
+        });
     }));
 };
 

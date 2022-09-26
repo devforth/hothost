@@ -1,6 +1,6 @@
 # HotHost
 
-Lightweight and minimalistic Open-Source hosts monitor. 
+Lightweight and minimalistic FOSS hosts monitor. 
 
 * Shows used disk space percentage and ALERT badge if it exceeds some threshold (90% by default)
 * Shows used RAM percentage and ALERT badge if it exceeds some threshold (90% by default)
@@ -62,6 +62,7 @@ version: '3.5'
 services:
   hothost-web:
     image: devforth/hothost-web
+    restart: always
     environment:
       - HOTHOST_WEB_ADMIN_USERNAME=admin
       - HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
