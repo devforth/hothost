@@ -14,7 +14,7 @@ import env from './env.js';
 import database from './database.js';
 import PluginManager from "./pluginManager.js";
 
-import { calculateAsyncEvents, checkUserExistsOrCreate, DATE_HUMANIZER_CONFIG, startScheduler } from './utils.js';
+import { calculateAsyncEvents, checkUserExistsOrCreate, DATE_HUMANIZER_CONFIG, startScheduler, dbClearScheduler } from './utils.js';
 import { authMiddleware } from './middleware.js';
 
 
@@ -24,6 +24,7 @@ async function main() {
   await checkUserExistsOrCreate();
   startScheduler();
   setTimeout(() => setInterval(calculateAsyncEvents, 1000), 90 * 1000);
+  setInterval(dbClearScheduler, 100*1000);
 
   const app = express();
   const port = env.WEB_PORT || 8007;
@@ -52,7 +53,10 @@ async function main() {
  
           const duration = now - eventLastTs;
           return humanizeDuration(duration, DATE_HUMANIZER_CONFIG);
-       }  
+       },
+       json: function(obj) {
+        return JSON.stringify(obj);
+      }  
      }
   });
 

@@ -32,6 +32,8 @@ Webhook is URL which look like this:
         'host_is_online',
         'ram_is_almost_full',
         'ram_usage_recovered',
+        'http_host_down',
+        'http_host_up',
     ],
 
     // parameters which should be configured by user
@@ -83,6 +85,20 @@ Webhook is URL which look like this:
             id: "ram_usage_recovered_message",
             name: "What message will be shown when you get ram_usage_recovered alert",
             default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}. Time required to fix: {{ EVENT_DURATION }}",
+            required: false,
+            type: "text",
+        },
+        {
+            id: "http_host_down_message",
+            name: "What message will be shown when you get http_host_down alert",
+            default_value: "⚠️ HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} down. Reason: {{ EVENT_REASON }}",
+            required: false,
+            type: "text",
+        },
+        {
+            id: "http_host_up_message",
+            name: "What message will be shown when you get http_host_up alert",
+            default_value: "👌🏼 HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} back online. Reason: {{ EVENT_REASON }}. Downtime: {{ EVENT_DURATION }}",
             required: false,
             type: "text",
         },

@@ -7,6 +7,7 @@ import fetch from 'node-fetch';
 import env from './env.js';
 import database from './database.js';
 import PluginManager from './pluginManager.js';
+import levelDb from './levelDB.js';
 
 export const DATE_HUMANIZER_CONFIG = {
     round: true,
@@ -153,6 +154,47 @@ export const calculateAsyncEvents = async () => {
     }));
 };
 
+export const generateHttpEvent = async (prevData, newData) => {
+    const events = [];
+    let reason = '';
+
+    if (!prevData.okStatus && newData.okStatus) {
+        events.push('http_host_up');
+        switch(newData.monitor_type) {
+            case 'status_code':
+                reason = 'Response status code back to 200';
+                break;
+            case 'keyword_exist':
+                reason = `Keyword ${newData.key_word} exists`;
+                break;
+            case 'keyword_not_exist':
+                reason = `Keyword ${newData.key_word} does not exist`;
+                break;
+        }
+    }
+    if (prevData.okStatus && !newData.okStatus) {
+        events.push('http_host_down');
+        switch(newData.monitor_type) {
+            case 'status_code':
+                reason = newData.status ? `Response status code is ${newData.status}`: 'Host down';
+                break;
+            case 'keyword_exist':
+                reason = `Keyword ${newData.key_word} no longer exists`;
+                break;
+            case 'keyword_not_exist':
+                reason = `Keyword ${newData.key_word} exists again`;
+                break;
+        }
+    }
+
+    PluginManager().handleEvents(events.filter(e => e), {
+        HOST_NAME: newData.URL,
+        HOST_LABEL: (newData.label && newData.label !== '') ? `\`${newData.label}\`` : '',
+        EVENT_DURATION: humanizeDuration(newData.event_created - prevData.event_created, DATE_HUMANIZER_CONFIG),
+        EVENT_REASON: reason,
+    });
+}
+
 export const parseNestedForm = (fields) => {
     return Object.keys(fields).reduce((acc, key) => {
         const nestedStartIndex = key.indexOf('[');
@@ -223,22 +265,26 @@ export const createMonitorDataset = (data) => {
     return monitor;
 }
 
-export const checkStatus = async (url, monitorType, keyWord, enableBaseAuth, login, password) => { 
+export const checkStatus = async (hostData) => {
+    const {URL, monitor_type, key_word, enable_auth, login, password} = hostData;
     const basicAuth = 'Basic ' + Buffer.from(`${login}:${password}`).toString('base64');
 
-    const response = enableBaseAuth ? 
-                        await fetch(url, {method:'GET', headers: {Authorization: basicAuth}}).catch(() => null) : 
-                        await fetch(url).catch(() => null);
+    const response = enable_auth ? 
+                        await fetch(URL, {method:'GET', headers: {Authorization: basicAuth}}).catch(() => null) : 
+                        await fetch(URL).catch(() => null);
 
-    switch(monitorType) {
+    switch(monitor_type) {
         case 'status_code':
-            return !!(response?.status == '200');
+            return {
+                status: response?.status,
+                response: !!(response?.status == '200'),
+            };
         case 'keyword_exist':
-            return response.text()
-                .then((res) => res.includes(keyWord));
+            return {response: response?.text()
+                .then((res) => res.includes(key_word))};
         case 'keyword_not_exist':
-            return response.text()
-                .then((res) => !res.includes(keyWord));
+            return {response: response?.text()
+                .then((res) => !res.includes(key_word))};
     }
 }
 
@@ -253,13 +299,23 @@ export const schedulerTask = [];
 export const createScheduleJob = (data) => {
     const job = setInterval( async ()=> {
         let status;
-        await checkStatus(data.URL, data.monitor_type, data?.key_word, data?.enable_auth, data?.login, data?.password)
+        const prevData = {...data};
+        await checkStatus(data)
             .then(res => {
-                if(res !== data.okStatus) {
+                if(res.response !== data.okStatus) {
                     data.event_created = new Date().getTime();
-                }
-                status = res;
-            })
+                } 
+                generateHttpEvent(prevData, { //JSON.parse(oldData)
+                    okStatus: !!res.response,
+                    label: data.label,
+                    event_created: data.event_created,
+                    monitor_type: data.monitor_type,
+                    key_word: data.key_word,
+                    URL: data.URL,
+                    status: res.status,
+                });
+                status = res.response;
+            });
         data.okStatus = status;
         await database.write();
     }, data.monitor_interval * 1000);
@@ -272,4 +328,23 @@ export const createScheduleJob = (data) => {
 export const stopScheduleJob = (id) => {
     const task = schedulerTask.find(el => el.id === id);
     clearInterval(task?.scheduleJob)
+}
+
+export const roundToNearestMinute = (date) => {
+    const minutes = 1;
+    const ms = 1000 * 60 * minutes;
+  
+    return Math.ceil(date / ms) * ms;
+}
+
+export const dbClearScheduler = async () => {
+    const now = new Date().getTime();
+    const time = now - (48*60*60*1000); // 48 hours ago in ms
+    const {monitoringData} = database.data;
+
+    monitoringData.map(async host => {
+        const id = host.id;
+        const dbIndex = levelDb.sublevel(id, { valueEncoding: 'json' });
+        await dbIndex.clear({lt: time.toString() }).catch((e) => console.log(e));
+    })
 }

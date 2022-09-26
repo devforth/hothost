@@ -3,8 +3,9 @@ import express from 'express';
 import md5 from 'md5';
 
 import database from './database.js';
-import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat, eventDuration, setWarning, createMonitorDataset, stopScheduleJob, createScheduleJob} from './utils.js';
+import { calculateDataEvent, mustBeAuthorizedView, readableRandomStringMaker, sizeFormat, eventDuration, setWarning, createMonitorDataset, stopScheduleJob, createScheduleJob, checkStatus, roundToNearestMinute} from './utils.js';
 import PluginManager from './pluginManager.js';
+import db from './levelDB.js';
 
 const router = express.Router();
 
@@ -36,6 +37,22 @@ router.post('/logout', (req, res) => {
     res.redirect('/login/');
 });
 
+router.post('/process/:secret', async (req, res) => {
+    const procData = req.fields
+    const process = procData.PROCESS;
+    const isRestart = +procData.IS_RESTART;
+    const now = roundToNearestMinute(new Date().getTime());
+    const hostId = database.data.monitoringData.find(el => el.secret === req.params.secret).id; 
+    const dbIndex = db.sublevel(hostId, { valueEncoding: 'json' });
+    const dbHostState = db.sublevel('options', { valueEncoding: 'json' });
+    dbIndex.put(now, process);
+    if(isRestart) {
+        dbHostState.put(hostId, {
+            restartTime: now
+        });
+    }
+    res.send('OK');  
+});
 
 router.post('/data/:secret', async (req, res) => {
     const monitorData = req.fields;
@@ -155,9 +172,17 @@ router.post('/add_http_monitor', mustBeAuthorizedView( async(req,res) => {
     const httpMonitorData = req.fields;
 
     const monitor = createMonitorDataset(httpMonitorData);
+
+    createScheduleJob(monitor);
+
+    await checkStatus(monitor)
+        .then(res => {
+            monitor.event_created = new Date().getTime();
+            monitor.okStatus = res.response;
+        });
+    
     database.data.httpMonitoringData.push(monitor);
     await database.write();
-    createScheduleJob(monitor);
 
     res.redirect('/http-monitor');
 }));

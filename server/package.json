@@ -17,6 +17,7 @@
     "express-handlebars": "^6.0.5",
     "humanize-duration": "^3.27.1",
     "jsonwebtoken": "^8.5.1",
+    "level": "^8.0.0",
     "lowdb": "^3.0.0",
     "markdown-it": "^13.0.1",
     "md5": "^2.3.0",
