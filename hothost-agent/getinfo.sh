@@ -440,15 +440,10 @@ do
       i=$(($i+1))
       RAM=$(echo $line | awk '{print $1;}')
       process=$(echo $line | sed "s/^[^ ]* //")
-      if (($i == 10))
-      then
-          JSON_PROCESS+="\"$RAM\":\"$process\""
-      else
-          JSON_PROCESS+="\"$RAM\":\"$process\","
-      fi
+      JSON_PROCESS+="\"$RAM\":\"$process\","  
 
   done <<< "$process_output"
-
+  JSON_PROCESS=${JSON_PROCESS::-1}
   # -------------------------------------------------------------------------------------------------
 
   PROC="{$JSON_PROCESS}"
