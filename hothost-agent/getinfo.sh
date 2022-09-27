@@ -432,7 +432,7 @@ do
   fi
 
   # Detect process RSS information
-  process_output=`ps -eo rss,command --sort -rss | head -n 11 | tail -n 10`
+  process_output=`ps -eo rss,command --sort -rss | head -n 11 | sed '1d'`
   JSON_PROCESS=""
 
   i=0
