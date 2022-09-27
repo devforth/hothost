@@ -17,6 +17,7 @@ db.read = async function () {
 
     db.data.users ||= [];
     db.data.monitoringData ||= [];
+    db.data.httpMonitoringData ||= [];
     db.data.settings ||= {
         RAM_THRESHOLD: 90,
         RAM_STABILIZATION_LEVEL: 3,

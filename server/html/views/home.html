@@ -1,5 +1,13 @@
 <div class="mx-auto pt-4 px-4 flex justify-center max-w-min mobile:max-w-max">
-  <div class="container  mb-4 p-4  bg-gray-100 rounded-lg shadow-md  dark:bg-gray-600 dark:border-gray-700">
+  <div class="container mb-4">
+
+  <div class="flex mb-1">
+    <div class="flex-1 mr-1 text-center border-b-4 border-gray-700 font-semibold text-gray-800 dark:text-white">Host monitoring</div>
+    <a href="/http-monitor" class="flex-1 ml-1 text-center border-b-2 border-gray-700 text-gray-800 dark:text-white hover:cursor-pointer">Http/Https monitoring</a>
+  </div>
+    
+
+  <div class="p-4  bg-gray-100 rounded-lg shadow-md  dark:bg-gray-600 dark:border-gray-700">
     <div class="flex justify-between items-center mb-4">
       <h5 class="w-max text-xl font-bold leading-none text-gray-900 dark:text-white">Hosts under monitoring</h5>
       {{#if authorized}}
@@ -146,6 +154,7 @@ services:
       {{> monitoring_table}}
     </div>
   </div>
+ </div>
 </div>
 <div id="toast-copied" class=" fixed right-2 bottom-2 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-green-900 dark:bg-green-100" role="alert">
   <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-100 dark:text-green-900">
