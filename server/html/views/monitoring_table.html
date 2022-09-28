@@ -71,8 +71,13 @@
       <p class="text-sm text-gray-500 truncate dark:text-gray-400">
         CPUs: {{ this.cpu_count }}
         &nbsp;&nbsp;&nbsp;
-        <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_ram_used-{{@index}}">
+        <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_ram_used-{{@index}}" class="inline-flex">
           RAM: {{ this.ram_total }} ({{ this.ram_used_percentage }}% used)
+          <button onclick="drawTimeSlider('{{this.id}}', '{{@index}}')" data-modal-toggle="modal_timeline-{{@index}}" class="ml-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+            </svg>            
+          </button>          
         </span>
         {{#if this.ram_warning}}
         <span data-tooltip-placement="bottom" data-tooltip-target="tooltip_ram_alert-{{@index}}"
@@ -155,7 +160,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
           </svg>
-          Time line
+          RAM by process
         </button>
         <button type="button" data-modal-toggle="modal_delete-{{@index}}"
           class="mx-3 my-2 flex text-left text-red-600 hover:underline">
@@ -273,10 +278,10 @@
                 <div class="absolute bg-gray-600 h-12 w-[1px] translate-x-[9px]" id="rangeV-{{@index}}">
                 </div>
                 <span id="restartLine-{{@index}}" class="absolute bg-red-500 h-12 w-[1px]">
-                  <p class="w-max text-red-500 translate-y-[48px]">Restart time</p>
+                  <p class="w-max absolute text-red-500 translate-y-[48px]">Restart time</p>
                 </span>
                 <div id="range-{{@index}}">
-                  <input id="range" type="range" min="1" max="2880" step="1" value="2160" />
+                  <input type="range" min="1" max="2880" step="1" value="2880" class="cursor-pointer"/>
                 </div>
               </div>
             </div>
@@ -439,9 +444,9 @@
     range.addEventListener("input", () => {
       sliderValues();
     });
-    // TODO slider value pointer don`t rendered at time (when open input clientWidth == 0)
+    // TODO slider value pointer don`t rendered at time (input clientWidth == 0)
     setTimeout(() => {
-      sliderValues();
+    sliderValues();
     }, 100);
 
     drawChart(generateChartData(processData), 20);
@@ -515,7 +520,7 @@
       restartTimeId.style.display = "none";
       return;
     }
-    const position = ((max - min) - minutes) / (max - min);
+    const position = ((max) - minutes) / (max);
     restartTimeId.style.left = (position * (range.offsetWidth - 10)) + "px";
     restartPositionTextHandler(minutes);
   }
@@ -524,13 +529,13 @@
     const val = range.value;
     const position = (val - min) / (max - min);
     rangeV.style.left = (position * (range.clientWidth - 20)) + "px";
-    selectedTime.innerHTML = calculateSelectedTime((max - 1) - range.value);
+    selectedTime.innerHTML = calculateSelectedTime((max + min) - range.value);
     getProcess(val);
   }
 
   const fetchProcess = async (id) => {
     const url = "/getProcess";
-    const timeStep = (max - 1) - range.value;
+    const timeStep = (+max + +min) - range.value;
     return await fetch(`${url}/${id}/${timeStep}`).then(
       res => res.json()).catch(e => console.log(e));
   }
@@ -555,7 +560,7 @@
             processArea.innerHTML = 'No data for now';
             processArea.classList.add('opacity-50');
           }
-          restartTimeHandler(+res.restartTime);
+          restartTimeHandler(+res.restartTime - 1000 * 60);
           processData = res.process;
           restartTime = res.restartTime;
         }
