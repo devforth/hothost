@@ -3,6 +3,8 @@
 # -------------------------------------------------------------------------------------------------
 # detect the kernel
 
+mount --bind /host/proc/ /proc
+
 KERNEL_NAME="$(uname -s)"
 KERNEL_VERSION="$(uname -r)"
 ARCHITECTURE="$(uname -m)"

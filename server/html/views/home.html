@@ -67,6 +67,7 @@ docker run -d \
   -v /etc/hostname:/host/etc/hostname:ro \
   --restart unless-stopped \
   --cap-add SYS_PTRACE \
+  --cap-add SYS_ADMIN \
   --security-opt apparmor=unconfined \
   {{#if ../local }}
   --network=host \
@@ -98,6 +99,7 @@ services:
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
+      - SYS_ADMIN # needed to read processes
     security_opt:
       - apparmor:unconfined
     volumes:
