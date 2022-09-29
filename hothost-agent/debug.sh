@@ -7,7 +7,6 @@ docker run -it \
   -v /etc/hostname:/host/etc/hostname:ro \
   --restart unless-stopped \
   --cap-add SYS_PTRACE \
-  --cap-add SYS_ADMIN \
   --security-opt apparmor=unconfined \
   $(docker build -q .) bash getinfo.sh
 
