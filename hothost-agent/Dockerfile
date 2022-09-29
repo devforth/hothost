@@ -1,7 +1,6 @@
 FROM ubuntu as psbuilder
-RUN apt-get update && apt-get -y install build-essential gettext autoconf pkg-config \
-  gcc make git autopoint libtool
-RUN apt-get install -y libtool-bin
+RUN apt-get update -y && apt-get -y install build-essential gettext autoconf pkg-config \
+  gcc make git autopoint libtool libtool-bin
 RUN git clone https://gitlab.com/procps-ng/procps.git
 WORKDIR /procps
 RUN git checkout v3.3.17 && find . \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's|"/proc|"/host/proc|g' &&\
@@ -14,7 +13,7 @@ RUN make
 FROM ubuntu
 COPY --from=psbuilder /procps/ps/pscommand /pscommand
 
-RUN apt-get update && apt-get install bash curl procps
+RUN apt-get update -y && apt-get -y install curl
 ADD getinfo.sh .
 
 CMD [ "bash", "getinfo.sh" ]
