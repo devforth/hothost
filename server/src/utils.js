@@ -191,12 +191,14 @@ export const generateHttpEvent = async (prevData, newData) => {
         }
     }
 
-    PluginManager().handleEvents(events.filter(e => e), {
-        HOST_NAME: newData.URL,
-        HOST_LABEL: (newData.label && newData.label !== '') ? `\`${newData.label}\`` : '',
-        EVENT_DURATION: humanizeDuration(newData.event_created - prevData.event_created, DATE_HUMANIZER_CONFIG),
-        EVENT_REASON: reason,
-    });
+    if (events.length !== 0) {
+        PluginManager().handleEvents(events.filter(e => e), {
+            HOST_NAME: newData.URL,
+            HOST_LABEL: (newData.label && newData.label !== '') ? `\`${newData.label}\`` : '',
+            EVENT_DURATION: humanizeDuration(newData.event_created - prevData.event_created, DATE_HUMANIZER_CONFIG),
+            EVENT_REASON: reason,
+        });
+    }   
 }
 
 export const parseNestedForm = (fields) => {
@@ -270,14 +272,14 @@ export const createMonitorDataset = (data) => {
 }
 
 export const checkStatus = async (hostData) => {
-    const {URL, monitor_type, key_word, enable_auth, login, password} = hostData;
-    const basicAuth = 'Basic ' + Buffer.from(`${login}:${password}`).toString('base64');
+    // const {URL, monitor_type, key_word, enable_auth, login, password} = hostData;
+    const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
 
-    const response = enable_auth ? 
-                        await fetch(URL, {method:'GET', headers: {Authorization: basicAuth}}).catch(() => null) : 
-                        await fetch(URL).catch(() => null);
+    const response = hostData.enable_auth ? 
+                        await fetch(hostData.URL, {method:'GET', headers: {Authorization: basicAuth}}).catch(() => null) : 
+                        await fetch(hostData.URL).catch(() => null);
 
-    switch(monitor_type) {
+    switch(hostData.monitor_type) {
         case 'status_code':
             return {
                 status: response?.status,
@@ -285,46 +287,49 @@ export const checkStatus = async (hostData) => {
             };
         case 'keyword_exist':
             return {response: response?.text()
-                .then((res) => res.includes(key_word))};
+                .then((res) => res.includes(hostData.key_word))};
         case 'keyword_not_exist':
             return {response: response?.text()
-                .then((res) => !res.includes(key_word))};
+                .then((res) => !res.includes(hostData.key_word))};
     }
 }
 
 export const startScheduler = () => {
     database.data.httpMonitoringData.map((data) => {
-        createScheduleJob(data);
+        createScheduleJob(data.id, data.monitor_interval);
     });
 }
 
 export const schedulerTask = [];
 
-export const createScheduleJob = (data) => {
-    const job = setInterval( async ()=> {
-        let status;
-        const prevData = {...data};
-        await checkStatus(data)
-            .then(res => {
-                if(res.response !== data.okStatus) {
-                    data.event_created = new Date().getTime();
-                } 
-                generateHttpEvent(prevData, { //JSON.parse(oldData)
+export const createScheduleJob = (httpHostId, interval) => {
+    
+
+    const job = setInterval( async () => {
+        let status; 
+        const dbData = database.data.httpMonitoringData.find(host => host.id == httpHostId);
+        const now = new Date().getTime();
+
+        await checkStatus(dbData)
+            .then(async res => {
+                generateHttpEvent(dbData, {
+                    ...dbData,
                     okStatus: !!res.response,
-                    label: data.label,
-                    event_created: data.event_created,
-                    monitor_type: data.monitor_type,
-                    key_word: data.key_word,
-                    URL: data.URL,
                     status: res.status,
+                    event_created: now,
                 });
                 status = res.response;
+                if(res.response !== dbData.okStatus) {
+                    dbData.event_created = now;
+                }
             });
-        data.okStatus = status;
+        dbData.okStatus = status; 
         await database.write();
-    }, data.monitor_interval * 1000);
+    },  interval * 1000);
+
+
     schedulerTask.push({
-        id: data.id,
+        id: httpHostId,
         scheduleJob: job,
     });
 }

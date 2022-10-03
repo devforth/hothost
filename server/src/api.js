@@ -173,18 +173,18 @@ router.post('/add_http_monitor', mustBeAuthorizedView( async(req,res) => {
     const httpMonitorData = req.fields;
 
     const monitor = createMonitorDataset(httpMonitorData);
+    
+    database.data.httpMonitoringData.push(monitor);
+    await database.write();
 
-    createScheduleJob(monitor);
+    createScheduleJob(monitor.id, monitor.monitor_interval);
 
     await checkStatus(monitor)
         .then(res => {
             monitor.event_created = new Date().getTime();
             monitor.okStatus = res.response;
         });
-    
-    database.data.httpMonitoringData.push(monitor);
-    await database.write();
-
+        
     res.redirect('/http-monitor');
 }));
 
