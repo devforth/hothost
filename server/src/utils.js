@@ -8,6 +8,7 @@ import env from './env.js';
 import database from './database.js';
 import PluginManager from './pluginManager.js';
 import levelDb from './levelDB.js';
+import db from './database.js';
 
 export const DATE_HUMANIZER_CONFIG = {
     round: true,
@@ -158,7 +159,7 @@ export const calculateAsyncEvents = async () => {
     }));
 };
 
-export const generateHttpEvent = async (prevData, newData) => {
+export const generateHttpEvent = (prevData, newData) => {
     const events = [];
     let reason = '';
 
@@ -273,24 +274,32 @@ export const createMonitorDataset = (data) => {
 
 export const checkStatus = async (hostData) => {
     // const {URL, monitor_type, key_word, enable_auth, login, password} = hostData;
-    const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
+    // const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
 
+    const controller = new AbortController();
+    const timeout = setTimeout(controller.abort, 2000);
     const response = hostData.enable_auth ? 
-                        await fetch(hostData.URL, {method:'GET', headers: {Authorization: basicAuth}}).catch(() => null) : 
-                        await fetch(hostData.URL).catch(() => null);
-
+                        await fetch(hostData.URL, { method:'GET', headers: { Authorization: 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64') }, signal: controller.signal }).catch(() => null) : 
+                        await fetch(hostData.URL, { signal: controller.signal }).catch((e) => e);
+    clearTimeout(timeout);
     switch(hostData.monitor_type) {
         case 'status_code':
             return {
                 status: response?.status,
-                response: !!(response?.status == '200'),
+                response: !!(response?.status === 200),
             };
         case 'keyword_exist':
-            return {response: response?.text()
-                .then((res) => res.includes(hostData.key_word))};
+            return {
+                response: 
+                    await response?.text()
+                        .then((res) => res.includes(hostData.key_word))
+            };
         case 'keyword_not_exist':
-            return {response: response?.text()
-                .then((res) => !res.includes(hostData.key_word))};
+            return {
+                response: 
+                    await response?.text()
+                        .then((res) => !res.includes(hostData.key_word))
+            };
     }
 }
 
@@ -305,28 +314,25 @@ export const schedulerTask = [];
 export const createScheduleJob = (httpHostId, interval) => {
     
 
-    const job = setInterval( async () => {
-        let status; 
+    const job = setInterval(async () => {
         const dbData = database.data.httpMonitoringData.find(host => host.id == httpHostId);
         const now = new Date().getTime();
 
-        await checkStatus(dbData)
-            .then(async res => {
-                generateHttpEvent(dbData, {
-                    ...dbData,
-                    okStatus: !!res.response,
-                    status: res.status,
-                    event_created: now,
-                });
-                status = res.response;
-                if(res.response !== dbData.okStatus) {
-                    dbData.event_created = now;
-                }
-            });
-        dbData.okStatus = status; 
-        await database.write();
-    },  interval * 1000);
+        const res = await checkStatus(dbData);
+        generateHttpEvent(dbData, {
+            ...dbData,
+            okStatus: !!res.response,
+            status: res.status,
+            event_created: now,
+        });
 
+        if(res.response !== dbData.okStatus) {
+            dbData.event_created = now;
+        }
+
+        dbData.okStatus = res.response;  
+        await database.write();
+     }, interval * 1000);
 
     schedulerTask.push({
         id: httpHostId,
