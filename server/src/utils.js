@@ -145,7 +145,7 @@ export const calculateDataEvent = (prevData, newData) => {
 export const calculateAsyncEvents = async () => {
     await Promise.all(database.data.monitoringData.map((data) => {
         const events = [];
-        const online = (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 1.3)) >= new Date().getTime();
+        const online = (data.updatedAt + (+data.MONITOR_INTERVAL * 1000 * 2.5)) >= new Date().getTime();
         if (!online && data.online)  {
             events.push('host_is_offline');
             data.online = false;
