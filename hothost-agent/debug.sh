@@ -8,5 +8,6 @@ docker run -it \
   --restart unless-stopped \
   --cap-add SYS_PTRACE \
   --security-opt apparmor=unconfined \
+  --security-opt seccomp=unconfined \
   $(docker build -q .) bash getinfo.sh
 

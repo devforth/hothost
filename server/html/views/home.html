@@ -100,6 +100,7 @@ services:
       - SYS_PTRACE
     security_opt:
       - apparmor:unconfined
+      - seccomp:unconfine
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
