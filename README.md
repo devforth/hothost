@@ -1,6 +1,6 @@
 # HotHost
 
-Lightweight and minimalistic FOSS hosts monitor. 
+Lightweight and minimalistic free and opensource Servers and HTTP monitor. 
 
 * 💾 Shows used disk space percentage and ALERT badge if it exceeds configurable threshold (90% by default)
 * 🧠 Shows used RAM percentage and ALERT badge if it exceeds configurable threshold (90% by default)
@@ -44,10 +44,10 @@ First you need to run HotHost Web Server. Web-server itself, when will be starte
 You can use any host with public IP. You are responsible for setting up HTTPS.
 
 You can use one of next options:
-- Nginx or Rraefik with connected external certificate or free Let's Encrypt certificate
+- Nginx or Traefik with connected external certificate or free Let's Encrypt certificate
 - Free Cloudflare CDN which terminates SSL and gives additional layer of cecurity.
 
-We recommend you to check this guide how to [setup HotHost with free Cloudflare plan and EC2 Nano](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
+We recommend you to check guide how to [setup HotHost with free Cloudflare plan and EC2 Nano](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
 
 If you have existing Docker/Compose stacks, you can use snippets below:
 
