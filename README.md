@@ -35,8 +35,7 @@ Available plugins:
 
 # RoadMap
 
-* HTTP URLs monitoring and keywords check
-* Probably porting UI from server-side to Vue.js
+* Porting UI from server-side to Vue.js
 
 # Installation
 
