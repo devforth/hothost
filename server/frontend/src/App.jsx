@@ -5,271 +5,87 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <div class="mx-auto pt-4 px-4 flex justify-center max-w-min mobile:max-w-max">
-        <div class="container mb-4">
-          <div class="flex mb-1">
-            <div class="flex-1 mr-1 text-center border-b-4 border-gray-700 font-semibold text-gray-800 dark:text-white">
-              Host monitoring
-            </div>
-            <a
-              href="/http-monitor"
-              class="flex-1 ml-1 text-center border-b-2 border-gray-700 text-gray-800 dark:text-white hover:cursor-pointer"
-            >
-              Http/Https monitoring
-            </a>
-          </div>
-
-          <div class="p-4  bg-gray-100 rounded-lg shadow-md  dark:bg-gray-600 dark:border-gray-700">
-            <div class="flex justify-between items-center mb-4">
-              <h5 class="w-max text-xl font-bold leading-none text-gray-900 dark:text-white">
-                Hosts under monitoring
-              </h5>
-              {/* {{#if authorized}} */}
-              <form action="/api/add_monitor" method="POST">
-                <button
-                  class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max
-            focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Add new host
-                </button>
-              </form>
-              {/* {{/if}} */}
-            </div>
-            {/* {{#each monitoringData}}
-    {{#if this.no_data}} */}
-            <div class="p-6 mt-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
-              <h5 class="text-md mb-4 font-bold leading-none text-gray-900 dark:text-white">
-                Configure your agent
-              </h5>
-              <ul
-                class="flex flex-nowrap overflow-x-auto text-sm font-medium text-center"
-                id="myTab-{{ this.id }}"
-                data-tabs-toggle="#myTabContent-{{ this.id }}"
-                role="tablist"
-              >
-                <li role="presentation" class="flex shrink-1">
-                  <button
-                    class="p-4 rounded-t-lg border-b-2"
-                    id="profile-tab-{{ this.id }}"
-                    data-tabs-target="#profile-{{ this.id }}"
-                    type="button"
-                    role="tab"
-                    aria-controls="profile-{{ this.id }}"
-                    aria-selected="false"
-                  >
-                    Pure Docker
-                  </button>
-                </li>
-                <li role="presentation" class="flex shrink-1">
-                  <button
-                    class=" p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                    id="dashboard-tab-{{ this.id }}"
-                    data-tabs-target="#dashboard-{{ this.id }}"
-                    type="button"
-                    role="tab"
-                    aria-controls="dashboard-{{ this.id }}"
-                    aria-selected="false"
-                  >
-                    Compose
-                  </button>
-                </li>
-                <li role="presentation" class="flex shrink-1">
-                  <button
-                    class="p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                    id="settings-tab-{{ this.id }}"
-                    data-tabs-target="#settings-{{ this.id }}"
-                    type="button"
-                    role="tab"
-                    aria-controls="settings-{{ this.id }}"
-                    aria-selected="false"
-                  >
-                    Pure Bash
-                  </button>
-                </li>
-              </ul>
-              <div id="myTabContent-{{ this.id }}">
-                <div
-                  class="hidden py-2 rounded-lg "
-                  id="profile-{{ this.id }}"
-                  role="tabpanel"
-                  aria-labelledby="profile-tab-{{ this.id }}"
-                >
-                  <p class="text-sm text-gray-500 dark:text-gray-400 relative">
-                    Make sure you have{" "}
-                    <a
-                      class="text-blue-600 hover:underline dark:text-blue-500"
-                      href="https://docs.docker.com/engine/install/"
-                    >
-                      Docker engine installed
-                    </a>{" "}
-                    and run this:
-                    <button
-                      class="hidden sm:flex  absolute right-2 top-12 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded  items-center"
-                      onclick="copyToCb('puredocpre')"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                        />
-                      </svg>
-                      Copy
-                    </button>
-                  </p>
-                  <pre
-                    id="puredocpre"
-                    data-pre-id="{{ this.id }}"
-                    class="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
-                  >
-                    docker run -d \ --env HOTHOST_SERVER_BASE=___CURRENT_URL___
-                    \{/* --env HOTHOST_AGENT_SECRET={{ this.secret }} \ */}
-                    --env HOTHOST_MONITOR_INTERVAL=60 \ --name hothost-agent \
-                    -v /proc:/host/proc:ro \ -v /sys:/host/sys:ro \ -v
-                    /etc/os-release:/host/etc/os-release:ro \ -v
-                    /etc/hostname:/host/etc/hostname:ro \ --restart
-                    unless-stopped \ --cap-add SYS_PTRACE \ --security-opt
-                    apparmor=unconfined \
-                    {/* {{#if ../local }}
-  --network=host \
-  {{/if}} */}
-                    devforth/hothost-agent
-                  </pre>
-                </div>
-                <div
-                  class="hidden py-4 rounded-lg dark:bg-gray-800"
-                  id="dashboard-{{ this.id }}"
-                  role="tabpanel"
-                  aria-labelledby="dashboard-tab-{{ this.id }}"
-                >
-                  <p class="text-sm text-gray-500 dark:text-gray-400 relative">
-                    If you have a Docker Compose stack you can just add this
-                    snippet:
-                    <button
-                      class="hidden sm:flex  absolute right-2 top-12 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded items-center"
-                      onclick="copyToCb('composepre')"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                        />
-                      </svg>
-                      Copy
-                    </button>
-                  </p>
-                  <pre
-                    id="composepre"
-                    data-pre-id="{{ this.id }}"
-                    class="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
-                  >
-                    version: '3' services: hothost-agent: image:
-                    devforth/hothost-agent environment: -
-                    HOTHOST_SERVER_BASE=___CURRENT_URL___
-                    {/* - HOTHOST_AGENT_SECRET={{ this.secret }} */}-
-                    HOTHOST_MONITOR_INTERVAL=60 container_name: hothost-agent
-                    restart: unless-stopped cap_add: - SYS_PTRACE security_opt:
-                    - apparmor:unconfined - seccomp:unconfine volumes: -
-                    /proc:/host/proc:ro - /sys:/host/sys:ro -
-                    /etc/os-release:/host/etc/os-release:ro -
-                    /etc/hostname:/host/etc/hostname:ro
-                  </pre>
-                </div>
-                <div
-                  class="hidden py-4 rounded-lg dark:bg-gray-800"
-                  id="settings-{{ this.id }}"
-                  role="tabpanel"
-                  aria-labelledby="settings-tab-{{ this.id }}"
-                >
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    If you want to run agent locally without Docker you can add
-                    cron job which starts on boot.
-                  </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 relative">
-                    First make sure you have{" "}
-                    <code class="rounded bg-pink-100 text-red-900 p-1">
-                      bash
-                    </code>{" "}
-                    and{" "}
-                    <code class="rounded bg-pink-100 text-red-900 p-1">
-                      curl
-                    </code>{" "}
-                    installed then use{" "}
-                    <code class="rounded bg-pink-100 text-red-900 p-1">
-                      crontab -e
-                    </code>{" "}
-                    and add next
-                    <button
-                      class="hidden sm:flex  absolute right-2 top-12 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded items-center"
-                      onclick="copyToCb('bashpre')"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                        />
-                      </svg>
-                      Copy
-                    </button>
-                  </p>
-                  {/* <pre id="bashpre" data-pre-id="{{ this.id }}" class="whitespace-pre-wrap overflow-x-scroll py-4 pl-4 pr-20  mb-4 text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
-@reboot curl https://raw.githubusercontent.com/devforth/hothost/main/hothost-agent/getinfo.sh | HOTHOST_SERVER_BASE=___CURRENT_URL___ HOTHOST_MONITOR_INTERVAL=60 HOTHOST_AGENT_SECRET={{ this.secret }} bash</pre> */}
-                  {/* <script>
-            document.querySelectorAll('[data-pre-id="{{ this.id }}"]').forEach(function (el) {
-              el.innerHTML = el.innerHTML.replace('___CURRENT_URL___', document.location.protocol + '//' +
-                document.location.host);
-            });
-          </script> */}
-                  <p></p>
-                </div>
+      <body class="bg-white dark:bg-gray-500">
+        <nav class="bg-white sticky top-0 mb-4 w-full shadow-md z-50 min-w-full border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-800">
+          <div class="container flex flex-wrap justify-between items-center mx-auto">
+            <a href="/" class="flex items-center">
+              {/* <img src="/static/logo.svg" class="mr-3 h-6 sm:h-9" alt="HotHost Logo" />  */}
+              <div class="flex text-xl font-semibold whitespace-nowrap dark:text-white">
+                <img class="h-9" src="./src/assets/logo.svg" alt="logo" />
+                <span class="my-auto pl-2">HotHost</span>
               </div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                Refresh this page to see update.
-                <form
-                  action="/api/remove_monitor?id={{ this.id }}"
-                  method="POST"
+            </a>
+
+            <button
+              id="theme-toggle"
+              type="button"
+              class="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
+            >
+              <svg
+                id="theme-toggle-dark-icon"
+                class="hidden w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+              <svg
+                id="theme-toggle-light-icon"
+                class="hidden w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </button>
+
+            <div class="flex md:order-2">
+              {/* {{#if (not authorized)}}
+        <a href="/login/" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</a>
+        {{else}} */}
+              <div class="px-2">
+                <svg
+                  class="my-1 w-6 h-6 text-gray-700 dark:text-gray-300 h-8 w-8 cursor-pointer hover:text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  data-dropdown-toggle="settingsDropdown"
+                  data-dropdown-placement="bottom-end"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <button class="flex mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded items-center">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+              </div>
+
+              <div
+                id="settingsDropdown"
+                class="hidden bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 mt-28"
+              >
+                <div class="py-3 block">
+                  <a
+                    href="/users/"
+                    class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white "
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="h-6 w-6 mr-1"
+                      class="h-6 w-6 mr-3"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -278,108 +94,160 @@ function App() {
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                       />
                     </svg>
-                    Remove
-                  </button>
-                </form>
-              </p>
+                    Manage users
+                  </a>
+                </div>
+                <div class="py-3 block">
+                  <a
+                    href="/plugins"
+                    class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white "
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-6 w-6 mr-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                      />
+                    </svg>
+                    Plugins
+                  </a>
+                </div>
+                <div class="py-3 block">
+                  <a
+                    href="/settings"
+                    class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white "
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-6 w-6 mr-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    Settings
+                  </a>
+                </div>
+              </div>
+
+              <div class="px-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="userManage"
+                  class="text-gray-700 dark:text-gray-300 h-10 w-10 cursor-pointer hover:text-gray-600 "
+                  data-dropdown-toggle="userManageDropdown"
+                  data-dropdown-placement="bottom-end"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div
+                id="userManageDropdown"
+                class="hidden bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 mt-28"
+              >
+                <div class="py-3">
+                  <form action="/api/logout" method="POST">
+                    <button class="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6 mr-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      Logout
+                    </button>
+                  </form>
+                </div>
+              </div>
+              {/* {{/if}} */}
+              {/* <button data-collapse-toggle="mobile-menu-4" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="mobile-menu-4" aria-expanded="false">
+          <span class="sr-only">Open main menu</span>
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+          <svg class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>  */}
             </div>
-            {/* {{/if}}
-    {{/each}}
-    <div class="flow-root overflow-auto mobile:truncate">
-      {{> monitoring_table}}
-    </div> */}
           </div>
-        </div>
-      </div>
-      <div
-        id="toast-copied"
-        class=" fixed right-2 bottom-2 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-green-900 dark:bg-green-100"
-        role="alert"
-      >
-        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-100 dark:text-green-900">
-          <svg
-            class="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-        </div>
-        <div class="ml-3 text-sm font-normal">Copied to clipboard!</div>
-        <button
-          type="button"
-          class="bg-transparent ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex h-8 w-8 dark:text-green-900 dark:hover:text-black "
-          onclick="hideCOpyTost()"
-          aria-label="Close"
-        >
-          <span class="sr-only">Close</span>
-          <svg
-            class="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-        </button>
-      </div>
+        </nav>
+        {/* {{{ body }}} */}
 
-      {/* <script>
+        {/* <script>
+    var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-  function hideCOpyTost() {
-    document.getElementById('toast-copied').classList.add('hidden');
-  }
-
-  function copyToCb(idOfPre) {
-    const copyText = document.getElementById(idOfPre).textContent;
-    const textArea = document.createElement('textarea');
-    textArea.textContent = copyText;
-    document.body.append(textArea);
-    textArea.select();
-    document.execCommand("copy");
-    textArea.remove();
-    document.getElementById('toast-copied').classList.remove('hidden');
-    setTimeout(hideCOpyTost, 5000);
-
-  }
-
-  function checkHost(hostName, index) {
-    const confirmHost = document.getElementById('confirmHost-'+index);
-    const deleteHostBtn = document.getElementById('deleteHostBtn-'+index);
-    if (hostName === confirmHost.value) {
-      deleteHostBtn.disabled = false;
+    // Change the icons inside the button based on previous settings
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        themeToggleLightIcon.classList.remove('hidden');
     } else {
-      deleteHostBtn.disabled = true;
+        themeToggleDarkIcon.classList.remove('hidden');
     }
-  }
 
-  function onCloseModal() {
-    window.location = "/"
-  }
+    var themeToggleBtn = document.getElementById('theme-toggle');
 
-  const monitoringTable = document.getElementById('monitoring');
-  setInterval(async () => {
-    const response = await fetch('/update');
-    const data = await response.text();
-    if (monitoringTable) {
-      monitoringTable.innerHTML = data;
+    themeToggleBtn.addEventListener('click', function() {
 
-      window.document.dispatchEvent(new Event("DOMContentLoaded"));
+    // toggle icons inside button
+    themeToggleDarkIcon.classList.toggle('hidden');
+    themeToggleLightIcon.classList.toggle('hidden');
+
+    // if set via local storage previously
+    if (localStorage.getItem('color-theme')) {
+        if (localStorage.getItem('color-theme') === 'light') {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+        }
+
+    // if NOT set via local storage previously
+    } else {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+        }
     }
-  }, 10000);
-</script> */}
+    
+    });
+  </script> */}
+      </body>
     </div>
   );
 }
