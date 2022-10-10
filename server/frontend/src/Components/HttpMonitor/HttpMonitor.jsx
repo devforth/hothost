@@ -1,0 +1,246 @@
+import React from "react";
+
+const HttpMonitor = () => {
+  return (
+    <div class="container mx-auto flex justify-center">
+      <div class="p-4 my-5">
+        <div class="flex mb-1">
+          <a
+            href="/"
+            class="flex-1 mr-1 text-center border-b-2 border-gray-700 text-gray-800 dark:text-white hover:cursor-pointer"
+          >
+            Host monitoring
+          </a>
+          <div class="flex-1 ml-1 text-center border-b-4 border-gray-700 font-semibold text-gray-800 dark:text-white">
+            Http/Https monitoring
+          </div>
+        </div>
+        <div class="bg-gray-100 rounded-lg shadow-md p-4 sm:p-4 dark:bg-gray-600 dark:border-gray-700">
+          <div class="flex justify-between items-center mb-4">
+            <h5 class="mobile:w-min text-xl font-bold leading-none text-gray-900 dark:text-white">
+              Add Http(s) monitoring
+            </h5>
+            <button
+              onclick="onAddMonitor()"
+              class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add new host
+            </button>
+          </div>
+          <form
+            id="monitor_form"
+            action="/api/add_http_monitor"
+            method="post"
+            class="hidden"
+          >
+            <label
+              for="URL"
+              class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+            >
+              Monitor url
+            </label>
+            <input
+              name="URL"
+              id="monitorURL"
+              type="text"
+              placeholder="https://example.com"
+              required
+              class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            />
+
+            <label
+              for="monitor_interval"
+              class="block text-sm font-semibold text-gray-900 dark:text-gray-200"
+            >
+              Monitor interval (sec)
+            </label>
+            <div class="flex justify-between items-center mb-5">
+              <input
+                name="monitor_interval"
+                id="monitorInterval"
+                oninput="onRangeSelect()"
+                type="range"
+                min="1"
+                max="120"
+                value="30"
+                class="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              />
+              <div class="text-gray-900 dark:text-gray-200">
+                <span id="interval">30</span> sec.
+              </div>
+            </div>
+            <label
+              for="enable_auth"
+              class="relative inline-flex items-center mb-4 cursor-pointer"
+            >
+              <input
+                name="enable_auth"
+                id="enable_auth"
+                onclick="onAuthEnable()"
+                type="checkbox"
+                value="true"
+                class="sr-only peer"
+              />
+              <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                Enable basic auth
+              </span>
+            </label>
+            <div id="baseAuth" class="hidden">
+              <label
+                for="login"
+                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+              >
+                Login
+              </label>
+              <input
+                name="login"
+                id="login"
+                type="text"
+                placeholder="login"
+                class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+              />
+              <label
+                for="password"
+                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+              >
+                Password
+              </label>
+              <input
+                name="password"
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div class="mb-6">
+              <label
+                for="monitor_type"
+                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-400"
+              >
+                Select monitor type
+              </label>
+              <select
+                id="monitor_type"
+                onchange="onKeyWordSelect()"
+                name="monitor_type"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="status_code" selected>
+                  Status code is 200
+                </option>
+                <option value="keyword_exist">Keyword exists</option>
+                <option value="keyword_not_exist">Keyword not exists</option>
+              </select>
+            </div>
+            <div id="keyWordPlace" class="hidden">
+              <label
+                for="key_word"
+                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+              >
+                Key Word
+              </label>
+              <input
+                name="key_word"
+                id="keyWordInp"
+                type="text"
+                placeholder="Keyword"
+                class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <button
+              type="submit"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Submit
+            </button>
+            <button
+              type="button"
+              onclick="onAddMonitor()"
+              class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+            >
+              Close
+            </button>
+            <div class="my-4 border-b-2 border-gray-200 dark:border-gray-700"></div>
+          </form>
+          <div class="flow-root overflow-auto mobile:truncate">
+            {/* {{> httpMonitoring_table}} */}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+{
+  /* <script>
+  function onRangeSelect() {
+    const interval = document.getElementById('interval');
+    interval.innerHTML = event.target.value;
+  }
+
+  function onAuthEnable() {
+    const baseAuth = document.getElementById('baseAuth');
+    const login = document.getElementById('login');
+    const password = document.getElementById('password');
+
+    baseAuth.classList.toggle('hidden');
+    if (event.target.checked) {
+      login.required = true;
+      password.required = true;
+    } else {
+      login.required = false;
+      password.required = true;
+    }
+  }
+
+  function onKeyWordSelect() {
+    const keyWord = document.getElementById('keyWordPlace');
+    const word = document.getElementById('keyWordInp')
+    if (event.target.value !== 'status_code') {
+      keyWord.classList.remove('hidden');
+      word.required = true;
+    } else {
+      keyWord.classList.add('hidden');
+      word.required = false;
+    }
+  }
+
+  function onAddMonitor() {
+    const monitorForm = document.getElementById('monitor_form');
+
+    monitorForm.classList.toggle('hidden');
+  }
+
+  function onCloseModal() {
+    window.location = "/http-monitor"
+  }
+
+  const httpMonitoringTable = document.getElementById('httpMonitoring');
+  setInterval(async () => {
+    const response = await fetch('/http_update');
+    const data = await response.text();
+    if (httpMonitoringTable) {
+      httpMonitoringTable.innerHTML = data;
+
+      window.document.dispatchEvent(new Event("DOMContentLoaded"));
+    }
+  }, 10000);
+</script>) */
+}
+
+export default HttpMonitor
