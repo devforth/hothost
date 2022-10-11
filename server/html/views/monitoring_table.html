@@ -199,7 +199,7 @@
           </h3>
           <div class="justify-center">
             <form action="/api/remove_host?id={{ this.id }}" method="post">
-              <input id="confirmHost-{{@index}}" oninput="checkHost('{{this.hostname}}', '{{@index}}')"
+              <input id="confirmHost-{{@index}}" onInput="checkHost('{{this.hostname}}', '{{@index}}')"
                 class="w-max mx-auto mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 required>
               <div>

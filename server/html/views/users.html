@@ -1,105 +1,146 @@
-<div class="container px-4 mx-auto relative justify-center ">
-    <div class="text-xs text-gray-700 border-b-2 rounded-t-lg border-gray-300 dark:border-gray-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <button id="triggerCollapse" type="button" class="py-2.5 px-5 mx-4 my-4 text-sm font-medium text-white focus:outline-none bg-green-700 rounded-lg border border-gray-200  hover:bg-green-800 dark:focus:ring-gray-700 dark:bg-green-400 dark:text-gray-800 dark:border-gray-600 dark:hover:bg-green-500">
-            + User
-        </button>
-        <div id="targetCollapse" class="hidden">
-            <form class="space-y-6 max-w-sm" action="/api/add_user" method="post">
-                <div class="flex justify-between mx-4">
-                    <label for="login" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                        Login
-                    </label>
-                    <input type="text" name="username" id="login" oninput="checkPassword()" class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="login" required>
-                </div>
-                <div class="flex justify-between mx-4">
-                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                        Password
-                    </label>
-                    <input type="password" name="password" id="password" oninput="checkPassword()"  placeholder="••••••••" class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
-                </div>
-                <div class="flex justify-between mx-4">
-                    <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                        Confirm password
-                    </label>
-                    <input type="password" name="confirm_password" id="confirm_password" oninput="checkPassword()"  placeholder="••••••••" class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
-                </div>
-                <div class="flex justify-end mx-4">
-                    <button type="submit" id="submit" class="text-white mb-4 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:hover:bg-gray-500  disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500" disabled>
-                        Create user
-                    </button>
-                </div>
-            </form>
+<div class="container px-4 mx-auto relative justify-center">
+  <div
+    class="text-xs text-gray-700 border-b-2 rounded-t-lg border-gray-300 dark:border-gray-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+  >
+    <button
+      id="triggerCollapse"
+      type="button"
+      class="py-2.5 px-5 mx-4 my-4 text-sm font-medium text-white focus:outline-none bg-green-700 rounded-lg border border-gray-200 hover:bg-green-800 dark:focus:ring-gray-700 dark:bg-green-400 dark:text-gray-800 dark:border-gray-600 dark:hover:bg-green-500"
+    >
+      + User
+    </button>
+    <div id="targetCollapse" class="hidden">
+      <form class="space-y-6 max-w-sm" action="/api/add_user" method="post">
+        <div class="flex justify-between mx-4">
+          <label
+            for="login"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >
+            Login
+          </label>
+          <input
+            type="text"
+            name="username"
+            id="login"
+            onInput="checkPassword()"
+            class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            placeholder="login"
+            required
+          />
         </div>
+        <div class="flex justify-between mx-4">
+          <label
+            for="password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            onInput="checkPassword()"
+            placeholder="••••••••"
+            class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            required
+          />
+        </div>
+        <div class="flex justify-between mx-4">
+          <label
+            for="confirm_password"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >
+            Confirm password
+          </label>
+          <input
+            type="password"
+            name="confirm_password"
+            id="confirm_password"
+            onInput="checkPassword()"
+            placeholder="••••••••"
+            class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            required
+          />
+        </div>
+        <div class="flex justify-end mx-4">
+          <button
+            type="submit"
+            id="submit"
+            class="text-white mb-4 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:hover:bg-gray-500 disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500"
+            disabled
+          >
+            Create user
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
   <div class="relative overflow-x-auto shadow-md rounded-b-lg">
     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3">
-                    User
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Role
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Created
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    <span class="sr-only">Edit</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each userInfo}}
-            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <td scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                    {{ this.username }}
-                </td>
-                <td class="px-6 py-4">
-                    {{#if (isNotAdmin this.username) }}
-                    admin
-                    {{else}}
-                    super admin
-                    {{/if}}
-                </td>
-                <td class="px-6 py-4">
-                    {{this.createdAt}}
-                </td>
-                <td class="px-6 py-4 text-right">
-                    {{#if (isNotAdmin this.username) }}
-                    <form action="/api/remove_user?id={{ this.id }}" method="POST">
-                        <button  class="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                    </form>
-                    {{/if}}
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
+      <thead
+        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+      >
+        <tr>
+          <th scope="col" class="px-6 py-3">User</th>
+          <th scope="col" class="px-6 py-3">Role</th>
+          <th scope="col" class="px-6 py-3">Created</th>
+          <th scope="col" class="px-6 py-3">
+            <span class="sr-only">Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each userInfo}}
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <td
+            scope="row"
+            class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
+          >
+            {{ this.username }}
+          </td>
+          <td class="px-6 py-4">
+            {{#if (isNotAdmin this.username) }} admin {{else}} super admin
+            {{/if}}
+          </td>
+          <td class="px-6 py-4">{{this.createdAt}}</td>
+          <td class="px-6 py-4 text-right">
+            {{#if (isNotAdmin this.username) }}
+            <form action="/api/remove_user?id={{ this.id }}" method="POST">
+              <button
+                class="font-medium text-red-600 dark:text-red-500 hover:underline"
+              >
+                Delete
+              </button>
+            </form>
+            {{/if}}
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
     </table>
   </div>
 </div>
 
 <script>
-    const targetEl = document.getElementById('targetCollapse');
-    const triggerEl = document.getElementById('triggerCollapse');
-    const password = document.getElementById('password');
-    const confirm_password = document.getElementById('confirm_password');
-    const submit = document.getElementById('submit');
+  const targetEl = document.getElementById("targetCollapse");
+  const triggerEl = document.getElementById("triggerCollapse");
+  const password = document.getElementById("password");
+  const confirm_password = document.getElementById("confirm_password");
+  const submit = document.getElementById("submit");
 
-    const options = {
-        triggerEl: triggerEl,
-        onCollapse: () => {  },
-        onExpand: () => {  },
-        onToggle: () => {  }
-    };
-    const collapse = new Collapse(targetEl, options);
+  const options = {
+    triggerEl: triggerEl,
+    onCollapse: () => {},
+    onExpand: () => {},
+    onToggle: () => {},
+  };
+  const collapse = new Collapse(targetEl, options);
 
-    const checkPassword = () => {
-        if(password.value !== confirm_password.value) {
-            submit.disabled = true;
-        } else {
-            submit.disabled = false;
-        }
+  const checkPassword = () => {
+    if (password.value !== confirm_password.value) {
+      submit.disabled = true;
+    } else {
+      submit.disabled = false;
     }
-    
+  };
 </script>

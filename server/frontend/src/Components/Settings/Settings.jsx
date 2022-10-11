@@ -21,7 +21,7 @@ const Settings = () => {
                   <path
                     fill-rule="evenodd"
                     d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
                 Back to hosts list
@@ -47,7 +47,7 @@ const Settings = () => {
                   name="disk_threshold"
                   value="{{this.settings.disk_threshold}}"
                   onkeypress="validateNumberOnly()"
-                  oninput="validateRange()"
+                  onInput="validateRange()"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 />
                 <p class="text-xs text-gray-400 dark:text-gray-300">
@@ -66,7 +66,7 @@ const Settings = () => {
                   name="disk_stabilization_lvl"
                   value="{{this.settings.disk_stabilization_lvl}}"
                   onkeypress="validateNumberOnly()"
-                  oninput="validateRange()"
+                  onInput="validateRange()"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 />
                 {/* <!-- <p class="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}
@@ -82,7 +82,7 @@ const Settings = () => {
                   name="ram_threshold"
                   value="{{this.settings.ram_threshold}}"
                   onkeypress="validateNumberOnly()"
-                  oninput="validateRange()"
+                  onInput="validateRange()"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 />
                 <p class="text-xs text-gray-400 dark:text-gray-300">
@@ -101,7 +101,7 @@ const Settings = () => {
                   name="ram_stabilization_lvl"
                   value="{{this.settings.ram_stabilization_lvl}}"
                   onkeypress="validateNumberOnly()"
-                  oninput="validateRange()"
+                  onInput="validateRange()"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 />
                 {/* <!-- <p class="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}

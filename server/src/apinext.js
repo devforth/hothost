@@ -7,6 +7,7 @@ import {
   mustNotBeAuthorizedView,
   roundToNearestMinute,
 } from "./utils.js";
+import { getCountryName, getDuration, getFlag } from "./helpers/helpers.js";
 
 import database from "./database.js";
 
@@ -96,6 +97,11 @@ const getMonitoringData = async (req) => {
           disk_warning:
             (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 >
             DISK_THRESHOLD,
+          humanizeDurationOnlineEvent: getDuration(data.ONLINE_EVENT_TS),
+          countryFlag: getFlag(data.HOST_PUBLIC_IP_COUNTRY),
+          countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
+          humanizeDurationRamEvent: getDuration(data.RAM_EVENT_TS),
+          humanizeDurationDiskEvent: getDuration(data.DISK_EVENT_TS),
         }
   );
 };

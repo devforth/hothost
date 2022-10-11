@@ -30,11 +30,11 @@ const HttpMonitor = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                stroke-width="2"
+                strokeWidth="2"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
               </svg>
@@ -72,7 +72,7 @@ const HttpMonitor = () => {
               <input
                 name="monitor_interval"
                 id="monitorInterval"
-                oninput="onRangeSelect()"
+                onInput="onRangeSelect()"
                 type="range"
                 min="1"
                 max="120"
@@ -243,4 +243,4 @@ const HttpMonitor = () => {
 </script>) */
 }
 
-export default HttpMonitor
+export default HttpMonitor;

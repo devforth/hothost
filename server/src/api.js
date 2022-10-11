@@ -114,9 +114,11 @@ router.post("/data/:secret", async (req, res) => {
     const events = calculateDataEvent(
       database.data.monitoringData[index],
       newData
+      
     );
     await PluginManager().handleEvents(events, {
       ...newData,
+     
       // variables which might be used in template
       DISK_USED: sizeFormat(+newData.DISK_USED),
       DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
