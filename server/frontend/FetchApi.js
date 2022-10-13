@@ -1,8 +1,9 @@
-async function getData() {
-  const BASE_LOCAL_URL = "http://localhost:8007/api/v2/getMonitoringData";
-  const BASE_PROD_URL = "/api/";
-  const path = document.location.host === "" ? BASE_PROD_URL : BASE_LOCAL_URL;
-  const response = await fetch(path, {
+const BASE_LOCAL_URL = "http://localhost:8007/api/v2/";
+const BASE_PROD_URL = "/api/";
+const path = document.location.host === "" ? BASE_PROD_URL : BASE_LOCAL_URL;
+
+async function getData(route) {
+  const response = await fetch(`${path}${route}`, {
     method: "GET",
 
     credentials: "include",
@@ -13,4 +14,54 @@ async function getData() {
   return data;
 }
 
-export { getData };
+async function addLabel(bodyel, route) {
+  const response = await fetch(`${path}${route}`, {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(bodyel),
+
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  return data;
+}
+
+async function deleteHost(body, route) {
+  const response = await fetch(`${path}${route}`, {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(body),
+
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  return data;
+}
+
+async function apiFetch(body, route) {
+  const response = await fetch(`${path}${route}`, {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(body),
+
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  return data;
+}
+export { getData, addLabel, deleteHost, apiFetch };
