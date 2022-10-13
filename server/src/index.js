@@ -34,6 +34,7 @@ async function main() {
   setInterval(dbClearScheduler, 100 * 1000);
 
   const app = express();
+
   const port = env.WEB_PORT || 8007;
 
   const hbs = create({
@@ -84,7 +85,8 @@ async function main() {
   app.engine("html", hbs.engine);
   app.set("views", path.join("html", "views"));
 
-  app.use(formidable());
+  app.use(express.json());
+  // app.use(formidable());
   app.use(cookieParser());
 
   app.use(

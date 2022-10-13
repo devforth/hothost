@@ -82,26 +82,6 @@ router.get(
   "/login/",
   mustNotBeAuthorizedView((req, res) => res.render("login"))
 );
-router.post(
-  "/login/",
-  mustNotBeAuthorizedView(async (req, res) => {
-    try {
-      const { username, password } = req.fields;
-      if (username && password) {
-        const jwtToken = await authorizeUser(username, password);
-        res.cookie("__hhjwt", jwtToken, {
-          maxAge: 60 * 60 * 1000,
-          sameSite: "Strict", // prevents from broader class of CSRF attacks then even Lax, no need in external CSRF handlers for 92.16% of browsers
-          secure: false, // some users might have non-SSL sites, probably should go from ENV var which gives greenlight
-        });
-        res.redirect(req.query.next || "/");
-      }
-    } catch (e) {
-      res.locals.error = e.message;
-      res.render("login");
-    }
-  })
-);
 
 router.get(
   "/plugins/",

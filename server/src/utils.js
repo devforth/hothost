@@ -52,7 +52,7 @@ export const authorizeUser = async (username, password) => {
       env.WEB_JWT_SECRET
     );
   } else {
-    throw new Error("Invalid username or password");
+    return "error";
   }
 };
 export const mustNotBeAuthorizedView = (callback) => {
@@ -63,10 +63,10 @@ export const mustNotBeAuthorizedView = (callback) => {
 };
 export const mustBeAuthorizedView = (callback) => {
   return (req, res) => {
-    if (req.user) {
+    console.log(req.user);
+    if (!req.user) {
       //res.redirect(`/login/?next=${req.path}`);
-      res.status(401);
-      res.send("Unauthorized");
+      return res.status(401).json({ error: "Unauthorized" });
     } else {
       callback(req, res);
     }
