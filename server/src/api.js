@@ -114,11 +114,10 @@ router.post("/data/:secret", async (req, res) => {
     const events = calculateDataEvent(
       database.data.monitoringData[index],
       newData
-      
     );
     await PluginManager().handleEvents(events, {
       ...newData,
-     
+
       // variables which might be used in template
       DISK_USED: sizeFormat(+newData.DISK_USED),
       DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
@@ -140,42 +139,6 @@ router.post("/data/:secret", async (req, res) => {
 });
 
 router.post(
-  "/add_user",
-  mustBeAuthorizedView(async (req, res) => {
-    const user = req.fields;
-    const { users } = database.data;
-    const existedLogin = users.findIndex((el) => el.username === user.username);
-
-    if (existedLogin === -1) {
-      users.push({
-        id: uuidv4(),
-        username: user.username,
-        password: md5(user.password),
-        createdAt: new Date().toDateString(),
-      });
-      await database.write();
-    } else {
-      res.statusCode = 400;
-    }
-
-    res.redirect("/users/");
-  })
-);
-
-router.post(
-  "/remove_user",
-  mustBeAuthorizedView(async (req, res) => {
-    const { id } = req.query;
-    const { users } = database.data;
-
-    const index = users.findIndex((el) => el.id === id);
-    users.splice(index, 1);
-    await database.write();
-    res.redirect("/users/");
-  })
-);
-
-router.post(
   "/remove_host",
   mustBeAuthorizedView(async (req, res) => {
     const { id } = req.query;
@@ -185,22 +148,6 @@ router.post(
     );
     if (index !== -1) {
       database.data.monitoringData.splice(index, 1);
-      await database.write();
-    }
-    res.redirect("/");
-  })
-);
-
-router.post(
-  "/add_label",
-  mustBeAuthorizedView(async (req, res) => {
-    const { id } = req.query;
-    const { label } = req.fields;
-
-    const monData = database.data.monitoringData.find((el) => el.id === id);
-
-    if (monData) {
-      monData.HOST_LABEL = label.trim();
       await database.write();
     }
     res.redirect("/");
