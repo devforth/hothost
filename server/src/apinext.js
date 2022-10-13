@@ -1,4 +1,6 @@
 import express from "express";
+import { v4 as uuidv4 } from "uuid";
+import md5 from "md5";
 import {
   sizeFormat,
   authorizeUser,
@@ -7,7 +9,12 @@ import {
   mustNotBeAuthorizedView,
   roundToNearestMinute,
 } from "./utils.js";
-import { getCountryName, getDuration, getFlag } from "./helpers/helpers.js";
+import {
+  getCountryName,
+  getDuration,
+  getFlag,
+  isNotAdmin,
+} from "./helpers/helpers.js";
 
 import database from "./database.js";
 
@@ -110,6 +117,147 @@ router.get(
   "/getMonitoringData",
   mustBeAuthorizedView(async (req, res) => {
     res.json(await getMonitoringData(req));
+  })
+);
+
+router.get(
+  "/getUsers",
+  mustBeAuthorizedView((req, res) => {
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: database.data.users.map((user) => {
+        return {
+          username: user.username,
+          isNotAdmin: isNotAdmin(user.username),
+          createdAt: user.createdAt,
+          id: user.id,
+        };
+      }),
+    });
+    // res.locals.userInfo = database.data.users;
+    // res.render("users");
+  })
+);
+
+router.post(
+  "/remove_user",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.body;
+    const { users } = database.data;
+
+    if (id) {
+      const index = users.findIndex((el) => el.id === id);
+      users.splice(index, 1);
+      await database.write();
+      return res.status(200).json({
+        status: "successful",
+        code: 200,
+        data: database.data.users.map((user) => {
+          return {
+            username: user.username,
+            isNotAdmin: isNotAdmin(user.username),
+            createdAt: user.createdAt,
+            id: user.id,
+          };
+        }),
+      });
+    } else {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+  })
+);
+
+router.post(
+  "/add_user",
+  mustBeAuthorizedView(async (req, res) => {
+    const user = req.body.user;
+
+    const { users } = database.data;
+    const existedLogin = users.findIndex((el) => el.username === user.username);
+
+    if (existedLogin === -1) {
+      users.push({
+        id: uuidv4(),
+        username: user.username,
+        password: md5(user.password),
+        createdAt: new Date().toDateString(),
+      });
+      await database.write();
+      return res.status(200).json({
+        status: "successful",
+        code: 200,
+        data: database.data.users.map((user) => {
+          return {
+            username: user.username,
+            isNotAdmin: isNotAdmin(user.username),
+            createdAt: user.createdAt,
+            id: user.id,
+          };
+        }),
+      });
+    } else {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+  })
+);
+
+router.post("/add_label", async (req, res) => {
+  console.log(12, req);
+  res.json([req.body, { 1: 2 }]);
+  // const { id } = req.query;
+  // const { label } = req.fields;
+
+  // const monData = database.data.monitoringData.find((el) => el.id === id);
+
+  // if (monData) {
+  //   monData.HOST_LABEL = label.trim();
+  //   await database.write();
+  // }
+  // res.redirect("/");
+});
+
+router.post(
+  "/login",
+  mustNotBeAuthorizedView(async (req, res) => {
+    const { username, password } = req.body;
+    if (username && password) {
+      const jwtToken = await authorizeUser(username, password);
+      console.log("token", jwtToken);
+      if (jwtToken !== "error") {
+        return res
+          .cookie("__hhjwt", jwtToken, {
+            maxAge: 60 * 60 * 1000,
+            sameSite: "Strict", // prevents from broader class of CSRF attacks then even Lax, no need in external CSRF handlers for 92.16% of browsers
+            secure: false, // some users might have non-SSL sites, probably should go from ENV var which gives greenlight
+          })
+          .status(200)
+          .json({
+            status: "successful",
+            code: 200,
+          });
+      } else {
+        return res.status(401).json({
+          status: "rejected",
+          code: 401,
+          error: "invalid data",
+        });
+      }
+    } else {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
   })
 );
 
