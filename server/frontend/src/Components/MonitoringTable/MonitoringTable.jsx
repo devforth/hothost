@@ -1,19 +1,44 @@
 import React from "react";
 import { Tooltip, Dropdown } from "flowbite-react";
 import { useState } from "react";
+import { addLabel, deleteHost } from "../../../FetchApi";
 
 const MonitoringTable = (props) => {
   const monitoringData = props.monitoringData;
+  const toastsManager = props.myDataSetterFunction;
   const [labelModalIsOpen, setLabelModalIsOpen] = useState(false);
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
   const [chosenHost, setChosenHost] = useState("0");
+  const [labelName, setLabelName] = useState("");
+  const [confrimName, seConfrimName] = useState("");
 
   const labelModalToggle = function (e) {
     setLabelModalIsOpen(!labelModalIsOpen);
-    setChosenHost(e.target.id);
+    setChosenHost(+e.target.id);
+  };
+  const getLabel = (evt) => {
+    setLabelName(evt.currentTarget.value);
+  };
+  const saveLabel = async () => {
+    const body = {
+      label: labelName,
+      id: monitoringData && monitoringData[chosenHost].id,
+    };
+    const data = await addLabel(body, "add_label");
   };
 
-  console.log(monitoringData);
+  const deleteHostAction = async () => {
+    const body = {
+      id: monitoringData && monitoringData[chosenHost].id,
+    };
+    const data = await deleteHost(body, "remove_host");
+  };
 
+  const deleteModalToggle = function (e) {
+    setDeleteModalIsOpen(!deleteModalIsOpen);
+  };
+
+  const deleteHost = async () => {};
   return (
     <table
       id="monitoring"
@@ -21,257 +46,264 @@ const MonitoringTable = (props) => {
       className="divide-y divide-gray-200 dark:divide-gray-700 w-full"
     >
       {monitoringData &&
-        monitoringData.map((host, index) => (
-          <tr
-            key={host.id}
-            className="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-3 border-b last:border-b-0 border-gray-200 dark:border-gray-700 w-full"
-          >
-            <td className="mobile:hidden py-4 pr-4 flex-shrink-0">
-              <img
-                className="min-w-[32px] min-h-[32px] rounded-full w-[8px]"
-                src={`/src/assets/${host.icon_name}.svg`}
-                alt="OS"
+        monitoringData
+          .filter((el) => {
+            return !el.no_data;
+          })
+          .map((host, index) => (
+            <tr
+              key={host.id}
+              className="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-3 border-b last:border-b-0 border-gray-200 dark:border-gray-700 w-full"
+            >
+              <td className="mobile:hidden py-4 pr-4 flex-shrink-0">
+                <img
+                  className="min-w-[32px] min-h-[32px] rounded-full w-[8px]"
+                  src={`/src/assets/${host.icon_name}.svg`}
+                  alt="OS"
 
-                // import PreviousMap from "postcss/lib/previous-map.js";
-              />
-            </td>
-            <td className="row-start-1 col-start-3 pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
-              <Tooltip
-                content={host.humanizeDurationOnlineEvent}
-                placement="bottom"
-              >
-                <span>
-                  {host.online ? <span>🟢 On</span> : <span>🔴 Off</span>}
-                </span>
-              </Tooltip>
-            </td>
-            <td className="pr-4 flex-1 row-start-1 col-start-1 col-span-3 min-w-max">
-              <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                {host.hostname}
-                {host.label && host.label !== "" && (
-                  <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
-                    {host.label}
-                  </span>
-                )}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
-                <span className="flex  text-center items-center">
-                  Public IP:&nbsp;
-                  {host.countryFlag && (
-                    <Tooltip content={host.countryName} placement="bottom">
-                      <img
-                        className="h-4 w-4 m-1"
-                        src={`/src/assets/flags/${host.countryFlag}`}
-                        data-tooltip-placement="bottom"
-                        data-tooltip-target="tooltip"
-                        alt="country"
-                      />{" "}
-                    </Tooltip>
-                  )}
-                  {host.public_ip && <span>{host.public_ip}</span>}
-                </span>
-              </p>
-            </td>
-            <td className="flex-1 sm:px-4 min-w-max">
-              <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                {host.os_name}
-              </p>
-              <Tooltip content={host.os_version} placement="bottom">
-                <p
-                  className="text-sm text-gray-500 truncate dark:text-gray-400 w-20"
-                  data-tooltip-placement="bottom"
-                >
-                  {host.os_version}
-                </p>
-              </Tooltip>
-            </td>
-            <td className="flex-1 pr-4 row-start-2 col-span-3 min-w-max">
-              <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                💻 {host.cpu_name}
-              </p>
-              <div className="text-sm text-gray-500 truncate dark:text-gray-400 flex">
-                <p> CPUs: {host.cpu_count}</p>
+                  // import PreviousMap from "postcss/lib/previous-map.js";
+                />
+              </td>
+              <td className="row-start-1 col-start-3 pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
                 <Tooltip
-                  content={` Used RAM: ${host.ram_used}`}
+                  content={host.humanizeDurationOnlineEvent}
                   placement="bottom"
                 >
-                  <span className="inline-flex ml-2">
-                    RAM:{" "}
-                    {`${host.ram_total} 
-                  ${host.ram_used_percentage}% used`}
-                    <button
-                      // onclick="drawTimeSlider('{{host.id}}', '{{@index}}')"
-                      data-modal-toggle="modal_timeline-{{@index}}"
-                      className="ml-2"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
+                  <span>
+                    {host.online ? <span>🟢 On</span> : <span>🔴 Off</span>}
                   </span>
                 </Tooltip>
-                {host.ram_warning && (
+              </td>
+              <td className="pr-4 flex-1 row-start-1 col-start-1 col-span-3 min-w-max">
+                <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {host.hostname}
+                  {host.label && host.label !== "" && (
+                    <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
+                      {host.label}
+                    </span>
+                  )}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
+                  <span className="flex  text-center items-center">
+                    Public IP:&nbsp;
+                    {host.countryFlag && (
+                      <Tooltip content={host.countryName} placement="bottom">
+                        <img
+                          className="h-4 w-4 m-1"
+                          src={`/src/assets/flags/${host.countryFlag}`}
+                          data-tooltip-placement="bottom"
+                          data-tooltip-target="tooltip"
+                          alt="country"
+                        />{" "}
+                      </Tooltip>
+                    )}
+                    {host.public_ip && <span>{host.public_ip}</span>}
+                  </span>
+                </p>
+              </td>
+              <td className="flex-1 sm:px-4 min-w-max">
+                <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {host.os_name}
+                </p>
+                <Tooltip content={host.os_version} placement="bottom">
+                  <p
+                    className="text-sm text-gray-500 truncate dark:text-gray-400 w-20"
+                    data-tooltip-placement="bottom"
+                  >
+                    {host.os_version}
+                  </p>
+                </Tooltip>
+              </td>
+              <td className="flex-1 pr-4 row-start-2 col-span-3 min-w-max">
+                <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  💻 {host.cpu_name}
+                </p>
+                <div className="text-sm text-gray-500 truncate dark:text-gray-400 flex">
+                  <p> CPUs: {host.cpu_count}</p>
                   <Tooltip
-                    content={host.humanizeDurationRamEvent}
+                    content={` Used RAM: ${host.ram_used}`}
                     placement="bottom"
                   >
-                    <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">
-                      ALERT
+                    <span className="inline-flex ml-2">
+                      RAM:{" "}
+                      {`${host.ram_total} 
+                  ${host.ram_used_percentage}% used`}
+                      <button
+                        // onclick="drawTimeSlider('{{host.id}}', '{{@index}}')"
+                        data-modal-toggle="modal_timeline-{{@index}}"
+                        className="ml-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
                     </span>
                   </Tooltip>
-                )}
-                &nbsp;&nbsp;&nbsp;
-                <span className="mobile:block">
-                  {/* {{#if host.isSwap }}
+                  {host.ram_warning && (
+                    <Tooltip
+                      content={host.humanizeDurationRamEvent}
+                      placement="bottom"
+                    >
+                      <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900">
+                        ALERT
+                      </span>
+                    </Tooltip>
+                  )}
+                  &nbsp;&nbsp;&nbsp;
+                  <span className="mobile:block">
+                    {/* {{#if host.isSwap }}
           SWAP {{ host.swap_total }} ({{ host.swap_used }}% used)
           {{else}}
           SWAP Off
           {{/if}} */}
-                  {host.isSwap
-                    ? `SWAP ${host.swap_total} ${host.swap_used}% used`
-                    : "SWAP Off"}
-                </span>
-              </div>
-            </td>
-            <td className="flex-1 pr-4 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
-              <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
-              <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                <p>{host.disk_used}% used</p>
-                {host.disk_warning ? (
-                  <>
-                    <Tooltip
-                      content={host.humanizeDurationDiskEvent}
-                      placement="bottom"
-                    >
-                      <span> ALERT </span>
-                    </Tooltip>
-                  </>
-                ) : (
-                  <span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
-                    OK
+                    {host.isSwap
+                      ? `SWAP ${host.swap_total} ${host.swap_used}% used`
+                      : "SWAP Off"}
                   </span>
-                )}
-              </p>
-            </td>
-            <td className="row-start-3 col-start-3 mobile:flex mobile:self-center mobile:place-content-end">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                id={index + 1}
-                data-dropdown-placement="bottom-end"
-                className="h-6 w-6 text-gray-700 dark:text-gray-100 cursor-pointer"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-                onClick={(e) => {
-                  if (
-                    document.querySelector(`#dropdownDotsInfo-${e.target.id}`)
-                  ) {
-                    document
-                      .querySelector(`#dropdownDotsInfo-${e.target.id}`)
-                      .classList.toggle("hidden");
-                  }
-                }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                />
-              </svg>
-              <div
-                id={`dropdownDotsInfo-${index + 1}`}
-                className="z-10  w-max hidden bg-white shadow text-sm font-medium text-white rounded-lg transition-opacity duration-300 dark:bg-gray-700"
-              >
-                <button
-                  type="button"
-                  id={index}
-                  className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
-                  onClick={labelModalToggle}
+                </div>
+              </td>
+              <td className="flex-1 pr-4 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
+                <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
+                <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+                  <p>{host.disk_used}% used</p>
+                  {host.disk_warning ? (
+                    <>
+                      <Tooltip
+                        content={host.humanizeDurationDiskEvent}
+                        placement="bottom"
+                      >
+                        <span> ALERT </span>
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
+                      OK
+                    </span>
+                  )}
+                </p>
+              </td>
+              <td className="row-start-3 col-start-3 mobile:flex mobile:self-center mobile:place-content-end">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  id={index + 1}
+                  data-dropdown-placement="bottom-end"
+                  className="h-6 w-6 text-gray-700 dark:text-gray-100 cursor-pointer"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  onClick={(e) => {
+                    if (
+                      document.querySelector(`#dropdownDotsInfo-${e.target.id}`)
+                    ) {
+                      document
+                        .querySelector(`#dropdownDotsInfo-${e.target.id}`)
+                        .classList.toggle("hidden");
+                    }
+                  }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 pr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                    />
-                  </svg>
-                  <p>{!host.label ? "Add label" : "Change label"}</p>
-                </button>
-                <button
-                  type="button"
-                  data-modal-toggle="modal_timeline-{{@index}}"
-                  // onclick="drawTimeSlider('{{host.id}}', '{{@index}}')"
-                  className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  />
+                </svg>
+                <div
+                  id={`dropdownDotsInfo-${index + 1}`}
+                  className="z-10  w-max hidden bg-white shadow text-sm font-medium text-white rounded-lg transition-opacity duration-300 dark:bg-gray-700"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="h-6 w-6 pr-2"
+                  <button
+                    type="button"
+                    id={index}
+                    className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
+                    onClick={labelModalToggle}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
-                    />
-                  </svg>
-                  RAM by process
-                </button>
-                <button
-                  type="button"
-                  data-modal-toggle="modal_delete-{{@index}}"
-                  className="mx-3 my-2 flex text-left text-red-600 hover:underline"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 pr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 pr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                      />
+                    </svg>
+                    <p>{!host.label ? "Add label" : "Change label"}</p>
+                  </button>
+                  <button
+                    type="button"
+                    data-modal-toggle="modal_timeline-{{@index}}"
+                    // onclick="drawTimeSlider('{{host.id}}', '{{@index}}')"
+                    className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="h-6 w-6 pr-2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
+                      />
+                    </svg>
+                    RAM by process
+                  </button>
+                  <button
+                    type="button"
+                    data-modal-toggle="modal_delete-{{@index}}"
+                    className="mx-3 my-2 flex text-left text-red-600 hover:underline"
+                    onClick={deleteModalToggle}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 pr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
 
       {/* {{/if}} */}
       <div
         id="modal_delete-{{@index}}"
         tabIndex="-1"
-        className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full"
+        className={`${
+          !deleteModalIsOpen && "hidden"
+        } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full`}
       >
         <div className="relative p-4 w-full max-w-md h-full md:h-auto">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -309,13 +341,20 @@ const MonitoringTable = (props) => {
                 ></path>
               </svg>
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
-                {/* Are you sure you want to delete host host? <br>Type <b>{{host.hostname}}</b> to confirm. */}
+                Are you sure you want to delete host host? Type{" "}
+                <b>
+                  {monitoringData.length > 0 &&
+                    monitoringData[+chosenHost].hostname}
+                </b>{" "}
               </h3>
               <div className="justify-center">
                 <form action="/api/remove_host?id={{ host.id }}" method="post">
                   <input
                     id="confirmHost-{{@index}}"
-                    // onInput="checkHost('{{host.hostname}}', '{{@index}}')"
+                    onChange={(e) => {
+                      seConfrimName(e.currentTarget.value);
+                    }}
+                    value={confrimName}
                     className="w-max mx-auto mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     required
                   />
@@ -323,8 +362,9 @@ const MonitoringTable = (props) => {
                     <button
                       id="deleteHostBtn-{{@index}}"
                       data-modal-toggle="modal_delete-{{@index}}"
-                      type="submit"
-                      disabled
+                      type="button"
+                      onClick={deleteHostAction}
+                      disabled={confrimName !== "Yes, I'm sure"}
                       className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2 disabled:hover:bg-gray-500  disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500"
                     >
                       Yes, I'm sure
@@ -381,29 +421,29 @@ const MonitoringTable = (props) => {
                 host
               </h3>
               <div className="justify-center">
-                <form action="/api/add_label?id={{ host.id }}" method="post">
-                  <input
-                    name="label"
-                    className="w-max mx-auto mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                  />
-                  <div>
-                    <button
-                      data-modal-toggle="modal_label-{{@index}}"
-                      type="submit"
-                      className="w-20 mb-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                      Ok
-                    </button>
-                    <button
-                      data-modal-toggle="modal_label-{{@index}}"
-                      //onclick="onCloseModal()"
-                      type="button"
-                      className="w-20 mb-4 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                <input
+                  name="label"
+                  onChange={getLabel}
+                  value={labelName}
+                  className="w-max mx-auto mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                />
+                <div>
+                  <button
+                    data-modal-toggle="modal_label-{{@index}}"
+                    onClick={saveLabel}
+                    className="w-20 mb-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    Ok
+                  </button>
+                  <button
+                    data-modal-toggle="modal_label-{{@index}}"
+                    onClick={labelModalToggle}
+                    type="button"
+                    className="w-20 mb-4 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
