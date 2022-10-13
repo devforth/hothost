@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "watch-tailwindcss": "npx tailwindcss -i src/input.css -o public/output.css --watch"
   },
   "dependencies": {
     "flowbite": "^1.5.3",
