@@ -3,8 +3,6 @@
 # -------------------------------------------------------------------------------------------------
 # detect the kernel
 
-mount --bind /host/proc/ /proc
-
 KERNEL_NAME="$(uname -s)"
 KERNEL_VERSION="$(uname -r)"
 ARCHITECTURE="$(uname -m)"
@@ -400,6 +398,12 @@ then
 fi
 
 IS_RESTART=1
+if [ -f /pscommand ]; then
+  pscommand='/pscommand'
+else
+  pscommand='ps'
+fi
+
 while :
 do
 
@@ -433,8 +437,8 @@ do
     FREE_SWAP="$((FREE_SWAP * 1024))"
   fi
 
-  # Detect process RSS information
-  process_output=`ps -eo rss,command --sort -rss | head -n 11 | sed '1d'`
+  # Detect process RSS information  
+  process_output=`$pscommand -eo rss,command --sort -rss | head -n 11 | sed '1d'`
   JSON_PROCESS=""
 
   i=0

@@ -307,7 +307,7 @@
                 </div>
               </div>
               <div class="w-[200px] h-[200px] ">
-                <canvas id="processChart-{{@index}}" width="200px" height="200px"></canvas>
+                <canvas id="processChart-{{@index}}" width="200px" height="200px" class="rounded-full"></canvas>
               </div>
             </div>
           </div>
@@ -461,7 +461,7 @@
       <span class="sr-only">Loading...</span>
     </div>
     `;
-  const colors = ['#808080', '#949494', '#a9a9a9', '#bdbebd', '#d3d3d3', '#8a8a8a', '#d1d1d1', '#e9e9e9', '#808080', '#949494']; // shades of grey
+  const colors = ['#D1D2D4', '#C1C2C4', '#B3B5B8', '#AFB1B4', '#9FA1A4', '#939598', '#818285', '#757679', '#6D6E71', '#58585A']; // shades of grey
 
   const generateChartData = (data) => {
     return data.map((el, index) => {

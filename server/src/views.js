@@ -273,7 +273,7 @@ router.get('/http-monitor',  mustBeAuthorizedView((req, res) => {
 }));
 
 const generateProcessData = (data) => {
-    const colors = ['#458cff', '#b145ff', '#ff4545', '#45f6ff', '#45ff89', '#bbff45', '#ffff45', '#ffb145', '#ff4596', '#ff45c4'];
+    const colors = ['#22d4bc', '#56AEE2', '#5668E2', '#8A56E2', '#CF56E2', '#E25668', '#E28956', '#E2CF56', '#AEE256', '#56E289'];
     let processEntries = [];
     let id = 0;
     for (const [key, value] of Object.entries(data)) {

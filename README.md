@@ -1,15 +1,15 @@
 # HotHost
 
-Lightweight and minimalistic FOSS hosts monitor. 
+Lightweight and minimalistic free and opensource Servers and HTTP monitor. 
 
-* Shows used disk space percentage and ALERT badge if it exceeds some threshold (90% by default)
-* Shows used RAM percentage and ALERT badge if it exceeds some threshold (90% by default)
-* Allows to setup Email/Slack/Telegram notifications
-* Agents could be easily installed with Docker/Compose/Bash+curl+crontab. Super simple snippets are shown when you click one button
-* Allows to monitor as many hosts as needed
-* Configurable monitoring interval
-* Based on alpine minimalistic Docker images
-* You can add a public page protected with Basic Auth to watch status with some external monitor (e.g. UptimeRobot can trigger own notifications when there is a ALERT keyword on page)
+* 💾 Shows used disk space percentage and ALERT badge if it exceeds configurable threshold (90% by default)
+* 🧠 Shows used RAM percentage and ALERT badge if it exceeds configurable threshold (90% by default)
+* ☎️ Built-in plugins to setup Email/Slack/Telegram notifications
+* 🪧 Agents installed using **simple code snippets**. Options: Docker/Compose/Bash+curl+crontab.
+* 🏙 Allows to monitor as many hosts as needed
+* ⏰️ Configurable monitoring interval
+* 📈 View top 10 processes consuming RAM, historically iver last 2 days.
+* 🌐 HTTP / HTTPS Monitor, status code check, webpage keywords existence, basic auth, notifications
 
 For each host it allows to see:
 
@@ -35,8 +35,7 @@ Available plugins:
 
 # RoadMap
 
-* HTTP URLs monitoring and keywords check
-* Probably porting UI from server-side to Vue.js
+* Porting UI from server-side to Vue.js
 
 # Installation
 
@@ -45,10 +44,10 @@ First you need to run HotHost Web Server. Web-server itself, when will be starte
 You can use any host with public IP. You are responsible for setting up HTTPS.
 
 You can use one of next options:
-- Nginx or Rraefik with connected external certificate or free Let's Encrypt certificate
+- Nginx or Traefik with connected external certificate or free Let's Encrypt certificate
 - Free Cloudflare CDN which terminates SSL and gives additional layer of cecurity.
 
-We recommend you to check this guide how to [setup HotHost with free Cloudflare plan and EC2 Nano](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
+We recommend you to check guide how to [setup HotHost with free Cloudflare plan and EC2 Nano](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
 
 If you have existing Docker/Compose stacks, you can use snippets below:
 

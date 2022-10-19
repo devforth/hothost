@@ -75,7 +75,7 @@ async function main() {
   app.use('/api/', apiRouter);
 
   app.listen(port, '0.0.0.0', () => {
-    console.log(`🔥🔥🔥 Hothost is listening on port ${port}`)
+    console.log(`🔥🔥🔥 ${new Date().toISOString()} Hothost is listening on port ${port}`)
   });
 }
 
