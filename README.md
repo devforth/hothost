@@ -8,7 +8,7 @@ Lightweight and minimalistic free and opensource Servers and HTTP monitor.
 * 🪧 Agents installed using **simple code snippets**. Options: Docker/Compose/Bash+curl+crontab.
 * 🏙 Allows to monitor as many hosts as needed
 * ⏰️ Configurable monitoring interval
-* 📈 View top 10 processes consuming RAM, historically iver last 2 days.
+* 📈 View top 10 processes consuming RAM, historically over last 2 days.
 * 🌐 HTTP / HTTPS Monitor, status code check, webpage keywords existence, basic auth, notifications
 
 For each host it allows to see:
@@ -149,11 +149,11 @@ Then use https://subdomain.yourdomain.com/public/ with basic auth credentials. Y
 
 # Plugin development
 
-Every plugin is a standalone .js of ESM format (with exports/imports, CommonJS with require is not supported). File should have a defined structure. Use `server/src/plugins/slack.js` for a Hello-World example. It is well documented
+Every plugin is a standalone .js in ESM format (with exports/imports, CommonJS with require is not supported). File should have a defined structure. Use `server/src/plugins/slack.js` for a Hello-World example. It is well documented
 
 Currently plugin file should be placed into `server/src/plugins` directory.
 
-If you want to bundle some dedicated node modules then you need to compile them using webpack or other bundler which supports ESM outputs. Please see `server/src/plugins/gmail.src/gmail.src.js` - it bundels node-mailer into plugin.
+If you want to bundle some dedicated node modules then you need to bundle them using webpack or other bundler which supports ESM outputs. Please see `server/src/plugins/gmail.src/gmail.src.js` - it bundels node-mailer into plugin.
 
 
 # Development
