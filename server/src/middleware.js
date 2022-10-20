@@ -1,15 +1,15 @@
-import jwt from 'jsonwebtoken';
-import env from './env.js';
+import jwt from "jsonwebtoken";
+import env from "./env.js";
 
 export const authMiddleware = (req, res, next) => {
-    const jwtToken = req.cookies['__hhjwt'];
-    try {
-        req.user = jwt.decode(jwtToken, env.WEB_JWT_SECRET);
-    } catch (e) {
-        req.user = null;
-    }
+  const jwtToken = req.cookies["__hhjwt"];
+  try {
+    req.user = jwt.decode(jwtToken, env.WEB_JWT_SECRET);
+  } catch (e) {
+    req.user = null;
+  }
 
-    res.locals.authorized = !!req.user;
-    if(env.ENV === 'local') res.locals.local = true;
-    next();
+  res.locals.authorized = !!req.user;
+  if (env.ENV === "local") res.locals.local = true;
+  next();
 };

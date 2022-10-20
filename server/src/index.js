@@ -101,6 +101,7 @@ async function main() {
   app.use("/", viewRouter);
   app.use("/api/", apiRouter);
   app.use("/api/v2/", nextApiRouter);
+  app.use("/v2/", nextApiRouter);
 
   app.listen(port, "0.0.0.0", () => {
     console.log(

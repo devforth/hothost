@@ -10,10 +10,9 @@ import {
   sizeFormat,
   eventDuration,
   setWarning,
-  createMonitorDataset,
-  stopScheduleJob,
-  createScheduleJob,
-  checkStatus,
+  // createMonitorDataset,
+
+  // checkStatus,
   roundToNearestMinute,
 } from "./utils.js";
 import PluginManager from "./pluginManager.js";
@@ -21,46 +20,8 @@ import db from "./levelDB.js";
 
 const router = express.Router();
 
-router.post(
-  "/add_monitor",
-  mustBeAuthorizedView(async (req, res) => {
-    const id = uuidv4();
-    const now = new Date().getTime();
-    const secret = readableRandomStringMaker(64);
-
-    database.data.monitoringData.push({
-      id,
-      createdAt: now,
-      updatedAt: now,
-      secret,
-    });
-    await database.write();
-
-    res.redirect("/");
-  })
-);
-
-router.post(
-  "/remove_monitor",
-  mustBeAuthorizedView(async (req, res) => {
-    const { id } = req.query;
-
-    const index = database.data.monitoringData.findIndex((md) => md.id === id);
-    if (index !== -1) {
-      database.data.monitoringData.splice(index, 1);
-      await database.write();
-    }
-    res.redirect("/");
-  })
-);
-
-router.post("/logout", (req, res) => {
-  res.cookie("__hhjwt", "", { maxAge: -1 });
-  res.redirect("/login/");
-});
-
 router.post("/process/:secret", async (req, res) => {
-  const procData = req.fields;
+  const procData = req.body;
   const process = procData.PROCESS;
   const isRestart = +procData.IS_RESTART;
   const now = roundToNearestMinute(new Date().getTime());
@@ -79,7 +40,7 @@ router.post("/process/:secret", async (req, res) => {
 });
 
 router.post("/data/:secret", async (req, res) => {
-  const monitorData = req.fields;
+  const monitorData = req.body;
 
   const index = database.data.monitoringData.findIndex(
     (md) => md.secret === req.params.secret
@@ -138,60 +99,7 @@ router.post("/data/:secret", async (req, res) => {
   }
 });
 
-router.post(
-  "/remove_host",
-  mustBeAuthorizedView(async (req, res) => {
-    const { id } = req.query;
 
-    const index = database.data.monitoringData.findIndex(
-      (host) => host.id === id
-    );
-    if (index !== -1) {
-      database.data.monitoringData.splice(index, 1);
-      await database.write();
-    }
-    res.redirect("/");
-  })
-);
-
-router.post(
-  "/add_http_monitor",
-  mustBeAuthorizedView(async (req, res) => {
-    const httpMonitorData = req.fields;
-
-    const monitor = createMonitorDataset(httpMonitorData);
-
-    database.data.httpMonitoringData.push(monitor);
-    await database.write();
-
-    createScheduleJob(monitor.id, monitor.monitor_interval);
-
-    await checkStatus(monitor).then((res) => {
-      monitor.event_created = new Date().getTime();
-      monitor.okStatus = res.response;
-    });
-
-    res.redirect("/http-monitor");
-  })
-);
-
-router.post(
-  "/remove_http_monitor",
-  mustBeAuthorizedView(async (req, res) => {
-    const { id } = req.query;
-
-    stopScheduleJob(id);
-    const index = database.data.httpMonitoringData.findIndex(
-      (host) => host.id === id
-    );
-    if (index !== -1) {
-      database.data.httpMonitoringData.splice(index, 1);
-      await database.write();
-    }
-
-    res.redirect("/http-monitor");
-  })
-);
 
 router.post(
   "/add_http_label",

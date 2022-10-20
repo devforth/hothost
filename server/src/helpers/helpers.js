@@ -3,8 +3,8 @@ import {
   calculateAsyncEvents,
   checkUserExistsOrCreate,
   DATE_HUMANIZER_CONFIG,
-  startScheduler,
-  dbClearScheduler,
+  // startScheduler,
+  // dbClearScheduler,
 } from "../utils.js";
 import env from "../env.js";
 

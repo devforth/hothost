@@ -63,7 +63,6 @@ export const mustNotBeAuthorizedView = (callback) => {
 };
 export const mustBeAuthorizedView = (callback) => {
   return (req, res) => {
-    console.log(req.user);
     if (!req.user) {
       //res.redirect(`/login/?next=${req.path}`);
       return res.status(401).json({ error: "Unauthorized" });
@@ -335,7 +334,8 @@ export const createMonitorDataset = (data) => {
     event_created: now,
   };
   for (const key in data) {
-    if (data[key] !== "") {
+    if (data[key] !== "" && typeof data[key] !== "boolean") {
+    
       monitor[key] = data[key].trim();
     }
   }
@@ -399,6 +399,7 @@ export const createScheduleJob = (httpHostId, interval) => {
     const now = new Date().getTime();
 
     const res = await checkStatus(dbData);
+
     generateHttpEvent(dbData, {
       ...dbData,
       okStatus: !!res.response,

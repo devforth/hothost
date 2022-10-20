@@ -28,6 +28,13 @@ const Home = () => {
       setStatus("fullfield");
     };
     fetchData();
+    const intervalId = setInterval(() => {
+     
+      fetchData();
+    }, 10000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   const addHost = async function () {

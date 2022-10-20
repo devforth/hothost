@@ -1,6 +1,11 @@
 import express from "express";
 import { v4 as uuidv4 } from "uuid";
 import md5 from "md5";
+import env from "./env.js";
+import PluginManagerSingleton from "./pluginManager.js";
+import md from "markdown-it";
+import db from "./levelDB.js";
+
 import {
   sizeFormat,
   authorizeUser,
@@ -8,6 +13,11 @@ import {
   mustBeAuthorizedView,
   mustNotBeAuthorizedView,
   roundToNearestMinute,
+  stopScheduleJob,
+  checkStatus,
+  createScheduleJob,
+  readableRandomStringMaker,
+  createMonitorDataset,
 } from "./utils.js";
 import {
   getCountryName,
@@ -46,10 +56,12 @@ const getMonitoringData = async (req) => {
           id: data.id,
           no_data: true,
           secret: req.user && data.secret,
+          isLocal: env.ENV === "local" ? true : false,
         }
       : {
           id: data.id,
           secret: req.user && data.secret,
+          isLocal: env.ENV === "local" ? true : false,
           icon_name: getIconName(data.HOST_OS_NAME),
           online:
             data.updatedAt + +data.MONITOR_INTERVAL * 1000 * 1.3 >=
@@ -116,7 +128,16 @@ const getMonitoringData = async (req) => {
 router.get(
   "/getMonitoringData",
   mustBeAuthorizedView(async (req, res) => {
-    res.json(await getMonitoringData(req));
+    res.status(200).json(await getMonitoringData(req));
+  })
+);
+
+router.get(
+  "/http-monitor",
+  mustBeAuthorizedView((req, res) => {
+    res
+      .status(200)
+      .json({ status: "success", code: 200, data: getHttpMonitor() });
   })
 );
 
@@ -171,6 +192,101 @@ router.post(
     }
   })
 );
+router.post(
+  "/remove_host",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.body;
+
+    const index = database.data.monitoringData.findIndex(
+      (host) => host.id === id
+    );
+    if (index !== -1) {
+      database.data.monitoringData.splice(index, 1);
+      await database.write();
+      return res.status(200).json({
+        status: "successful",
+        code: 200,})
+    }
+   
+  })
+);
+
+router.post(
+  "/remove_monitor",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.body;
+
+    const index = database.data.monitoringData.findIndex((md) => md.id === id);
+    if (index !== -1) {
+      database.data.monitoringData.splice(index, 1);
+      await database.write();
+      return res.status(200).json({
+        status: "successful",
+        code: 200,
+        data: await getMonitoringData(req),
+      });
+    }
+  })
+);
+router.post(
+  "/add_monitor",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = uuidv4();
+    const now = new Date().getTime();
+    const secret = readableRandomStringMaker(64);
+
+    database.data.monitoringData.push({
+      id,
+      createdAt: now,
+      updatedAt: now,
+      secret,
+    });
+    await database.write();
+
+    res.status(200).json(await getMonitoringData(req));
+  })
+);
+
+router.post(
+  "/add_http_monitor",
+  mustBeAuthorizedView(async (req, res) => {
+    const httpMonitorData = req.body;
+
+    const monitor = createMonitorDataset(httpMonitorData);
+
+    database.data.httpMonitoringData.push(monitor);
+    await database.write();
+
+    createScheduleJob(monitor.id, monitor.monitor_interval);
+
+    await checkStatus(monitor).then((res) => {
+      monitor.event_created = new Date().getTime();
+      monitor.okStatus = res.response;
+    });
+    res
+      .status(200)
+      .json({ status: "successful", code: 200, data: getHttpMonitor() });
+  })
+);
+
+router.post(
+  "/remove_http_monitor",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.body;
+
+    stopScheduleJob(id);
+    const index = database.data.httpMonitoringData.findIndex(
+      (host) => host.id === id
+    );
+    if (index !== -1) {
+      database.data.httpMonitoringData.splice(index, 1);
+      await database.write();
+      res
+        .status(200)
+        .json({ status: "success", code: 200, data: getHttpMonitor() });
+    }
+  })
+);
 
 router.post(
   "/add_user",
@@ -211,18 +327,15 @@ router.post(
 );
 
 router.post("/add_label", async (req, res) => {
-  console.log(12, req);
-  res.json([req.body, { 1: 2 }]);
-  // const { id } = req.query;
-  // const { label } = req.fields;
+  const { id, label } = req.body;
 
-  // const monData = database.data.monitoringData.find((el) => el.id === id);
+  const monData = database.data.monitoringData.find((el) => el.id === id);
 
-  // if (monData) {
-  //   monData.HOST_LABEL = label.trim();
-  //   await database.write();
-  // }
-  // res.redirect("/");
+  if (monData) {
+    monData.HOST_LABEL = label.trim();
+    await database.write();
+  }
+  res.json([req.body]);
 });
 
 router.post(
@@ -231,7 +344,7 @@ router.post(
     const { username, password } = req.body;
     if (username && password) {
       const jwtToken = await authorizeUser(username, password);
-      console.log("token", jwtToken);
+
       if (jwtToken !== "error") {
         return res
           .cookie("__hhjwt", jwtToken, {
@@ -261,6 +374,13 @@ router.post(
   })
 );
 
+router.post("/logout", (req, res) => {
+  res.cookie("__hhjwt", "", { maxAge: -1 }).status(200).json({
+    status: "successful",
+    code: 200,
+  });
+});
+
 router.post(
   "/edit_settings",
   mustBeAuthorizedView(async (req, res) => {
@@ -269,7 +389,7 @@ router.post(
       disk_stabilization_lvl,
       ram_threshold,
       ram_stabilization_lvl,
-    } = request.body;
+    } = req.body;
 
     database.data.settings = {
       RAM_THRESHOLD: +ram_threshold,
@@ -277,8 +397,311 @@ router.post(
       DISK_THRESHOLD: +disk_threshold,
       DISK_STABILIZATION_LEVEL: +disk_stabilization_lvl,
     };
-    res.json({ ok: true });
+    res.status(200).json({
+      status: "sucessful",
+      code: 200,
+    });
   })
 );
 
+const getSettings = () => {
+  const settings = database.data.settings;
+  return {
+    ram_threshold: settings.RAM_THRESHOLD,
+    ram_stabilization_lvl: settings.RAM_STABILIZATION_LEVEL,
+    disk_threshold: settings.DISK_THRESHOLD,
+    disk_stabilization_lvl: settings.DISK_STABILIZATION_LEVEL,
+  };
+};
+
+const getHttpMonitor = () => {
+  const data = database.data.httpMonitoringData;
+
+  return data.map((data) => ({
+    id: data.id,
+    url: data.URL,
+    label: data.label,
+    status: data.okStatus,
+    lastEventTs: data.event_created,
+    monitorLastEventsTs: getDuration(data.event_created),
+  }));
+};
+
+router.get(
+  "/getSettings",
+  mustBeAuthorizedView((req, res) => {
+    return res
+      .status(200)
+      .json({ status: "successful", code: 200, data: getSettings() });
+  })
+);
 export default router;
+
+router.get(
+  "/plugins/",
+  mustBeAuthorizedView((req, res) => {
+    return res.status(200).json({
+      status: "successful",
+      code: 200,
+      plugins: PluginManagerSingleton()
+        .plugins.map((p) => {
+          return {
+            ...p,
+            pluginEnabled: database.data.pluginSettings.find(
+              (ps) => ps.id === p.id
+            )?.enabled,
+          };
+        })
+        .reverse(),
+    });
+  })
+);
+
+router.get(
+  "/plugin/:id/",
+  mustBeAuthorizedView((req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(
+      (p) => p.id === req.params.id
+    );
+
+    if (!plugin) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+      });
+    } else {
+      const pluginSettings = database.data.pluginSettings.find(
+        (ps) => ps.id === plugin.id
+      );
+
+      return res.status(200).json({
+        status: "success",
+        code: 200,
+        data: {
+          plugin,
+          pluginSettings,
+          params: [
+            ...plugin.supportedEvents.map((e) => {
+              return {
+                id: e,
+                value: pluginSettings?.enabledEvents.includes(e) ?? true,
+                name: `Notify on ${e}`,
+                type: "bool",
+                inputName: `events[${e}]`,
+              };
+            }),
+            ...plugin.params.map((p) => {
+              const value = pluginSettings?.params[p.id];
+              return {
+                ...p,
+                value: value || p.default_value,
+                inputName: `params[${p.id}]`,
+                required: p.required ?? true,
+              };
+            }),
+          ],
+          descriptionFull:
+            plugin.longDescriptionMD && md().render(plugin.longDescriptionMD),
+        },
+      });
+
+      // res.locals.plugin = plugin;
+      // res.locals.pluginSettings = pluginSettings;
+      // res.locals.params = [
+      //   ...plugin.supportedEvents.map((e) => {
+      //     return {
+      //       id: e,
+      //       value: pluginSettings?.enabledEvents.includes(e) ?? true,
+      //       name: `Notify on ${e}`,
+      //       type: "bool",
+      //       inputName: `events[${e}]`,
+      //     };
+      //   }),
+      //   ...plugin.params.map((p) => {
+      //     const value = pluginSettings?.params[p.id];
+      //     return {
+      //       ...p,
+      //       value: value || p.default_value,
+      //       inputName: `params[${p.id}]`,
+      //       required: p.required ?? true,
+      //     };
+      //   }),
+      // ];
+
+      // res.locals.descriptionFull =
+      //   plugin.longDescriptionMD && md().render(plugin.longDescriptionMD);
+      // res.render("plugin");
+    }
+  })
+);
+
+router.post(
+  "/plugin/:id/",
+  mustBeAuthorizedView(async (req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(
+      (p) => p.id === req.params.id
+    );
+
+    if (!plugin) {
+      res.redirect("/plugins/");
+    } else {
+      const input = parseNestedForm(req.body);
+
+      const psIndex = database.data.pluginSettings.findIndex(
+        (ps) => ps.id === plugin.id
+      );
+      const newPluginSetting = {
+        id: plugin.id,
+        params: input.params,
+        enabledEvents: Object.keys(input.events),
+        enabled: true,
+      };
+
+      if (psIndex !== -1) {
+        if (
+          !database.data.pluginSettings[psIndex].enabled &&
+          newPluginSetting.enabled
+        ) {
+          await plugin.onPluginEnabled?.();
+        }
+        database.data.pluginSettings[psIndex] = newPluginSetting;
+        if (input.notify) {
+          await plugin.sendMessage?.(newPluginSetting);
+        }
+      } else {
+        database.data.pluginSettings.push(newPluginSetting);
+        await plugin.onPluginEnabled?.();
+        if (input.notify) {
+          await plugin.sendMessage?.(newPluginSetting);
+        }
+      }
+
+      await database.write();
+      res.status(200).json({
+        status: "success",
+        code: 200,
+      });
+      // res.redirect('/plugins/');
+    }
+  })
+);
+
+router.post(
+  "/plugin_disable/",
+  mustBeAuthorizedView(async (req, res) => {
+    const plugin = PluginManagerSingleton().plugins.find(
+      (p) => p.id === req.body.id
+    );
+
+    if (!plugin) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+      });
+    } else {
+      const psIndex = database.data.pluginSettings.findIndex(
+        (ps) => ps.id === plugin.id
+      );
+      const newPluginSetting = {
+        enabled: false,
+      };
+
+      if (psIndex !== -1) {
+        if (database.data.pluginSettings[psIndex].enabled) {
+          await plugin.onPluginDisabled?.();
+        }
+        database.data.pluginSettings[psIndex] = newPluginSetting;
+      }
+      await database.write();
+      return res.status(200).json({
+        status: "success",
+        code: 200,
+      });
+    }
+  })
+);
+
+router.get("/getProcess/:id/:timeStep/", async (req, res) => {
+  const { id, timeStep } = req.params;
+  const minutesLeft = timeStep * 1000 * 60;
+  const now = new Date().getTime();
+  const time = roundToNearestMinute(now - minutesLeft);
+
+  const dbIndex = db.sublevel(id, { valueEncoding: "json" });
+  const dbHostState = db.sublevel("options", { valueEncoding: "json" });
+
+  const restartTime = await dbHostState
+    .get(id)
+    .then((res) => res.restartTime)
+    .catch(() => 0);
+
+  const processByTime = await dbIndex
+    .get(+time)
+    .then((res) => generateProcessData(res).reverse())
+    .catch((err) => []);
+
+  res.json({
+    restartTime: restartTime,
+    process: processByTime,
+  });
+});
+
+router.post("/data/:secret", async (req, res) => {
+  const monitorData = req.fields;
+
+  const index = database.data.monitoringData.findIndex(
+    (md) => md.secret === req.params.secret
+  );
+  if (index === -1) {
+    res.statusCode = 401;
+    res.send("Unauthorized");
+  } else {
+    const data = Object.keys(monitorData).reduce((acc, key) => {
+      const value = monitorData[key];
+      acc[key] =
+        value !== undefined && value !== null ? value.toString() : value;
+      return acc;
+    }, {});
+    const dataItem = database.data.monitoringData[index];
+    setWarning(data, dataItem);
+    const newData = {
+      ...dataItem,
+      ...data,
+      updatedAt: new Date().getTime(),
+      online: true,
+    };
+    // for testing
+    // const DIST_TOTAL = +newData.DISK_AVAIL + +newData.DISK_USED;
+    // const DISK_USED_PERCENT = 0.87;
+    // newData.DISK_AVAIL = DIST_TOTAL * ( 1 - DISK_USED_PERCENT );
+    // newData.DISK_USED = DIST_TOTAL * DISK_USED_PERCENT;
+
+    // const RAM_USED_PERCENT = 0.80;
+    // newData.SYSTEM_FREE_RAM = +newData.SYSTEM_TOTAL_RAM * (1 - RAM_USED_PERCENT);
+
+    const events = calculateDataEvent(
+      database.data.monitoringData[index],
+      newData
+    );
+    await PluginManager().handleEvents(events, {
+      ...newData,
+
+      // variables which might be used in template
+      DISK_USED: sizeFormat(+newData.DISK_USED),
+      DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
+      RAM_USED: sizeFormat(
+        +newData.SYSTEM_TOTAL_RAM - +newData.SYSTEM_FREE_RAM
+      ),
+      RAM_TOTAL: sizeFormat(+newData.SYSTEM_TOTAL_RAM),
+      HOST_LABEL:
+        newData.HOST_LABEL && newData.HOST_LABEL !== ""
+          ? `\`${newData.HOST_LABEL}\``
+          : "",
+      EVENT_DURATION: eventDuration(newData, events),
+    });
+    database.data.monitoringData[index] = newData;
+    await database.write();
+
+    res.send("OK");
+  }
+});
