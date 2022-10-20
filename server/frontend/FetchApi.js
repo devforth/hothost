@@ -9,9 +9,13 @@ async function getData(route) {
     credentials: "include",
   });
 
-  const data = await response.json();
+  if (response.status === 401) {
+    window.location.assign("http://localhost:5173/login");
+  } else {
+    const data = await response.json();
 
-  return data;
+    return data;
+  }
 }
 
 async function addLabel(bodyel, route) {
