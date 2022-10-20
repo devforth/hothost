@@ -1,15 +1,40 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import HHlogo from "../../assets/logo.svg";
+// import { Dropdown } from "flowbite-react";
+import { apiFetch } from "../../../FetchApi.js";
+import OutsideAlerter from "../OutsideAlert/OutsideAlert";
 
 const Header = (props) => {
+  const userMenuBtn = useRef(null);
+  const logoutMenuBtn = useRef(null);
+
+  // const setSettingsIsVisibleFromUseoutside = function () {
+  //   useEffect(() => {
+  //     console.log(setingsIsVisible);
+  //     if (setingsIsVisible) {
+  //       setSettingsIsVisible(false);
+  //       console.log(12);
+  //     }
+  //   }, []);
+  // };
+
   const auth = props.isAuthorize;
   const [setingsIsVisible, setSettingsIsVisible] = useState(false);
+  const [usertManageIsVisible, setUsertManageIsVisible] = useState(false);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate("");
   const clickAndNavigate = function (path) {
     navigate(`/${path}`);
+  };
+
+  const logout = async () => {
+    const data = await apiFetch({}, "logout");
+    if (data && data.status === "successful") {
+      clickAndNavigate("login");
+      // code ..//
+    }
   };
 
   return (
@@ -21,6 +46,9 @@ const Header = (props) => {
             <div
               className="flex text-xl font-semibold whitespace-nowrap dark:text-white cursor-pointer"
               navigate
+              onClick={() => {
+                clickAndNavigate("home");
+              }}
             >
               <img className="h-9" src={HHlogo} alt="logo" />
               <span className="my-auto pl-2">HotHost</span>
@@ -68,46 +96,61 @@ const Header = (props) => {
               </a>
             ) : (
               <>
-                <div
-                  className="px-2"
-                  onClick={() => {
-                    setSettingsIsVisible(!setingsIsVisible);
-                  }}
-                >
-                  <svg
-                    className="my-1 w-6 h-6 text-gray-700 dark:text-gray-300 h-8 w-8 cursor-pointer hover:text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    data-dropdown-toggle="settingsDropdown"
-                    data-dropdown-placement="bottom-end"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    ></path>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    ></path>
-                  </svg>
-                </div>
-
-                <div
-                  id="settingsDropdown"
-                  // className={`${
-                  //   setingsIsVisible
-                  //     ? "mt-0 absolute inset: 0px 0px auto auto translate-y-1/4 translate-x-[-75%]  "
-                  //     : "hidden mt-0 "
-                  // }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 `}
+                {" "}
+                <OutsideAlerter
+                // setSettingsIsVisible={setSettingsIsVisibleFromUseoutside}
                 >
                   <div
-                    className="py-3 block"
+                    ref={userMenuBtn}
+                    id={"userMenuBtn"}
+                    className="px-2"
+                    onClick={() => {
+                      setSettingsIsVisible(!setingsIsVisible);
+                    }}
+                  >
+                    {/* <div ref={dropEl}>
+                    {" "}
+                    <Dropdown label="qwer" inline={true} arrowIcon={false}>
+                      <Dropdown.Item>Dashboard</Dropdown.Item>
+                      <Dropdown.Item>Settings</Dropdown.Item>
+                      <Dropdown.Item>Earnings</Dropdown.Item>
+                      <Dropdown.Item>Sign out</Dropdown.Item>
+                    </Dropdown>
+                  </div> */}
+                    <svg
+                      className="my-1 w-6 h-6 text-gray-700 dark:text-gray-300 h-8 w-8 cursor-pointer hover:text-gray-600"
+                      fill="none"
+                      stroke="currentColor"
+                      data-dropdown-toggle="settingsDropdown"
+                      data-dropdown-placement="bottom-end"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      ></path>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      ></path>
+                    </svg>
+                  </div>
+                </OutsideAlerter>
+                <div
+                  id="settingsDropdown"
+                  className={`${
+                    setingsIsVisible
+                      ? "mt-0 absolute inset: 0px 0px auto auto translate-y-1/4 translate-x-[-75%]  "
+                      : "hidden mt-0 "
+                  }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 `}
+                >
+                  <div
+                    className="py-3 block cursor-pointer"
                     onClick={() => {
                       clickAndNavigate("users");
                     }}
@@ -131,7 +174,7 @@ const Header = (props) => {
                     </a>
                   </div>
                   <div
-                    className="py-3 block"
+                    className="py-3 block cursor-pointer"
                     onClick={() => {
                       clickAndNavigate("plugins");
                     }}
@@ -155,7 +198,7 @@ const Header = (props) => {
                     </a>
                   </div>
                   <div
-                    className="py-3 block"
+                    className="py-3 block cursor-pointer"
                     onClick={() => {
                       clickAndNavigate("settings");
                     }}
@@ -184,8 +227,13 @@ const Header = (props) => {
                     </a>
                   </div>
                 </div>
-
-                <div className="px-2" onClick={() => {}}>
+                <div
+                  ref={logoutMenuBtn}
+                  className="px-2"
+                  onClick={() => {
+                    setUsertManageIsVisible(!usertManageIsVisible);
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     id="userManage"
@@ -204,28 +252,33 @@ const Header = (props) => {
                 </div>
                 <div
                   id="userManageDropdown"
-                  className="hidden bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 mt-28"
+                  className={`${
+                    usertManageIsVisible
+                      ? "mt-0 absolute inset: 0px 0px auto auto translate-y-3/4 translate-x-[-50%]  "
+                      : "hidden mt-0 "
+                  }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 mt-28 block`}
                 >
                   <div className="py-3">
-                    <form action="/api/logout" method="POST">
-                      <button className="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 mr-3"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                          />
-                        </svg>
-                        Logout
-                      </button>
-                    </form>
+                    <button
+                      onClick={logout}
+                      className="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 mr-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      Logout
+                    </button>
                   </div>
                 </div>
               </>
