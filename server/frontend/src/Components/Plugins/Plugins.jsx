@@ -1,6 +1,34 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import { apiFetch, getData } from "../../../FetchApi";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Toast } from "flowbite-react";
 
 const Plugins = () => {
+  const navigate = useNavigate("");
+  const clickAndNavigate = function (path) {
+    navigate(`/${path}`);
+  };
+
+  const getPlugginsArr = async function () {
+    const data = await getData("plugins");
+    if (data) {
+      setPluginsArr(data.plugins);
+    }
+  };
+
+  useEffect(() => {
+    getPlugginsArr();
+  }, []);
+
+  const [pluginsArr, setPluginsArr] = useState([]);
+  const disablePlugin = async function (e) {
+    const data = await apiFetch({ id: e.target.id }, `plugin_disable`);
+
+    if (data.status === "success") {
+      getPlugginsArr();
+    }
+  };
   return (
     <div>
       <div class="container mx-auto flex justify-center px-4">
@@ -8,7 +36,9 @@ const Plugins = () => {
           <div class="flex justify-between items-center mb-5">
             <div>
               <a
-                href="/"
+                onClick={() => {
+                  clickAndNavigate("home");
+                }}
                 class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
           focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
           text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center"
@@ -36,7 +66,7 @@ const Plugins = () => {
             </h5>
 
             {/* <!-- {{#if authorized}} */}
-            <form action="/api/add_monitor" method="POST">
+            {/* <form action="/api/add_monitor" method="POST">
               <button
                 class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center"
@@ -57,23 +87,27 @@ const Plugins = () => {
                 </svg>
                 Import from external file
               </button>
-            </form>
+            </form> */}
             {/* {{/if}} --> */}
           </div>
           <div class="max-w-2/3 gap-x-10 gap-y-10 justify-center divide-gray-200 dark:divide-gray-700 flex flex-wrap">
-            {/* {{#each plugins}} */}
-            <div class="w-60 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 flex flex-col">
-              <img
-                class="w-40 h-40 my-6 mx-auto rounded-t-lg"
-                src="{{ this.iconUrlOrBase64 }}"
-                alt="product image"
-              />
-              <div class="px-6 pb-3">
-                {/* <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{ this.name }}</h5>
+            {pluginsArr.map((pl) => {
+              return (
+                <div
+                  key={pl.id}
+                  class="w-60 bg-white rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 flex flex-col"
+                >
+                  <img
+                    class="w-40 h-40 my-6 mx-auto rounded-t-lg"
+                    src={pl.iconUrlOrBase64}
+                    alt="product image"
+                  />
+                  <div class="px-6 pb-3">
+                    {/* <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{ this.name }}</h5>
         
               <div class="text-sm pt-2 tracking-tight text-gray-600 dark:text-gray-300">{{ this.description }}</div> */}
 
-                {/* <!-- <div class="flex items-center mt-2.5 mb-5">
+                    {/* <!-- <div class="flex items-center mt-2.5 mb-5">
                   <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                   <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                   <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
@@ -81,35 +115,42 @@ const Plugins = () => {
                   <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                   <span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">4.9</span>
               </div> --> */}
-              </div>
-              <div class="flex justify-between items-center px-6 pb-6 mt-auto">
-                {/* {{#if this.pluginEnabled}} */}
-                <a
-                  href="/plugin/{{ this.id }}/"
-                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Settings
-                </a>
-
-                {/* {{else}} */}
-                <a
-                  href="/plugin/{{ this.id }}/"
-                  class="text-white w-full bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                >
-                  Enable
-                </a>
-                {/* {{/if}} */}
-
-                {/* {{#if this.pluginEnabled}} */}
-                <form method="POST" action="/plugin/disable/{{ this.id }}/">
-                  <button class="ml-5 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
-                    Disable
-                  </button>
-                </form>
-                {/* {{/if}} */}
-              </div>
-            </div>
-            {/* {{/each}} */}
+                  </div>
+                  <div class="flex justify-between items-center px-6 pb-6 mt-auto">
+                    {pl.pluginEnabled ? (
+                      <a
+                        onClick={() => {
+                          clickAndNavigate(`plugin/${pl.id}`);
+                        }}
+                        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
+                      >
+                        Settings
+                      </a>
+                    ) : (
+                      <a
+                        onClick={() => {
+                          clickAndNavigate(`plugin/${pl.id}`);
+                        }}
+                        class="text-white w-full bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 cursor-pointer"
+                      >
+                        Enable
+                      </a>
+                    )}
+                    {pl.pluginEnabled ? (
+                      <button
+                        onClick={(e) => {
+                          disablePlugin(e);
+                        }}
+                        id={pl.id}
+                        class="ml-5 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 cursor-pointer"
+                      >
+                        Disable
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

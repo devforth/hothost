@@ -1,8 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { getData, apiFetch } from "../../../FetchApi";
+import { Spinner } from "flowbite-react";
 
 const Users = () => {
+  const [status, setStatus] = useState("fullfield");
   const [addUserDlgVisible, setAddUserDlgVisible] = useState(false);
   const [users, setUsers] = useState([]);
   const [addUserError, setaddUserError] = useState("");
@@ -11,6 +13,7 @@ const Users = () => {
   const [confrimPassword, setConfrimPassword] = useState("");
   useEffect(() => {
     const fetchData = async () => {
+      setStatus("pending");
       const data = await getData("getUsers");
       if (!data.error) {
         data && setUsers(data.data);
@@ -18,6 +21,7 @@ const Users = () => {
         setIsAuthorize(false);
         navigate("/login");
       }
+      setStatus("fullfield");
     };
     fetchData();
   }, []);
@@ -143,8 +147,10 @@ const Users = () => {
                 </th>
               </tr>
             </thead>
+
             <tbody>
-              {users &&
+              {status === "fullfield" &&
+                users &&
                 users.map((user, i) => {
                   return (
                     <tr
@@ -185,7 +191,12 @@ const Users = () => {
                 })}
             </tbody>
           </table>
-        </div>
+        </div>{" "}
+        {status === "pending" && (
+          <div className="flex justify-center  p-7">
+            <Spinner size="xl"></Spinner>
+          </div>
+        )}
       </div>
     </>
 

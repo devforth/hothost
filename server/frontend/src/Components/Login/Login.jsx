@@ -7,18 +7,17 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [inputsError, setInputsError] = useState(false);
-
-  const navigate = useNavigate();
-  const clickAndNavigate = function (path) {
-    navigate(`/${path}`);
-  };
+  let navigate = useNavigate();
+  function goToHome() {
+    navigate("/home");
+  }
 
   const loginAction = async () => {
     const data = await apiFetch({ username, password }, "login");
-    if (data && data.status === "successful") {
-      await navigate("/home");
-    } else {
+    if (data && data.status !== "successful") {
       setInputsError(true);
+    } else {
+      goToHome();
     }
   };
 
