@@ -39,7 +39,7 @@ Available notification plugins:
 
 Analyze top RAM-consuming processes at a time:
 
-<img src="https://user-images.githubusercontent.com/1838656/197137232-5b9236ad-8b46-4c1f-9947-170c95286d27.gif" width="700"/>
+<img src="https://user-images.githubusercontent.com/1838656/197183957-e22b2690-f79f-4dcd-a7b7-092ab9622990.gif" width="700"/>
 
 HTTP(s) Monitor setup:
 
