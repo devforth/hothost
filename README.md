@@ -37,7 +37,8 @@ Available plugins:
 
 Top RAM-consuming processes by time:
 
-<img src="https://user-images.githubusercontent.com/1838656/196886667-7293ff6f-5e07-4e86-aaba-4400169425a4.png" width="700"/>
+
+<img src="https://user-images.githubusercontent.com/1838656/197137232-5b9236ad-8b46-4c1f-9947-170c95286d27.gif" width="700"/>
 
 HTTP(s) Monitor setup
 
