@@ -22,25 +22,26 @@ For each host it allows to see:
 
 # Preview
 
+Hosts view:
+
 ![image](https://user-images.githubusercontent.com/1838656/196886907-c90e5e36-c695-4b56-85f0-aadccd125140.png)
 
 
-Add new host form:
+Add new host box:
 
 ![image](https://user-images.githubusercontent.com/1838656/196889285-c9c6b7c3-d665-4c8f-b615-be990599168d.png)
 
 
-Available plugins:
+Available notification plugins:
 
 ![image](https://user-images.githubusercontent.com/1838656/196889594-5a405ca0-0608-4a39-8a42-b62d74055f99.png)
 
 
-Top RAM-consuming processes by time:
-
+Analyze top RAM-consuming processes at a time:
 
 <img src="https://user-images.githubusercontent.com/1838656/197137232-5b9236ad-8b46-4c1f-9947-170c95286d27.gif" width="700"/>
 
-HTTP(s) Monitor setup
+HTTP(s) Monitor setup:
 
 <img src="https://user-images.githubusercontent.com/1838656/196887413-14055152-4114-42e8-841f-cd5ec7c33e50.png" width="500"/>
 
@@ -51,7 +52,7 @@ HTTP(s) Monitor setup
 
 # Installation
 
-First you need to run HotHost Web Server. Web-server itself, when will be started, will give you clear guide how to add agents. 
+First you need to run HotHost Web Server. Web-server itself, when will be started, will give you clear guide how to add agents via own Web UI. 
 
 You can use any host with public IP. You are responsible for setting up HTTPS.
 
