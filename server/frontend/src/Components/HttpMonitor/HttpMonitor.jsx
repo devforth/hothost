@@ -36,22 +36,8 @@ const HttpMonitor = () => {
       }
       setStatus("fullfield");
     };
+    const intervalId = setInterval(fetchData, 10000);
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const fetchData = async () => {
-        setStatus("pending");
-
-        const data = await getData("http-monitor");
-        if (data.data) {
-          setMonitoringHttpData(data.data);
-        }
-        setStatus("fullfield");
-      };
-      fetchData();
-    }, 10000);
     return () => {
       clearInterval(intervalId);
     };
@@ -109,7 +95,6 @@ const HttpMonitor = () => {
 
           const data = await apiFetch(body, "add_http_monitor");
           if (data) {
-          
             resetFieds();
             setMonitoringHttpData(data.data);
           }

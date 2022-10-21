@@ -349,9 +349,8 @@ const MonitoringTable = (props) => {
       id: monitoringData && monitoringData[chosenHost].id,
     };
     const data = await deleteHost(body, "remove_host");
-    if(data.status==="successful"){
-      setDeleteModalIsVisible(false)
-
+    if (data.status === "successful") {
+      setDeleteModalIsVisible(false);
     }
   };
 
@@ -383,6 +382,7 @@ const MonitoringTable = (props) => {
                 setTimeLineModalIsOpen(true);
               }}
               drawTimeSlider={drawTimeSlider}
+              key={`hst_tbl_row_${index}`}
             />
           ))}
 

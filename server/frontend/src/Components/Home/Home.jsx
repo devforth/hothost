@@ -19,19 +19,19 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setStatus("pending");
+    const fetchData = async (withLoader) => {
+      withLoader && setStatus("pending");
       const data = await getData("getMonitoringData");
       if (data) {
         setMonitoringData(data);
       }
-      setStatus("fullfield");
+      withLoader && setStatus("fullfield");
     };
-    fetchData();
+    fetchData({ withLoader: true });
     const intervalId = setInterval(() => {
-     
       fetchData();
     }, 10000);
+    console.log(intervalId, "addedInt");
     return () => {
       clearInterval(intervalId);
     };

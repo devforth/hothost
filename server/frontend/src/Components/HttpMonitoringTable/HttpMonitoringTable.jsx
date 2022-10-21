@@ -30,7 +30,7 @@ const httpMonitoringTable = (props) => {
                 closeDeleteModal={() => {
                   setDeleteModalIsVisible(false);
                 }}
-                key={i}
+                key={`http_tbl_row_${i}`}
               ></HttpTableRow>
             );
           })}
