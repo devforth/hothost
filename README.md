@@ -4,7 +4,7 @@ Lightweight and minimalistic free and opensource Servers and HTTP monitor.
 
 * 💾 Shows used disk space percentage and ALERT badge if it exceeds configurable threshold (90% by default)
 * 🧠 Shows used RAM percentage and ALERT badge if it exceeds configurable threshold (90% by default)
-* ☎️ Built-in plugins to setup Email/Slack/Telegram notifications
+* ☎️ Built-in plugins to setup free Email/Slack/Telegram notifications
 * 🪧 Agents installed using **simple code snippets**. Options: Docker/Compose/Bash+curl+crontab.
 * 🏙 Allows to monitor as many hosts as needed
 * ⏰️ Configurable monitoring interval
