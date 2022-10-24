@@ -23,6 +23,7 @@ const router = express.Router();
 router.post("/process/:secret", async (req, res) => {
   const procData = req.body;
   const process = procData.PROCESS;
+  
   const isRestart = +procData.IS_RESTART;
   const now = roundToNearestMinute(new Date().getTime());
   const hostId = database.data.monitoringData.find(

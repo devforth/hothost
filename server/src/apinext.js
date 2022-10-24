@@ -205,9 +205,9 @@ router.post(
       await database.write();
       return res.status(200).json({
         status: "successful",
-        code: 200,})
+        code: 200,
+      });
     }
-   
   })
 );
 
@@ -621,8 +621,39 @@ router.post(
   })
 );
 
-router.get("/getProcess/:id/:timeStep/", async (req, res) => {
+const generateProcessData = (data) => {
+  console.log("works")
+  const colors = [
+    "#22d4bc",
+    "#56AEE2",
+    "#5668E2",
+    "#8A56E2",
+    "#CF56E2",
+    "#E25668",
+    "#E28956",
+    "#E2CF56",
+    "#AEE256",
+    "#56E289",
+  ];
+  let processEntries = [];
+  let id = 0;
+  for (const [key, value] of Object.entries(data)) {
+    processEntries.push({
+      id: id + 1,
+      data: value,
+      total_usage: key,
+      ram_usage: sizeFormat(key * 1024),
+      color: colors[id],
+    });
+    id++;
+  }
+  return processEntries;
+};
+
+router.get("/getProcess/:id/:timeStep/",  mustBeAuthorizedView(async (req, res) => {
   const { id, timeStep } = req.params;
+  
+
   const minutesLeft = timeStep * 1000 * 60;
   const now = new Date().getTime();
   const time = roundToNearestMinute(now - minutesLeft);
@@ -644,7 +675,7 @@ router.get("/getProcess/:id/:timeStep/", async (req, res) => {
     restartTime: restartTime,
     process: processByTime,
   });
-});
+}));
 
 router.post("/data/:secret", async (req, res) => {
   const monitorData = req.fields;

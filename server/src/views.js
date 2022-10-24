@@ -77,32 +77,4 @@ router.get(
   })
 );
 
-const generateProcessData = (data) => {
-  const colors = [
-    "#22d4bc",
-    "#56AEE2",
-    "#5668E2",
-    "#8A56E2",
-    "#CF56E2",
-    "#E25668",
-    "#E28956",
-    "#E2CF56",
-    "#AEE256",
-    "#56E289",
-  ];
-  let processEntries = [];
-  let id = 0;
-  for (const [key, value] of Object.entries(data)) {
-    processEntries.push({
-      id: id + 1,
-      data: value,
-      total_usage: key,
-      ram_usage: sizeFormat(key * 1024),
-      color: colors[id],
-    });
-    id++;
-  }
-  return processEntries;
-};
-
 export default router;
