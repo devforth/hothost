@@ -53,11 +53,13 @@ const AgentConfigurator = (props) => {
               data-pre-id="${e.id}"
               className="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
             >
-              {`docker run -d --env HOTHOST_SERVER_BASE=${`${
-                document.location.protocol
-              }//${e.isLocal ? "localhost:8007" : document.location.host}`} \\
+              {`docker run -d \\
+               --env HOTHOST_SERVER_BASE=${`${document.location.protocol}//${
+                 e.isLocal ? "localhost:8007" : document.location.host
+               }`} \\
                     --env HOTHOST_AGENT_SECRET=${e.secret} \\
-                    --env HOTHOST_MONITOR_INTERVAL=60 \ --name hothost-agent \\
+                    --env HOTHOST_MONITOR_INTERVAL=60 \\
+                    --name hothost-agent \\
                     -v /proc:/host/proc:ro \\
                     -v /sys:/host/sys:ro \\
                     -v /etc/os-release:/host/etc/os-release:ro \\
@@ -103,24 +105,33 @@ const AgentConfigurator = (props) => {
               Copy
             </button>
           </p>
-          <pre
-            id="composepre"
-            data-pre-id="${e.id}"
-            className="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
-          >
-            {`version: '3' services: hothost-agent: image:
-                    devforth/hothost-agent environment: -
-                    HOTHOST_SERVER_BASE=${`${document.location.protocol}//${
+       
+
+
+          <pre id="composepre"  class="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none ">
+{`version: '3'
+services:
+  hothost-agent:
+    image: devforth/hothost-agent
+    environment:
+    - HOTHOST_SERVER_BASE=${`${document.location.protocol}//${
                       e.isLocal ? "localhost:8007" : document.location.host
                     }`}
-                    - HOTHOST_AGENT_SECRET=${e.secret}-
-                    HOTHOST_MONITOR_INTERVAL=60 container_name: hothost-agent
-                    restart: unless-stopped cap_add: - SYS_PTRACE security_opt:
-                    - apparmor:unconfined - seccomp:unconfine volumes: -
-                    /proc:/host/proc:ro - /sys:/host/sys:ro -
-                    /etc/os-release:/host/etc/os-release:ro -
-                    /etc/hostname:/host/etc/hostname:ro`}
-          </pre>
+    - HOTHOST_AGENT_SECRET=${e.secret}
+    - HOTHOST_MONITOR_INTERVAL=60
+    container_name: hothost-agent
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+      - seccomp:unconfine
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /etc/hostname:/host/etc/hostname:ro`}</pre>
+         
         </div>
       ) : (
         <div
