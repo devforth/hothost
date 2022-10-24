@@ -9,8 +9,8 @@ const MonitoringRow = (props) => {
   const getDeleteId = props.getDeleteId;
   const getLabelId = props.getLabelId;
   const getTimeline = props.getTimeline;
+  const setChosenId = props.setChosenId;
   const index = props.index;
-  const drawTimeSlider = props.drawTimeSlider;
 
   //   const handleClickOutside = (e) => {
   //     console.log(e.target, chosenHost);
@@ -99,7 +99,6 @@ const MonitoringRow = (props) => {
               {`${host.ram_total} 
                   ${host.ram_used_percentage}% used`}
               <button
-                // onclick="drawTimeSlider('{{host.id}}', '{{@index}}')"
                 data-modal-toggle="modal_timeline-{{@index}}"
                 className="ml-2"
               >
@@ -212,12 +211,10 @@ const MonitoringRow = (props) => {
           </button>
           <button
             type="button"
-            data-modal-toggle="modal_timeline-{{@index}}"
-            onclick="drawTimeSlider('{{host.id}}', '{{@index}}')"
             onClick={(e) => {
               getTimeline(e.target.id);
               setDotsIsvisible(false);
-              drawTimeSlider(host.id, index + "");
+              setChosenId(host.id);
             }}
             className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
           >
