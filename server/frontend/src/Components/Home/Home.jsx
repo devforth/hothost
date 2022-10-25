@@ -104,12 +104,17 @@ const Home = () => {
                   Add new host
                 </button>
               </div>
-              {monitoringData.length > 0 && status === "fullfield" && (
-                <AddHostDlg
-                  monitoringData={monitoringData}
-                  deleteMonitorUpdate={setMonitoringData}
-                ></AddHostDlg>
-              )}
+              {monitoringData.length > 0 &&
+                status === "fullfield" &&
+                monitoringData.map((el) => {
+                  return el.no_data ? (
+                    <AddHostDlg
+                      key={`addHst-${el.id}`}
+                      monitoringData={el}
+                      deleteMonitorUpdate={setMonitoringData}
+                    ></AddHostDlg>
+                  ) : null;
+                })}
 
               {/* {{/if}}
     {{/each}} */}
