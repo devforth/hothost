@@ -1,32 +1,27 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import HHlogo from "../../assets/logo.svg";
 // import { Dropdown } from "flowbite-react";
 import { apiFetch } from "../../../FetchApi.js";
-import OutsideAlerter from "../OutsideAlert/OutsideAlert";
+import ThemeButton from "./ThemeButton";
+import { useLocation } from "react-router-dom";
+import OutsideHider from "../OutsideAlert/OutsideAlert";
+import Settings from "./Settings";
 
-const Header = (props) => {
+const Header = ({ theme, setTheme }) => {
   const userMenuBtn = useRef(null);
   const logoutMenuBtn = useRef(null);
+  const location = useLocation();
 
-  // const setSettingsIsVisibleFromUseoutside = function () {
-  //   useEffect(() => {
-  //     console.log(setingsIsVisible);
-  //     if (setingsIsVisible) {
-  //       setSettingsIsVisible(false);
-  //       console.log(12);
-  //     }
-  //   }, []);
-  // };
-
-  const auth = props.isAuthorize;
   const [setingsIsVisible, setSettingsIsVisible] = useState(false);
   const [usertManageIsVisible, setUsertManageIsVisible] = useState(false);
 
   const navigate = useNavigate("");
   const clickAndNavigate = function (path) {
     navigate(`/${path}`);
+    setSettingsIsVisible(false);
+    setUsertManageIsVisible(false);
   };
 
   const logout = async () => {
@@ -55,37 +50,10 @@ const Header = (props) => {
             </div>
           </a>
 
-          <button
-            id="theme-toggle"
-            type="button"
-            className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5"
-          >
-            <svg
-              id="theme-toggle-dark-icon"
-              className="hidden w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-            </svg>
-            <svg
-              id="theme-toggle-light-icon"
-              className="hidden w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                fillRule="evenodd"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-          </button>
+          <ThemeButton theme={theme} setTheme={setTheme}></ThemeButton>
 
           <div className="flex md:order-2">
-            {!auth ? (
+            {location.pathname === "/login" ? (
               <a
                 onClick={() => {
                   clickAndNavigate("login");
@@ -96,137 +64,46 @@ const Header = (props) => {
               </a>
             ) : (
               <>
-                {" "}
-                <OutsideAlerter
-                // setSettingsIsVisible={setSettingsIsVisibleFromUseoutside}
-                >
-                  <div
-                    ref={userMenuBtn}
-                    id={"userMenuBtn"}
-                    className="px-2"
-                    onClick={() => {
-                      setSettingsIsVisible(!setingsIsVisible);
-                    }}
-                  >
-                    {/* <div ref={dropEl}>
-                    {" "}
-                    <Dropdown label="qwer" inline={true} arrowIcon={false}>
-                      <Dropdown.Item>Dashboard</Dropdown.Item>
-                      <Dropdown.Item>Settings</Dropdown.Item>
-                      <Dropdown.Item>Earnings</Dropdown.Item>
-                      <Dropdown.Item>Sign out</Dropdown.Item>
-                    </Dropdown>
-                  </div> */}
-                    <svg
-                      className="my-1 w-6 h-6 text-gray-700 dark:text-gray-300 h-8 w-8 cursor-pointer hover:text-gray-600"
-                      fill="none"
-                      stroke="currentColor"
-                      data-dropdown-toggle="settingsDropdown"
-                      data-dropdown-placement="bottom-end"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                      ></path>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      ></path>
-                    </svg>
-                  </div>
-                </OutsideAlerter>
                 <div
-                  id="settingsDropdown"
-                  className={`${
-                    setingsIsVisible
-                      ? "mt-0 absolute inset: 0px 0px auto auto translate-y-1/4 translate-x-[-75%]  "
-                      : "hidden mt-0 "
-                  }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 `}
+                  onClick={() => {
+                    setSettingsIsVisible(!setingsIsVisible);
+                  }}
                 >
-                  <div
-                    className="py-3 block cursor-pointer"
-                    onClick={() => {
-                      clickAndNavigate("users");
-                    }}
+                  <svg
+                    className="my-1 w-6 h-6 text-gray-700 dark:text-gray-300 h-8 w-8 cursor-pointer hover:text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    data-dropdown-toggle="settingsDropdown"
+                    data-dropdown-placement="bottom-end"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <a className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
-                      </svg>
-                      Manage users
-                    </a>
-                  </div>
-                  <div
-                    className="py-3 block cursor-pointer"
-                    onClick={() => {
-                      clickAndNavigate("plugins");
-                    }}
-                  >
-                    <a className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                        />
-                      </svg>
-                      Plugins
-                    </a>
-                  </div>
-                  <div
-                    className="py-3 block cursor-pointer"
-                    onClick={() => {
-                      clickAndNavigate("settings");
-                    }}
-                  >
-                    <a className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      Settings
-                    </a>
-                  </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    ></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                  </svg>
                 </div>
+                <OutsideHider
+                  state={setingsIsVisible}
+                  setstate={setSettingsIsVisible}
+                >
+                  {setingsIsVisible ? (
+                    <Settings
+                      clickAndNavigate={clickAndNavigate}
+                      setingsIsVisible={setingsIsVisible}
+                    ></Settings>
+                  ) : null}
+                </OutsideHider>
+
                 <div
                   ref={logoutMenuBtn}
                   className="px-2"
@@ -250,37 +127,40 @@ const Header = (props) => {
                     />
                   </svg>
                 </div>
-                <div
-                  id="userManageDropdown"
-                  className={`${
-                    usertManageIsVisible
-                      ? "mt-0 absolute inset: 0px 0px auto auto translate-y-3/4 translate-x-[-50%]  "
-                      : "hidden mt-0 "
-                  }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 mt-28 block`}
+                <OutsideHider
+                  state={usertManageIsVisible}
+                  setstate={setUsertManageIsVisible}
                 >
-                  <div className="py-3">
-                    <button
-                      onClick={logout}
-                      className="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                  {usertManageIsVisible ? (
+                    <div
+                      id="userManageDropdown"
+                      className="absolute inset: 0px 0px auto auto bottom-[-64px]  translate-x-[-50%]  bg-white divide-y divide-gray-100 rounded shadow w-32 dark:bg-gray-700 dark:divide-gray-600  block`"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        />
-                      </svg>
-                      Logout
-                    </button>
-                  </div>
-                </div>
+                      <div className="py-3">
+                        <button
+                          onClick={logout}
+                          className="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 mr-3"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            />
+                          </svg>
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </OutsideHider>
               </>
             )}
 
@@ -292,7 +172,6 @@ const Header = (props) => {
           </div>
         </div>
       </nav>
-      {/* {{{ body }}} */}
 
       {/* <script>
     var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
