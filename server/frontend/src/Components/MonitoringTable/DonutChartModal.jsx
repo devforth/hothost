@@ -3,7 +3,6 @@ import DonutChartInput from "./DonutChartInput";
 import MyDonutChart from "./DonutChart";
 import { getData } from "../../../FetchApi";
 import useDebounce from "../Utils/Hooks/useDebounce";
-import donutData from "../../donutdata.json";
 
 const DonutChartModal = (props) => {
   const setDonutModalIsVisible = props.setDonutModalIsVisible;
@@ -23,14 +22,16 @@ const DonutChartModal = (props) => {
 
   const [selectedTimeFromInput, setSelectedTime] = useState("");
   const debouncedValue = useDebounce(selectedTimeFromInput, 500);
-  const [donutData,setDonutData]=useState({process:[],restartTime:""})
+  const [donutData, setDonutData] = useState({ process: [], restartTime: "" });
 
   const getDataForChart = async (id) => {
     const data = await getData(
       `getProcess/${hostId}/${2881 - selectedTimeFromInput}`
     );
-    if(data){setDonutData(data)}
-    console.log(donutData)
+    if (data) {
+      setDonutData(data);
+    }
+    console.log(donutData);
   };
 
   useEffect(() => {
@@ -73,8 +74,10 @@ const DonutChartModal = (props) => {
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
                 Top 10 processes by memory at time
               </h3>
+
               <DonutChartInput
                 setSelectedTime={setSelectedTime}
+                restartTime={donutData.restartTime}
               ></DonutChartInput>
               <div className="flex justify-between font-normal text-gray-500 dark:text-gray-400 whitespace-normal mt-2">
                 <span>48 hours ago</span>
@@ -86,8 +89,13 @@ const DonutChartModal = (props) => {
                   {calculateSelectedTime(2880 - selectedTimeFromInput)}
                 </span>
               </h4>
-              {donutData.process.length>0?  <MyDonutChart chartData={donutData}></MyDonutChart>:<h2  className="text-2xl font-bold align-middle flex justify-center mt-5">No data for now</h2>}
-            
+              {donutData.process.length > 0 ? (
+                <MyDonutChart chartData={donutData}></MyDonutChart>
+              ) : (
+                <h2 className="text-2xl font-bold align-middle flex justify-center mt-5">
+                  No data for now
+                </h2>
+              )}
             </div>
           </div>
         </div>

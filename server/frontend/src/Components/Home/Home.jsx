@@ -52,9 +52,9 @@ const Home = () => {
             onClick={() => {
               clickAndNavigate("home");
             }}
-            className={`flex-1 mr-1 text-center cursor-pointer  ${
+            className={`flex-1 mr-1 text-center cursor-pointer  text-gray-800  dark:text-white ${
               pathName === "/home"
-                ? `font-semibold text-gray-800 dark:text-white border-b-4 border-gray-700`
+                ? `font-semibold dark:text-white border-b-4 border-gray-700`
                 : ""
             }`}
           >
@@ -64,9 +64,9 @@ const Home = () => {
             onClick={() => {
               clickAndNavigate("home/http-monitor");
             }}
-            className={`flex-1 mr-1 text-center cursor-pointer  ${
+            className={`flex-1 mr-1 text-center cursor-pointer   text-gray-800 dark:text-white ${
               pathName === "/home/http-monitor"
-                ? `font-semibold text-gray-800 dark:text-white border-b-4 border-gray-700`
+                ? `font-semibold dark:text-white border-b-4 border-gray-700`
                 : ""
             }`}
           >
