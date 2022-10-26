@@ -6,7 +6,7 @@ const Settings = ({ clickAndNavigate, setingsIsVisible }) => {
       id="settingsDropdown"
       className={`${
         setingsIsVisible
-          ? "mt-0 absolute inset: 0px 0px auto auto translate-y-1/4 translate-x-[-75%]  "
+          ? "mt-0 absolute inset: 0px 0px auto auto  translate-x-[-75%]  "
           : " mt-0 "
       }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 `}
     >
