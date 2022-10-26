@@ -77,7 +77,6 @@ const HttpTableRow = (props) => {
               type="button"
               id={monitor.id}
               onClick={(e) => {
-                console.log(e.target.id);
                 getLabelId(e.target.id);
                 setDotsIsvisible(false);
               }}

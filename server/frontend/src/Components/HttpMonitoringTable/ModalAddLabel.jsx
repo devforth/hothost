@@ -15,7 +15,7 @@ const ModalAddLabel = (props) => {
         { id, label: labelInputValue },
         "add_http_label"
       );
-      console.log(data);
+
       if (data[0].id) {
         setAddLabelModalIsVisible(false);
       }

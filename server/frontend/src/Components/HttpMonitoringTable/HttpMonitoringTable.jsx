@@ -36,7 +36,6 @@ const httpMonitoringTable = (props) => {
                 getLabelId={(e) => {
                   setChosenId(e);
                   setLabelModalIsVisible(true);
-                  console.log("labelModal", labelModalIsVisible);
                 }}
               ></HttpTableRow>
             );

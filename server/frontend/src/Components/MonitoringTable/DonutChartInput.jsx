@@ -32,7 +32,6 @@ const DonutChartInput = (props) => {
     giveSelectedTime(timeRangeValue);
   }, []);
 
-  console.log(restartTime);
   return (
     <div className="relative">
       <div className=" m-auto mt-14 w-[95%]" ref={refRange}>

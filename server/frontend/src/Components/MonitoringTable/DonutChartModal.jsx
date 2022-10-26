@@ -31,7 +31,6 @@ const DonutChartModal = (props) => {
     if (data) {
       setDonutData(data);
     }
-    console.log(donutData);
   };
 
   useEffect(() => {

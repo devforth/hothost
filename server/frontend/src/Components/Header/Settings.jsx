@@ -61,7 +61,6 @@ const Settings = ({ clickAndNavigate, setingsIsVisible }) => {
       <div
         className="py-3 block cursor-pointer"
         onClick={() => {
-          console.log("go to settings");
           clickAndNavigate("settings");
         }}
       >

@@ -273,11 +273,11 @@ router.post(
   "/add_http_label",
   mustBeAuthorizedView(async (req, res) => {
     const { id, label } = req.body;
-    console.log(database.data.httpMonitoringData);
+  
 
     const data = database.data.httpMonitoringData.find((el) => el.id === id);
     if (data) {
-      console.log(data);
+      
       data.HOST_LABEL = label.trim();
       await database.write();
     }
@@ -638,7 +638,7 @@ router.post(
 );
 
 const generateProcessData = (data) => {
-  console.log("works");
+ 
   const colors = [
     "#22d4bc",
     "#56AEE2",

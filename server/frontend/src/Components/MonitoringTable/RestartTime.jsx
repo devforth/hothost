@@ -4,7 +4,6 @@ const RestartTime = (props) => {
   const position = props.position.left;
   const restartTime = props.restartTime;
   const restartTextIsLeft = props.restartTextIsLeft;
-  console.log(position);
 
   return (
     // <div className={restartTimeIsVisible ? "" : ""}>

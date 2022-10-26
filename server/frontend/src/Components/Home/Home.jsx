@@ -31,7 +31,7 @@ const Home = () => {
     const intervalId = setInterval(() => {
       fetchData();
     }, 10000);
-    console.log(intervalId, "addedInt");
+
     return () => {
       clearInterval(intervalId);
     };
