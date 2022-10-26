@@ -1,32 +1,17 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Tooltip, Dropdown } from "flowbite-react";
+import OutsideHider from "../OutsideAlert/OutsideAlert";
 
 const MonitoringRow = (props) => {
-  const [chosenHost, setChosenHost] = useState("");
   const [dotsIsVisible, setDotsIsvisible] = useState(false);
   const host = props.host;
-  const getDeleteId = props.getDeleteId;
-  const getLabelId = props.getLabelId;
-  const getTimeline = props.getTimeline;
-  const setChosenId = props.setChosenId;
+  const setChosenHost = props.setChosenHost;
+  const setDelModalIsVisible = props.setDelModalIsVisible;
+  const setlabelModalIsVisible = props.setlabelModalIsVisible;
+  const setDonutModalIsVisible = props.setDonutModalIsVisible;
+
   const index = props.index;
-
-  //   const handleClickOutside = (e) => {
-  //     console.log(e.target, chosenHost);
-  //   };
-
-  //   useEffect(() => {
-  //     const useOutsideAlerter = function () {
-  //       // Bind the event listener
-  //       document.addEventListener("mousedown", handleClickOutside);
-  //       return () => {
-  //         // Unbind the event listener on clean up
-  //         document.removeEventListener("mousedown", handleClickOutside);
-  //       };
-  //     };
-  //     useOutsideAlerter();
-  //   }, []);
 
   return (
     <tr
@@ -158,114 +143,118 @@ const MonitoringRow = (props) => {
         </p>
       </td>
       <td className="row-start-3 col-start-3 mobile:flex mobile:self-center mobile:place-content-end">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          id={index}
-          data-dropdown-placement="bottom-end"
-          className="h-6 w-6 text-gray-700 dark:text-gray-100 cursor-pointer"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-          onClick={(e) => {
-            setChosenHost(e.target.id);
-            setDotsIsvisible(!dotsIsVisible);
-          }}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-          />
-        </svg>
-        <div
-          id={index}
-          className={`z-10 ${
-            dotsIsVisible ? "" : "hidden"
-          } w-max  bg-white shadow text-sm font-medium text-white rounded-lg absolute translate-x-[-75%]  transition-opacity duration-300 dark:bg-gray-700`}
-        >
-          <button
-            type="button"
+        <OutsideHider state={dotsIsVisible} setstate={setDotsIsvisible}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            id={host.id}
+            data-dropdown-placement="bottom-end"
+            className="h-6 w-6 text-gray-700 dark:text-gray-100 cursor-pointer"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+            onClick={(e) => {
+              if (e.target.id) {
+                setChosenHost(e.target.id);
+
+                setDotsIsvisible(!dotsIsVisible);
+              }
+            }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+            />
+          </svg>
+          <div
             id={index}
-            className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
-            onClick={(e) => {
-              getLabelId(e.target.id);
-              setDotsIsvisible(false);
-            }}
+            className={`z-10 ${
+              dotsIsVisible ? "" : "hidden"
+            } w-max  bg-white shadow text-sm font-medium text-white rounded-lg absolute translate-x-[-75%]  transition-opacity duration-300 dark:bg-gray-700`}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 pr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
+            <button
+              type="button"
+              id={index}
+              className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
+              onClick={(e) => {
+                setlabelModalIsVisible(true);
+                setDotsIsvisible(false);
+              }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-              />
-            </svg>
-            <p>{!host.label ? "Add label" : "Change label"}</p>
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              getTimeline(e.target.id);
-              setDotsIsvisible(false);
-              setChosenId(host.id);
-            }}
-            className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="h-6 w-6 pr-2"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 pr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                />
+              </svg>
+              <p>{!host.label ? "Add label" : "Change label"}</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDonutModalIsVisible(true);
+                setDotsIsvisible(false);
+              }}
+              className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
-              />
-            </svg>
-            RAM by process
-          </button>
-          <button
-            type="button"
-            id={index}
-            data-modal-toggle="modal_delete-{{@index}}"
-            className="mx-3 my-2 flex text-left text-red-600 hover:underline"
-            onClick={(e) => {
-              getDeleteId(e.target.id);
-              setDotsIsvisible(false);
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 pr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="h-6 w-6 pr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
+                />
+              </svg>
+              RAM by process
+            </button>
+            <button
+              type="button"
+              id={index}
+              data-modal-toggle="modal_delete-{{@index}}"
+              className="mx-3 my-2 flex text-left text-red-600 hover:underline"
+              onClick={(e) => {
+                setDelModalIsVisible(true);
+                setDotsIsvisible(false);
+              }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-            Delete
-          </button>
-        </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 pr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+              Delete
+            </button>
+          </div>
+        </OutsideHider>
       </td>
     </tr>
   );
