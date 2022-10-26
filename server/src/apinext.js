@@ -270,6 +270,22 @@ router.post(
 );
 
 router.post(
+  "/add_http_label",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id, label } = req.body;
+    console.log(database.data.httpMonitoringData);
+
+    const data = database.data.httpMonitoringData.find((el) => el.id === id);
+    if (data) {
+      console.log(data);
+      data.HOST_LABEL = label.trim();
+      await database.write();
+    }
+    res.json([req.body]);
+  })
+);
+
+router.post(
   "/remove_http_monitor",
   mustBeAuthorizedView(async (req, res) => {
     const { id } = req.body;
@@ -622,7 +638,7 @@ router.post(
 );
 
 const generateProcessData = (data) => {
-  console.log("works")
+  console.log("works");
   const colors = [
     "#22d4bc",
     "#56AEE2",
@@ -650,32 +666,34 @@ const generateProcessData = (data) => {
   return processEntries;
 };
 
-router.get("/getProcess/:id/:timeStep/",  mustBeAuthorizedView(async (req, res) => {
-  const { id, timeStep } = req.params;
-  
+router.get(
+  "/getProcess/:id/:timeStep/",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id, timeStep } = req.params;
 
-  const minutesLeft = timeStep * 1000 * 60;
-  const now = new Date().getTime();
-  const time = roundToNearestMinute(now - minutesLeft);
+    const minutesLeft = timeStep * 1000 * 60;
+    const now = new Date().getTime();
+    const time = roundToNearestMinute(now - minutesLeft);
 
-  const dbIndex = db.sublevel(id, { valueEncoding: "json" });
-  const dbHostState = db.sublevel("options", { valueEncoding: "json" });
+    const dbIndex = db.sublevel(id, { valueEncoding: "json" });
+    const dbHostState = db.sublevel("options", { valueEncoding: "json" });
 
-  const restartTime = await dbHostState
-    .get(id)
-    .then((res) => res.restartTime)
-    .catch(() => 0);
+    const restartTime = await dbHostState
+      .get(id)
+      .then((res) => res.restartTime)
+      .catch(() => 0);
 
-  const processByTime = await dbIndex
-    .get(+time)
-    .then((res) => generateProcessData(res).reverse())
-    .catch((err) => []);
+    const processByTime = await dbIndex
+      .get(+time)
+      .then((res) => generateProcessData(res).reverse())
+      .catch((err) => []);
 
-  res.json({
-    restartTime: restartTime,
-    process: processByTime,
-  });
-}));
+    res.json({
+      restartTime: restartTime,
+      process: processByTime,
+    });
+  })
+);
 
 router.post("/data/:secret", async (req, res) => {
   const monitorData = req.fields;

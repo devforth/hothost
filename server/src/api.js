@@ -23,7 +23,7 @@ const router = express.Router();
 router.post("/process/:secret", async (req, res) => {
   const procData = req.body;
   const process = procData.PROCESS;
-  
+
   const isRestart = +procData.IS_RESTART;
   const now = roundToNearestMinute(new Date().getTime());
   const hostId = database.data.monitoringData.find(
@@ -99,8 +99,6 @@ router.post("/data/:secret", async (req, res) => {
     res.send("OK");
   }
 });
-
-
 
 router.post(
   "/add_http_label",
