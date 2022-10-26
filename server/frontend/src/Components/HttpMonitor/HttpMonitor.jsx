@@ -312,60 +312,6 @@ const HttpMonitor = () => {
   );
 };
 {
-  /* <script>
-  function onRangeSelect() {
-    const interval = document.getElementById('interval');
-    interval.innerHTML = event.target.value;
-  }
-
-  function onAuthEnable() {
-    const baseAuth = document.getElementById('baseAuth');
-    const login = document.getElementById('login');
-    const password = document.getElementById('password');
-
-    baseAuth.classList.toggle('hidden');
-    if (event.target.checked) {
-      login.required = true;
-      password.required = true;
-    } else {
-      login.required = false;
-      password.required = true;
-    }
-  }
-
-  function onKeyWordSelect() {
-    const keyWord = document.getElementById('keyWordPlace');
-    const word = document.getElementById('keyWordInp')
-    if (event.target.value !== 'status_code') {
-      keyWord.classList.remove('hidden');
-      word.required = true;
-    } else {
-      keyWord.classList.add('hidden');
-      word.required = false;
-    }
-  }
-
-  function onAddMonitor() {
-    const monitorForm = document.getElementById('monitor_form');
-
-    monitorForm.classList.toggle('hidden');
-  }
-
-  function onCloseModal() {
-    window.location = "/http-monitor"
-  }
-
-  const httpMonitoringTable = document.getElementById('httpMonitoring');
-  setInterval(async () => {
-    const response = await fetch('/http_update');
-    const data = await response.text();
-    if (httpMonitoringTable) {
-      httpMonitoringTable.innerHTML = data;
-
-      window.document.dispatchEvent(new Event("DOMContentLoaded"));
-    }
-  }, 10000);
-</script>) */
 }
 
 export default HttpMonitor;
