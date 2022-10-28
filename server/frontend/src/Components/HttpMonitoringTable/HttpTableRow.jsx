@@ -11,7 +11,7 @@ const HttpTableRow = (props) => {
   const getLabelId = props.getLabelId;
 
   return (
-    <tr class="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 max-w-max">
+    <tr class="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
       <td class="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
         {monitor.status ? (
           <span>🟢OK</span>
@@ -24,7 +24,7 @@ const HttpTableRow = (props) => {
           </span>
         )}
       </td>
-      <td class="pr-4 row-start-2 col-start-1 flex-1 text-gray-900 dark:text-white">
+      <td class="pr-4 row-start-2 col-start-1   flex-1 text-gray-900 dark:text-white">
         <p>
           <span class="whitespace-normal">{monitor.url}</span>
           {monitor.label && monitor.label !== "" && (
