@@ -9,3 +9,8 @@
 .donutChart {
   position: fixed;
 }
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 8px;
+}

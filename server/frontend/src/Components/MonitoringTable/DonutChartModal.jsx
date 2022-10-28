@@ -47,7 +47,7 @@ const DonutChartModal = (props) => {
       className="overflow-x-hidden  fixed top-[50%] left-[50%]  z-50 md:inset-0 mobile:top-0 mobile:absolute  mobile:left-0 mobile:right-0"
     >
       <div className="relative p-4 w-full max-w-5xl   mx-auto mobile:max-w-sm  mobile:h-[100vh] ">
-        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 h-[80vh] overflow-y-scroll">
+        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 h-[80vh] overflow-y-auto overflow-hidden">
           <button
             type="button"
             onClick={() => {

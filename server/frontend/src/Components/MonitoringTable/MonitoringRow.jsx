@@ -81,9 +81,11 @@ const MonitoringRow = (props) => {
               {`${host.ram_total} 
                   ${host.ram_used_percentage}% used`}
               <button
+                id={host.id}
                 data-modal-toggle="modal_timeline-{{@index}}"
                 className="ml-2"
-                onClick={() => {
+                onClick={(e) => {
+                  setChosenHost(e.currentTarget.id);
                   setDonutModalIsVisible(true);
                   setDotsIsvisible(false);
                 }}
@@ -120,7 +122,7 @@ const MonitoringRow = (props) => {
       </td>
       <td className="flex-1 pr-4 col-start-2 row-start-3 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
         <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
-        <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+        <p className="text-sm text-gray-500 truncate dark:text-gray-400 flex ">
           <p>{host.disk_used}% used</p>
           {host.disk_warning ? (
             <>
@@ -132,7 +134,7 @@ const MonitoringRow = (props) => {
               </Tooltip>
             </>
           ) : (
-            <span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">
+            <span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded ml-1 dark:bg-green-200 dark:text-green-900">
               OK
             </span>
           )}
