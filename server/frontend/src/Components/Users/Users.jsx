@@ -41,11 +41,11 @@ const Users = () => {
             + User
           </button>
           <div id="targetCollapse" class={addUserDlgVisible ? "" : "hidden"}>
-            <div class="space-y-6 max-w-sm">
+            <div class="space-y-6 max-w-md sm:max-w-sm">
               <div class="flex justify-between mx-4">
                 <label
                   for="login"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300 mr-1"
                 >
                   Login
                 </label>
@@ -65,7 +65,7 @@ const Users = () => {
               <div class="flex justify-between mx-4">
                 <label
                   for="password"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300 mr-1"
                 >
                   Password
                 </label>
@@ -85,7 +85,7 @@ const Users = () => {
               <div class="flex justify-between mx-4">
                 <label
                   for="confirm_password"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300 mr-1"
                 >
                   Confirm password
                 </label>

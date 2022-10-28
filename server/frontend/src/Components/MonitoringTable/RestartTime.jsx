@@ -17,7 +17,7 @@ const RestartTime = (props) => {
           class={`w-max absolute text-red-500 translate-y-[48px] `}
           style={restartTextIsLeft ? { right: 0 } : {}}
         >
-          Restart time {restartTime}
+          <span className="mobile:hidden">Restart time</span> {restartTime}
         </p>
       </span>
     </div>

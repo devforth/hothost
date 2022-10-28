@@ -335,7 +335,6 @@ export const createMonitorDataset = (data) => {
   };
   for (const key in data) {
     if (data[key] !== "" && typeof data[key] !== "boolean") {
-    
       monitor[key] = data[key].trim();
     }
   }
@@ -369,6 +368,7 @@ export const checkStatus = async (hostData) => {
         response: !!(response?.status === 200),
       };
     case "keyword_exist":
+      console.log(await response);
       return {
         response: await response
           ?.text()
