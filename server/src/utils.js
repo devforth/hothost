@@ -368,7 +368,6 @@ export const checkStatus = async (hostData) => {
         response: !!(response?.status === 200),
       };
     case "keyword_exist":
-      console.log(await response);
       return {
         response: await response
           ?.text()

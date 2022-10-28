@@ -3,6 +3,7 @@ import { useState } from "react";
 import { apiFetch, getData } from "../../../FetchApi";
 import { useRef, useEffect } from "react";
 import HttpMonitoringTable from "../HttpMonitoringTable/HttpMonitoringTable";
+import validator from "validator";
 
 const HttpMonitor = () => {
   const checkInputs = (inp, inpEl, setInpErr) => {
@@ -62,6 +63,11 @@ const HttpMonitor = () => {
 
     if (checkInputs(monitorUrlInp, urlInpEl, setUrlError)) {
       validationIsOk = true;
+      if (!validator.isURL(monitorUrlInp)) {
+        setUrlError("Field value must be url");
+        urlInpEl.current.focus();
+        validationIsOk = false;
+      }
     } else return;
 
     if (basicAuthChk) {
@@ -156,7 +162,11 @@ const HttpMonitor = () => {
           }`}
           style={{ color: urlError ? "red" : "" }}
         >
-          {urlError ? "Monitor url is required" : "Monitor url"}
+          {urlError && urlError === "Field value must be url"
+            ? "Field value must be url"
+            : urlError
+            ? "Monitor url is required"
+            : "Monitor url"}
         </label>
 
         <input
@@ -309,7 +319,12 @@ const HttpMonitor = () => {
         <button
           type="button"
           onClick={addHttpMonitor}
-          class=" mr-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          disabled={passwordError || urlError || keyWordError || loginError}
+          className={` ${
+            passwordError || urlError || keyWordError || loginError
+              ? "disabled"
+              : null
+          } mr-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:hover:bg-gray-500 disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500`}
         >
           Submit
         </button>
