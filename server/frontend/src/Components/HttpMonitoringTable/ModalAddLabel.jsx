@@ -29,7 +29,7 @@ const ModalAddLabel = (props) => {
         class=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 w-full max-w-md h-full md:h-auto z-10"
       >
         <div class=" p-4 w-full max-w-md h-full md:h-auto">
-          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 mobile:absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
             <button
               type="button"
               onClick={() => {
@@ -51,7 +51,7 @@ const ModalAddLabel = (props) => {
                 ></path>
               </svg>
             </button>
-            <div class="p-6 text-center">
+            <div class="p-6 text-center  ">
               <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
                 Enter label name for <br />
                 <b>{hostUrl}</b> host

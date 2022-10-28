@@ -54,12 +54,12 @@ const MyDonutChart = (props) => {
   const colors = chartData.map((e) => e.color);
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between mobile:justify-start">
       <DonutChart
         data={dataForChart}
         colors={colors}
         legend={false}
-        width={300}
+        width={width > 600 ? 250 : 150}
         onMouseLeave={(e) => {
           setChosenSectorId(e.id);
         }}
@@ -69,12 +69,15 @@ const MyDonutChart = (props) => {
         innerRadius={0.6}
         className="donutChart"
       />
-      <div className="w-[65%] ml-auto">
+      <div
+        className="w-[65%] ml-auto mobile:w-15
+        mobile:ml-0"
+      >
         <ul
           onMouseLeave={() => {
             setSelectedProcess("");
           }}
-          className=""
+          className="mobile:flex-col  "
         >
           {chartData.map((el) => {
             return (
@@ -90,7 +93,9 @@ const MyDonutChart = (props) => {
                 }}
                 className={`gap-4
                 py-4
-                inline-flex
+                flex
+                mobile:justify-end
+                
                 items-center
                 cursor-default
                 text-sm
@@ -105,7 +110,7 @@ const MyDonutChart = (props) => {
                   ></div>
                 </div>
                 <div class="grow-1 w-20 font-bold">{`${el.ram_usage}`}</div>
-                <div class="flex-1 break-all">{`${el.data}`}</div>
+                <div class="flex-1 break-all mobile:hidden">{`${el.data}`}</div>
               </li>
             );
           })}

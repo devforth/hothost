@@ -3,6 +3,7 @@ import DonutChartInput from "./DonutChartInput";
 import MyDonutChart from "./DonutChart";
 import { getData } from "../../../FetchApi";
 import useDebounce from "../Utils/Hooks/useDebounce";
+import { Spinner } from "flowbite-react";
 
 const DonutChartModal = (props) => {
   const setDonutModalIsVisible = props.setDonutModalIsVisible;
@@ -21,8 +22,9 @@ const DonutChartModal = (props) => {
   };
 
   const [selectedTimeFromInput, setSelectedTime] = useState("");
-  const debouncedValue = useDebounce(selectedTimeFromInput, 500);
+  const debouncedValue = useDebounce(selectedTimeFromInput, 200);
   const [donutData, setDonutData] = useState({ process: [], restartTime: "" });
+  const [isPending, setIsPending] = useState(false);
 
   const getDataForChart = async (id) => {
     const data = await getData(
@@ -30,6 +32,7 @@ const DonutChartModal = (props) => {
     );
     if (data) {
       setDonutData(data);
+      setIsPending(false);
     }
   };
 
@@ -41,12 +44,10 @@ const DonutChartModal = (props) => {
     <div
       id="modal_timeline-1"
       tabIndex="-1"
-      className={`${
-        true ? "" : "hidden"
-      } overflow-x-hidden fixed top-[50%] left-[50%]  z-50 md:inset-0 h-modal md:h-full`}
+      className="overflow-x-hidden  fixed top-[50%] left-[50%]  z-50 md:inset-0 mobile:top-0 mobile:absolute  mobile:left-0 mobile:right-0"
     >
-      <div className="relative p-4 w-full max-w-5xl h-full md:h-auto mx-auto">
-        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 ">
+      <div className="relative p-4 w-full max-w-5xl   mx-auto mobile:max-w-sm  mobile:h-[100vh] ">
+        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 h-[80vh] overflow-y-scroll">
           <button
             type="button"
             onClick={() => {
@@ -73,10 +74,11 @@ const DonutChartModal = (props) => {
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
                 Top 10 processes by memory at time
               </h3>
-
               <DonutChartInput
                 setSelectedTime={setSelectedTime}
                 restartTime={donutData.restartTime}
+                getDataForChart={donutData}
+                setIsPending={setIsPending}
               ></DonutChartInput>
               <div className="flex justify-between font-normal text-gray-500 dark:text-gray-400 whitespace-normal mt-2">
                 <span>48 hours ago</span>
@@ -88,10 +90,15 @@ const DonutChartModal = (props) => {
                   {calculateSelectedTime(2880 - selectedTimeFromInput)}
                 </span>
               </h4>
-              {donutData.process.length > 0 ? (
+              {isPending ? (
+                <div className="w-[52px] mx-auto ">
+                  {" "}
+                  <Spinner size="3xl"></Spinner>
+                </div>
+              ) : donutData.process.length > 0 ? (
                 <MyDonutChart chartData={donutData}></MyDonutChart>
               ) : (
-                <h2 className="text-2xl font-bold align-middle flex justify-center mt-5">
+                <h2 className="text-2xl font-bold align-middle flex justify-center mt-5   text-gray-500 dark:text-gray-400">
                   No data for now
                 </h2>
               )}
@@ -99,6 +106,7 @@ const DonutChartModal = (props) => {
           </div>
         </div>
       </div>
+      <div className="overlay h-[100vh] w-[100vw] overflow-hidden z-[-1] fixed top-0 left-0 bg-gray-900 opacity-50"></div>
     </div>
   );
 };

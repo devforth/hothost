@@ -6,9 +6,13 @@ import RestartTime from "./RestartTime";
 const DonutChartInput = (props) => {
   const giveSelectedTime = props.setSelectedTime;
   const restartTime = props.restartTime;
+  const getDataForChart = props.getDataForChart;
+  const setIsPending = props.setIsPending;
   const [timeRangeValue, setTimeRangeValue] = useState(2880);
-  const [restartTimeIsVisible, setRestartTimeIsVisible] = useState(false);
-  const [restartPosition, setRestartPosition] = useState(0);
+  const [checkStatus, setCheckStatus] = useState({
+    status: "fullfield",
+    isStarting: false,
+  });
   const refRange = useRef(null);
   const max = 2880;
   const min = 1;
@@ -32,34 +36,31 @@ const DonutChartInput = (props) => {
     giveSelectedTime(timeRangeValue);
   }, []);
 
+  useEffect(() => {
+    setCheckStatus({ isStarting: false, status: "fullfield" });
+  }, [getDataForChart]);
+
   return (
     <div className="relative">
-      <div className=" m-auto mt-14 w-[95%]" ref={refRange}>
+      <div className=" m-auto mt-14 w-[100%]" ref={refRange}>
         {minutes >= max ? (
           ""
         ) : (
           <RestartTime
-            position={{ left: position * (refRange.current.offsetWidth + 22) }}
+            position={{ left: position * refRange.current.offsetWidth }}
             restartTime={calculateSelectedTime(minutes)}
             restartTextIsLeft={max - minutes > max / 2}
           ></RestartTime>
         )}
-        {/* <div className={restartTimeIsVisible ? "" : ""}>
-          <span
-            id="restartLine-{{@index}}"
-            className={`absolute bg-red-500 h-12 w-[1px] ${
-              restartPosition ? `left-[${restartPosition}]` : ""
-            }`}
-          >
-            <p
-              class={`w-max absolute text-red-500 translate-y-[48px] ${
-                max - minutes > max / 2 ? "right-0" : ""
-              }`}
-            >
-              Restart time
-            </p>
-          </span>
-        </div> */}
+        <div
+          className={`absolute bg-gray-600 h-12 w-[1px] left-[`}
+          style={{
+            left: `${
+              refRange.current &&
+              (refRange.current.offsetWidth / max) * timeRangeValue
+            }px`,
+          }}
+        ></div>
         <div>
           <input
             type="range"
@@ -70,6 +71,13 @@ const DonutChartInput = (props) => {
             onChange={(e) => {
               setTimeRangeValue(e.target.value);
               giveSelectedTime(timeRangeValue);
+              if (
+                checkStatus.status === "fullfield" &&
+                !checkStatus.isStarting
+              ) {
+                setCheckStatus({ isStarting: true, status: "pending" });
+                setIsPending(true);
+              }
             }}
             className="cursor-pointer"
           />
