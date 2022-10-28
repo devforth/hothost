@@ -45,7 +45,7 @@ const Home = () => {
   };
 
   return (
-    <div className="mx-auto pt-4 px-4 flex justify-center  mobile:max-w-max">
+    <div className="mx-auto pt-4 px-4 flex justify-center  mobile:max-w-max overflow-y-hidden">
       <div className="container mb-4">
         <div className="flex mb-1">
           <div
@@ -76,9 +76,9 @@ const Home = () => {
 
         <div className="p-4  bg-gray-100 rounded-lg shadow-md  dark:bg-gray-600 dark:border-gray-700">
           {pathName === "/home" ? (
-            <div>
+            <>
               <div className="flex justify-between items-center mb-4">
-                <h5 className="w-max text-xl font-bold leading-none text-gray-900 dark:text-white">
+                <h5 className="mobile:w-[150px] text-xl font-bold leading-none text-gray-900 dark:text-white">
                   Hosts under monitoring
                 </h5>
 
@@ -126,7 +126,7 @@ const Home = () => {
                 )}
                 {status === "pending" && <Spinner></Spinner>}
               </div>
-            </div>
+            </>
           ) : (
             <HttpMonitor></HttpMonitor>
           )}

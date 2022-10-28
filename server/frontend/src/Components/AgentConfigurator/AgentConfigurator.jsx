@@ -49,22 +49,20 @@ const AgentConfigurator = (props) => {
           className="p-4 mb-4   overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
         >
           {`docker run -d \\
-               --env HOTHOST_SERVER_BASE=${`${document.location.protocol}//${
-                 e.isLocal ? "localhost:8007" : document.location.host
-               }`} \\
-                    --env HOTHOST_AGENT_SECRET=${e.secret} \\
-                    --env HOTHOST_MONITOR_INTERVAL=60 \\
-                    --name hothost-agent \\
-                    -v /proc:/host/proc:ro \\
-                    -v /sys:/host/sys:ro \\
-                    -v /etc/os-release:/host/etc/os-release:ro \\
-                    -v  /etc/hostname:/host/etc/hostname:ro \\
-                    --restart unless-stopped \\
-                    --cap-add SYS_PTRACE \\
-                    --security-opt apparmor=unconfined \\
-                    ${
-                      e.isLocal ? `--network=host` : ""
-                    }  devforth/hothost-agent`}
+ --env HOTHOST_SERVER_BASE=${`${document.location.protocol}//${
+   e.isLocal ? "localhost:8007" : document.location.host
+ }`} \\
+ --env HOTHOST_AGENT_SECRET=${e.secret} \\
+ --env HOTHOST_MONITOR_INTERVAL=60 \\
+ --name hothost-agent \\
+ -v /proc:/host/proc:ro \\
+ -v /sys:/host/sys:ro \\
+ -v /etc/os-release:/host/etc/os-release:ro \\
+ -v  /etc/hostname:/host/etc/hostname:ro \\
+ --restart unless-stopped \\
+ --cap-add SYS_PTRACE \\
+ --security-opt apparmor=unconfined \\
+ ${e.isLocal ? `--network=host` : ""}  devforth/hothost-agent`}
         </pre>
       ),
     },
@@ -152,7 +150,7 @@ services:
           {textContent[active].header}
           {textContent[active].text}
           <button
-            className={`sm:flex  absolute right-2 top-14 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded  items-center ${
+            className={`sm:flex  mobile:hidden absolute right-2 top-14 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded  items-center ${
               active === "Pure Bash" ? "top-[76px]" : ""
             }`}
             onClick={() => {

@@ -6,5 +6,6 @@
   opacity: 0 !important;
 }
 
-
-.donutChart{position:fixed}
+.donutChart {
+  position: fixed;
+}

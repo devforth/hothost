@@ -4,7 +4,7 @@ import { getData } from "../FetchApi.js";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { createContext } from "react";
 import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+
 
 import Header from "./Components/Header/Header.jsx";
 import Home from "./Components/Home/Home.jsx";
