@@ -16,7 +16,7 @@ const MonitoringRow = (props) => {
   return (
     <tr
       key={host.id}
-      className="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-3 border-b last:border-b-0 border-gray-200 dark:border-gray-700 w-full"
+      className="py-4 mobile:grid grid-cols-3 grid-rows-3 gap-4 border-b last:border-b-0 border-gray-200 dark:border-gray-700 w-full"
     >
       <td className="mobile:hidden py-4 pr-4 flex-shrink-0">
         <img
@@ -27,12 +27,12 @@ const MonitoringRow = (props) => {
           // import PreviousMap from "postcss/lib/previous-map.js";
         />
       </td>
-      <td className="row-start-1 col-start-3 pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+      <td className="pr-4 flex-1 col-start-3 row-start-1  items-center text-base font-semibold text-gray-900 dark:text-white place-self-center">
         <Tooltip content={host.humanizeDurationOnlineEvent} placement="bottom">
           <span>{host.online ? <span>🟢 On</span> : <span>🔴 Off</span>}</span>
         </Tooltip>
       </td>
-      <td className="pr-4 flex-1 row-start-1 col-start-1 col-span-3 min-w-max">
+      <td className="pr-4 flex-1 col-start-1 row-start-1 min-w-max">
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
           {host.hostname}
           {host.label && host.label !== "" && (
@@ -59,20 +59,17 @@ const MonitoringRow = (props) => {
           </span>
         </p>
       </td>
-      <td className="flex-1 sm:px-4 min-w-max">
+      <td className="flex-1 col-start-1 row-start-3 sm:px-4 min-w-max">
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
           {host.os_name}
         </p>
         <Tooltip content={host.os_version} placement="bottom">
-          <p
-            className="text-sm text-gray-500 truncate dark:text-gray-400 w-20"
-            data-tooltip-placement="bottom"
-          >
+          <p className="text-sm text-gray-500 truncate dark:text-gray-400 w-20">
             {host.os_version}
           </p>
         </Tooltip>
       </td>
-      <td className="flex-1 pr-4 row-start-2 col-span-3 min-w-max">
+      <td className="flex-1 pr-4 col-start-1 row-start-2 col-span-2 min-w-max">
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
           💻 {host.cpu_name}
         </p>
@@ -86,6 +83,10 @@ const MonitoringRow = (props) => {
               <button
                 data-modal-toggle="modal_timeline-{{@index}}"
                 className="ml-2"
+                onClick={() => {
+                  setDonutModalIsVisible(true);
+                  setDotsIsvisible(false);
+                }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -111,18 +112,13 @@ const MonitoringRow = (props) => {
           )}
           &nbsp;&nbsp;&nbsp;
           <span className="mobile:block">
-            {/* {{#if host.isSwap }}
-          SWAP {{ host.swap_total }} ({{ host.swap_used }}% used)
-          {{else}}
-          SWAP Off
-          {{/if}} */}
             {host.isSwap
               ? `SWAP ${host.swap_total} ${host.swap_used}% used`
               : "SWAP Off"}
           </span>
         </div>
       </td>
-      <td className="flex-1 pr-4 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
+      <td className="flex-1 pr-4 col-start-2 row-start-3 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
         <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
         <p className="text-sm text-gray-500 truncate dark:text-gray-400">
           <p>{host.disk_used}% used</p>
@@ -142,7 +138,7 @@ const MonitoringRow = (props) => {
           )}
         </p>
       </td>
-      <td className="row-start-3 col-start-3 mobile:flex mobile:self-center mobile:place-content-end">
+      <td className=" mobile:flex mobile:self-center col-start-3 row-start-3 place-self-end">
         <OutsideHider state={dotsIsVisible} setstate={setDotsIsvisible}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
