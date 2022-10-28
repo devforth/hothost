@@ -47,6 +47,15 @@ const MonitoringTable = (props) => {
     }
   };
 
+  useEffect(() => {
+    const body = document.querySelector("body");
+    if (donutModalIsVisible) {
+      body.style.overflowY = "hidden";
+    } else {
+      body.style.overflowY = "";
+    }
+  }, [donutModalIsVisible]);
+
   return (
     <>
       <table
