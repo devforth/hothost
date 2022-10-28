@@ -5,6 +5,14 @@ import { useRef, useEffect } from "react";
 import HttpMonitoringTable from "../HttpMonitoringTable/HttpMonitoringTable";
 
 const HttpMonitor = () => {
+  const checkInputs = (inp, inpEl, setInpErr) => {
+    if (!inp) {
+      inpEl.current.focus();
+      setInpErr(true);
+      return false;
+    } else return true;
+  };
+
   const [monitorIsVisible, setMonitorIsVisible] = useState(false);
   const [monitorUrlInp, setMonitorUrlInp] = useState("");
   const [monitorIntervalRng, setMonitorIntervalRng] = useState("30");
@@ -16,11 +24,11 @@ const HttpMonitor = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [urlError, setUrlError] = useState(false);
+  const [keyWordError, setKeyWordError] = useState(false);
   const [status, setStatus] = useState("fullfield");
   const [monitoringHttpData, setMonitoringHttpData] = useState([]);
   const resetFieds = function () {
     setMonitorUrlInp("");
-
     setLoginInp("");
     setPasswordInp("");
     setKeyWordInp("");
@@ -46,58 +54,65 @@ const HttpMonitor = () => {
   const loginInpEl = useRef(null);
   const passwordInpEl = useRef(null);
   const urlInpEl = useRef(null);
+  const keywordInpEl = useRef(null);
 
   const addHttpMonitor = async function () {
-    if (!monitorUrlInp) {
-      urlInpEl.current.focus();
-      setUrlError(true);
-    } else {
-      if (basicAuthChk) {
-        if (!loginInp) {
-          setLoginError(true);
-          loginInpEl.current.focus();
-        } else {
-          if (!passwordInp) {
-            setPasswordError(true);
-            passwordInpEl.current.focus();
-          } else {
-            const body = {
-              URL: monitorUrlInp,
-              enable_auth: basicAuthChk,
-              monitor_interval: monitorIntervalRng,
-              login: loginInp,
-              password: passwordInp,
-              monitor_type: monitorTypeSlt,
-              key_word: keyWordInp,
-            };
+    let body = {};
+    let validationIsOk = false;
 
-            const data = await apiFetch(body, "add_http_monitor");
-            if (data) {
-              resetFieds();
-              setMonitoringHttpData(data.data);
-            }
-          }
+    if (checkInputs(monitorUrlInp, urlInpEl, setUrlError)) {
+      validationIsOk = true;
+    } else return;
+
+    if (basicAuthChk) {
+      if (checkInputs(loginInp, loginInpEl, setLoginError)) {
+        validationIsOk = true;
+      } else return;
+      if (checkInputs(passwordInp, passwordInpEl, setPasswordError)) {
+        validationIsOk = true;
+      } else return;
+
+      if (monitorTypeSlt !== "status_code") {
+        if (checkInputs(keyWordInp, keywordInpEl, setKeyWordError)) {
+          validationIsOk = true;
+        } else return;
+      }
+      body = {
+        URL: monitorUrlInp,
+        enable_auth: basicAuthChk,
+        monitor_interval: monitorIntervalRng,
+        login: loginInp,
+        password: passwordInp,
+        monitor_type: monitorTypeSlt,
+        key_word: keyWordInp,
+      };
+      if (validationIsOk) {
+        const data = await apiFetch(body, "add_http_monitor");
+        if (data) {
+          resetFieds();
+          setMonitoringHttpData(data.data);
         }
-      } else {
-        if (!passwordInp) {
-          setPasswordError(true);
-          passwordInpEl.current.focus();
-        } else {
-          const body = {
-            URL: monitorUrlInp,
-            enable_auth: basicAuthChk,
-            monitor_interval: monitorIntervalRng,
-            login: loginInp,
-            password: passwordInp,
-            monitor_type: monitorTypeSlt,
-            key_word: keyWordInp,
-          };
-
-          const data = await apiFetch(body, "add_http_monitor");
-          if (data) {
-            resetFieds();
-            setMonitoringHttpData(data.data);
-          }
+      }
+    } else {
+      if (monitorTypeSlt !== "status_code") {
+        if (checkInputs(keyWordInp, keywordInpEl, setKeyWordError)) {
+          validationIsOk = true;
+        } else return;
+      }
+      body = {
+        URL: monitorUrlInp,
+        enable_auth: basicAuthChk,
+        monitor_interval: monitorIntervalRng,
+        login: "",
+        password: "",
+        monitor_type: monitorTypeSlt,
+        key_word: keyWordInp,
+      };
+      if (validationIsOk) {
+        const data = await apiFetch(body, "add_http_monitor");
+        if (data) {
+          resetFieds();
+          setMonitoringHttpData(data.data);
         }
       }
     }
@@ -108,35 +123,38 @@ const HttpMonitor = () => {
         <h5 class="mobile:w-min text-xl font-bold leading-none text-gray-900 dark:text-white">
           Add Http(s) monitoring
         </h5>
-        <button
-          onClick={() => {
-            setMonitorIsVisible(!monitorIsVisible);
-          }}
-          class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
+        <div>
+          <button
+            onClick={() => {
+              setMonitorIsVisible(!monitorIsVisible);
+            }}
+            class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center "
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Add new host
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+            Add new host
+          </button>
+        </div>
       </div>
       <div id="monitor_form" class={monitorIsVisible ? "" : "hidden"}>
         <label
           for="URL"
           class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${
-            urlError && "text-red-700"
+            urlError ? "text-red-700 " : ""
           }`}
+          style={{ color: urlError ? "red" : "" }}
         >
           {urlError ? "Monitor url is required" : "Monitor url"}
         </label>
@@ -201,9 +219,9 @@ const HttpMonitor = () => {
         <div id="baseAuth" class={`${basicAuthChk ? "" : "hidden"}`}>
           <label
             for="login"
-            class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${
-              loginError && "text-red-700"
+            class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 
             }`}
+            style={{ color: loginError ? "red" : "" }}
           >
             {loginError ? "Login is required" : "Login"}
           </label>
@@ -222,9 +240,8 @@ const HttpMonitor = () => {
           />
           <label
             for="password"
-            class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${
-              passwordError && "text-red-700"
-            }`}
+            class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 `}
+            style={{ color: passwordError ? "red" : "" }}
           >
             {passwordError ? "Password is required" : "Password"}
           </label>
@@ -262,28 +279,33 @@ const HttpMonitor = () => {
             <option value="keyword_not_exist">Keyword not exists</option>
           </select>
         </div>
-        <div
-          id="keyWordPlace"
-          class={monitorTypeSlt === "status_code" ? "hidden" : ""}
-        >
-          <label
-            for="key_word"
-            class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
-          >
-            "status_code" Key Word
-          </label>
-          <input
-            value={keyWordInp}
-            onChange={(e) => {
-              setKeyWordInp(e.target.value);
-            }}
-            name="key_word"
-            id="keyWordInp"
-            type="text"
-            placeholder="Keyword"
-            class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-          />
-        </div>
+        {monitorTypeSlt !== "status_code" ? (
+          <div id="keyWordPlace">
+            <label
+              for="key_word"
+              class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+              style={{ color: keyWordError ? "red" : "" }}
+            >
+              {" "}
+              {keyWordError
+                ? "status_code Key Word is required"
+                : "status_code Key Word"}
+            </label>
+            <input
+              ref={keywordInpEl}
+              value={keyWordInp}
+              onChange={(e) => {
+                setKeyWordInp(e.target.value);
+                setKeyWordError(false);
+              }}
+              name="key_word"
+              id="keyWordInp"
+              type="text"
+              placeholder="Keyword"
+              class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            />
+          </div>
+        ) : null}
         <button
           type="button"
           onClick={addHttpMonitor}
