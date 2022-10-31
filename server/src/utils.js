@@ -346,7 +346,7 @@ export const checkStatus = async (hostData) => {
   // const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
 
   const controller = new AbortController();
-  const timeout = setTimeout(controller.abort, 2000);
+  const timeout = setTimeout(() => controller.abort(), 2000);
   const response = hostData.enable_auth
     ? await fetch(hostData.URL, {
         method: "GET",

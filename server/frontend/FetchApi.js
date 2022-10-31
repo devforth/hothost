@@ -1,5 +1,8 @@
 const BASE_LOCAL_URL = "http://localhost:8007/api/v2/";
-const BASE_PROD_URL = "/api/";
+const BASE_PROD_URL = "/api/v2";
+
+//here should be hostname  
+
 const path = document.location.host === "" ? BASE_PROD_URL : BASE_LOCAL_URL;
 
 async function getData(route) {
