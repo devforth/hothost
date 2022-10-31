@@ -60,7 +60,7 @@ const getMonitoringData = async (req) => {
         }
       : {
           id: data.id,
-          secret: req.user && data.secret,
+          // secret: req.user && data.secret,
           isLocal: env.ENV === "local" ? true : false,
           icon_name: getIconName(data.HOST_OS_NAME),
           online:
