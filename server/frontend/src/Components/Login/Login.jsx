@@ -22,16 +22,12 @@ const Login = () => {
     }
   };
 
-  // const getFirstData = async () => {
-  //   const data = await getData("getMonitoringData");
-  //   if (data) {
-  //     navigate("/home");
-  //   }
-  // };
+  const checkAuth = async () => {
+    const data = await getData("checkAuth");
+    if(data.error ==="Can`t access when authorized"){goToHome()}
+    }
 
-  // useEffect(() => {
-  //   getFirstData();
-  // }, []);
+    useEffect(()=>{checkAuth(),[]})
 
   return (
     <div class="relative min-h-screen flex flex-col justify-center overflow-hidden sm:py-12">

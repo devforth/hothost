@@ -354,6 +354,9 @@ router.post("/add_label", async (req, res) => {
   res.json([req.body]);
 });
 
+
+router.get("/checkAuth",mustNotBeAuthorizedView(async (req, res) => {return res.status(403).json({status:"ok"})}))
+
 router.post(
   "/login",
   mustNotBeAuthorizedView(async (req, res) => {

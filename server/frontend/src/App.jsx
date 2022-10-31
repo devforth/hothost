@@ -1,9 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect, Suspense } from "react";
-import { getData } from "../FetchApi.js";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { createContext } from "react";
-import ReactDOM from "react-dom/client";
 
 import Header from "./Components/Header/Header.jsx";
 import Home from "./Components/Home/Home.jsx";
@@ -18,7 +14,7 @@ import "./App.css";
 
 function App() {
   //get data from server
-  const [isAuthorize, setIsAuthorize] = useState(true);
+  const [isAuthorize, setIsAuthorize] = useState("");
   const [monitoringData, setMonitoringData] = useState([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
@@ -35,7 +31,7 @@ function App() {
   return (
     <div className="App">
       <Header setTheme={setTheme} theme={theme} />
-      <Suspense fallback={<div>Download</div>}>
+      
         <Routes>
           <Route path="/" element={<Navigate replace to="/home" />} />
           <Route path="/home" element={<Home />}>
@@ -49,7 +45,7 @@ function App() {
             <Route path=":pluginName" element={<Plugin />}></Route>
           </Route>
         </Routes>
-      </Suspense>
+      
     </div>
   );
 }

@@ -57,7 +57,7 @@ export const authorizeUser = async (username, password) => {
 };
 export const mustNotBeAuthorizedView = (callback) => {
   return (req, res) => {
-    if (req.user) res.redirect(req.query.next || "/");
+    if (req.user) res.status(403).json({ error: "Can`t access when authorized" })
     else callback(req, res);
   };
 };
