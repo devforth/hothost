@@ -5,7 +5,6 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { createContext } from "react";
 import ReactDOM from "react-dom/client";
 
-
 import Header from "./Components/Header/Header.jsx";
 import Home from "./Components/Home/Home.jsx";
 import Login from "./Components/Login/Login";
@@ -38,7 +37,7 @@ function App() {
       <Header setTheme={setTheme} theme={theme} />
       <Suspense fallback={<div>Download</div>}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Navigate replace to="/home" />} />
           <Route path="/home" element={<Home />}>
             <Route path="http-monitor" element={<HttpMonitor />} />
           </Route>

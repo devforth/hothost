@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../../FetchApi";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { getData } from "../../../FetchApi";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -20,6 +21,17 @@ const Login = () => {
       goToHome();
     }
   };
+
+  // const getFirstData = async () => {
+  //   const data = await getData("getMonitoringData");
+  //   if (data) {
+  //     navigate("/home");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getFirstData();
+  // }, []);
 
   return (
     <div class="relative min-h-screen flex flex-col justify-center overflow-hidden sm:py-12">
