@@ -28,9 +28,15 @@ const MonitoringRow = (props) => {
         />
       </td>
       <td className="pr-4 flex-1 col-start-3 row-start-1  items-center text-base font-semibold text-gray-900 dark:text-white place-self-center">
-        <Tooltip content={host.humanizeDurationOnlineEvent} placement="bottom">
-          <span>{host.online ? <span>🟢 On</span> : <span>🔴 Off</span>}</span>
-        </Tooltip>
+        {host.online
+         ?
+          <span>🟢 On</span> 
+         :
+          <Tooltip content={host.humanizeDurationOnlineEvent} placement="bottom">
+           <span>🔴 Off</span>
+          </Tooltip>}
+        
+        
       </td>
       <td className="pr-4 flex-1 col-start-1 row-start-1 min-w-max">
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
