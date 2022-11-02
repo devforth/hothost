@@ -121,6 +121,8 @@ const getMonitoringData = async (req) => {
           countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
           humanizeDurationRamEvent: getDuration(data.RAM_EVENT_TS),
           humanizeDurationDiskEvent: getDuration(data.DISK_EVENT_TS),
+        
+
         }
   );
 };
@@ -408,6 +410,10 @@ router.post(
       disk_stabilization_lvl,
       ram_threshold,
       ram_stabilization_lvl,
+      host_is_down_confirmations,
+      http_issue_confirmations,
+
+
     } = req.body;
 
     database.data.settings = {
@@ -415,6 +421,8 @@ router.post(
       RAM_STABILIZATION_LEVEL: +ram_stabilization_lvl,
       DISK_THRESHOLD: +disk_threshold,
       DISK_STABILIZATION_LEVEL: +disk_stabilization_lvl,
+      HOST_IS_DOWN_CONFIRMATIONS: +host_is_down_confirmations,
+      HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations
     };
     res.status(200).json({
       status: "sucessful",
@@ -430,6 +438,10 @@ const getSettings = () => {
     ram_stabilization_lvl: settings.RAM_STABILIZATION_LEVEL,
     disk_threshold: settings.DISK_THRESHOLD,
     disk_stabilization_lvl: settings.DISK_STABILIZATION_LEVEL,
+    host_is_down_confirmations:settings.HOST_IS_DOWN_CONFIRMATIONS,
+    http_issue_confirmations:settings.HTTP_ISSUE_CONFIRMATION
+    
+
   };
 };
 
