@@ -23,6 +23,10 @@ db.read = async function () {
         RAM_STABILIZATION_LEVEL: 3,
         DISK_THRESHOLD: 90,
         DISK_STABILIZATION_LEVEL: 1,
+        HOST_IS_DOWN_CONFIRMATIONS: 1,
+        HTTP_ISSUE_CONFIRMATION: 1
+
+
     };
     db.data.pluginSettings ||= [];
 };
