@@ -1,6 +1,5 @@
 dev.db
 node_modules/
-html/node_modules/
-output.css
-static/css/output.css
+frontend/node_modules/
 data/*
+frontend/dist

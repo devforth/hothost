@@ -1,6 +1,8 @@
 import path from "path";
 import express from "express";
 import cors from "cors";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 import { create } from "express-handlebars";
 
@@ -25,6 +27,12 @@ import {
 } from "./utils.js";
 import { authMiddleware } from "./middleware.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = path.join(__dirname, '..')
+
+console.log('rootDir', rootDir)
+
 async function main() {
   await database.read();
   await PluginManager().loadPlugins();
@@ -37,56 +45,7 @@ async function main() {
 
   const port = env.WEB_PORT || 8007;
 
-  const hbs = create({
-    extname: "html",
-    defaultLayout: "main",
-    layoutsDir: path.join("html", "layouts"),
-    partialsDir: path.join("html", "views"),
-
-    helpers: {
-      or(a, b) {
-        return a || b;
-      },
-      not(a) {
-        return !a;
-      },
-      and(a, b) {
-        return a && b;
-      },
-      eq(a, b) {
-        return a?.toString() === b?.toString();
-      },
-      isNotAdmin(a) {
-        return a.toString() !== env.WEB_ADMIN_USERNAME.toString();
-      },
-      getFlag(country) {
-        return !country ? null : "/img/flags/" + country.toLowerCase() + ".svg";
-      },
-      getCountryName(country) {
-        if (!country) {
-          return null;
-        }
-        const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
-        return regionNames.of(country);
-      },
-      getDuration(eventLastTs) {
-        const now = new Date().getTime();
-
-        const duration = now - eventLastTs;
-        return humanizeDuration(duration, DATE_HUMANIZER_CONFIG);
-      },
-      json: function (obj) {
-        return JSON.stringify(obj);
-      },
-    },
-  });
-
-  app.set("view engine", "html");
-  app.engine("html", hbs.engine);
-  app.set("views", path.join("html", "views"));
-
   app.use(express.json());
-  // app.use(formidable());
   app.use(cookieParser());
 
   app.use(
@@ -95,13 +54,19 @@ async function main() {
       credentials: true,
     })
   );
-
+  
+  app.use(express.static(`${rootDir}/frontend/dist`));
   app.use(authMiddleware);
 
-  app.use("/", viewRouter);
   app.use("/api/", apiRouter);
   app.use("/api/v2/", nextApiRouter);
   app.use("/v2/", nextApiRouter);
+
+
+  app.get('*', function (request, response) {
+  
+    response.sendFile(path.resolve('frontend/dist/index.html'));
+  });
 
   app.listen(port, "0.0.0.0", () => {
     console.log(
