@@ -4,11 +4,11 @@ Lightweight and minimalistic free and opensource Servers and HTTP monitor.
 
 * 💾 Shows used disk space percentage and ALERT badge if it exceeds configurable threshold (90% by default)
 * 🧠 Shows used RAM percentage and ALERT badge if it exceeds configurable threshold (90% by default)
-* ☎️ Built-in plugins to setup Email/Slack/Telegram notifications
+* ☎️ Built-in plugins to setup free Email/Slack/Telegram notifications
 * 🪧 Agents installed using **simple code snippets**. Options: Docker/Compose/Bash+curl+crontab.
 * 🏙 Allows to monitor as many hosts as needed
 * ⏰️ Configurable monitoring interval
-* 📈 View top 10 processes consuming RAM, historically iver last 2 days.
+* 📈 View top 10 processes consuming RAM, historically over last 2 days.
 * 🌐 HTTP / HTTPS Monitor, status code check, webpage keywords existence, basic auth, notifications
 
 For each host it allows to see:
@@ -22,24 +22,37 @@ For each host it allows to see:
 
 # Preview
 
-![image](https://user-images.githubusercontent.com/1838656/167828815-25082ef0-c0b7-45dd-881a-f4f63b0861ea.png)
+Hosts view:
 
-Add new host form:
-
-![image](https://user-images.githubusercontent.com/1838656/167829631-54ae182f-87f9-4a3d-85dd-b2bb47b37329.png)
+![image](https://user-images.githubusercontent.com/1838656/196886907-c90e5e36-c695-4b56-85f0-aadccd125140.png)
 
 
-Available plugins:
+Add new host box:
 
-![image](https://user-images.githubusercontent.com/1838656/167828992-d15dc19e-409d-491d-a2c7-c713786bf9a0.png)
+![image](https://user-images.githubusercontent.com/1838656/196889285-c9c6b7c3-d665-4c8f-b615-be990599168d.png)
+
+
+Available notification plugins:
+
+![image](https://user-images.githubusercontent.com/1838656/196889594-5a405ca0-0608-4a39-8a42-b62d74055f99.png)
+
+
+Analyze top RAM-consuming processes at a time:
+
+<img src="https://user-images.githubusercontent.com/1838656/197183957-e22b2690-f79f-4dcd-a7b7-092ab9622990.gif" width="700"/>
+
+HTTP(s) Monitor setup:
+
+<img src="https://user-images.githubusercontent.com/1838656/196887413-14055152-4114-42e8-841f-cd5ec7c33e50.png" width="500"/>
+
 
 # RoadMap
 
-* Porting UI from server-side to Vue.js
+* Porting UI from server-side to React
 
 # Installation
 
-First you need to run HotHost Web Server. Web-server itself, when will be started, will give you clear guide how to add agents. 
+First you need to run HotHost Web Server. Web-server itself, when will be started, will give you clear guide how to add agents via own Web UI. 
 
 You can use any host with public IP. You are responsible for setting up HTTPS.
 
@@ -149,11 +162,11 @@ Then use https://subdomain.yourdomain.com/public/ with basic auth credentials. Y
 
 # Plugin development
 
-Every plugin is a standalone .js of ESM format (with exports/imports, CommonJS with require is not supported). File should have a defined structure. Use `server/src/plugins/slack.js` for a Hello-World example. It is well documented
+Every plugin is a standalone .js in ESM format (with exports/imports, CommonJS with require is not supported). File should have a defined structure. Use `server/src/plugins/slack.js` for a Hello-World example. It is well documented
 
 Currently plugin file should be placed into `server/src/plugins` directory.
 
-If you want to bundle some dedicated node modules then you need to compile them using webpack or other bundler which supports ESM outputs. Please see `server/src/plugins/gmail.src/gmail.src.js` - it bundels node-mailer into plugin.
+If you want to bundle some dedicated node modules then you need to bundle them using webpack or other bundler which supports ESM outputs. Please see `server/src/plugins/gmail.src/gmail.src.js` - it bundels node-mailer into plugin.
 
 
 # Development
