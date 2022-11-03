@@ -10,8 +10,6 @@ import HttpMonitor from "./Components/HttpMonitor/HttpMonitor";
 import Plugins from "./Components/Plugins/Plugins";
 import Plugin from "./Components/Plugin/Plugin";
 
-import "./App.css";
-
 function App() {
   //get data from server
   const [isAuthorize, setIsAuthorize] = useState("");

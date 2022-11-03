@@ -439,8 +439,8 @@ const getSettings = () => {
     ram_stabilization_lvl: settings.RAM_STABILIZATION_LEVEL,
     disk_threshold: settings.DISK_THRESHOLD,
     disk_stabilization_lvl: settings.DISK_STABILIZATION_LEVEL,
-    host_is_down_confirmations:settings.HOST_IS_DOWN_CONFIRMATIONS,
-    http_issue_confirmations:settings.HTTP_ISSUE_CONFIRMATION
+    host_is_down_confirmations:settings.HOST_IS_DOWN_CONFIRMATIONS || 1,  // FALLBACK FOR USERS WHO HAD hh INSTALLED BEFORE 1.2.1
+    http_issue_confirmations:settings.HTTP_ISSUE_CONFIRMATION || 1
     
 
   };

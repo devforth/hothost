@@ -199,7 +199,7 @@ export const calculateAsyncEvents = async () => {
       const safePeriod = 0.1 * 1000
       const events = [];
       
-      const online = data.updatedAt + +data.MONITOR_INTERVAL * 1000 * (1 + +HOST_IS_DOWN_CONFIRMATIONS) + safePeriod >= new Date().getTime();
+      const online = data.updatedAt + +data.MONITOR_INTERVAL * 1000 * (1 + +(HOST_IS_DOWN_CONFIRMATIONS||0)) + safePeriod >= new Date().getTime();
       if (!online && data.online) {
           events.push("host_is_offline");
           data.online = false;
@@ -443,7 +443,7 @@ export const createScheduleJob = (httpHostId, interval) => {
       dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1
 
      
-      if (dbData.numberOfFalseWarnings >= +HTTP_ISSUE_CONFIRMATION + 1) {
+      if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION||0) + 1) {
         generateHttpEvent(dbData, {
           ...dbData,
           okStatus: !!res.response,

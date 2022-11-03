@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.0.1
+version=1.2.2
 docker build . -t devforth/hothost-web:$version
 docker push devforth/hothost-web:$version
 
