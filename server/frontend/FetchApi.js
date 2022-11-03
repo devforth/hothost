@@ -1,9 +1,16 @@
 const BASE_LOCAL_URL = "http://localhost:8007/api/v2/";
-const BASE_PROD_URL = "/api/v2";
+const BASE_PROD_URL = "/api/v2/";
 
 //here should be hostname  
 
-const path = document.location.host === "" ? BASE_PROD_URL : BASE_LOCAL_URL;
+const path = (
+  document.location.host.startsWith("localhost") ||
+  document.location.host.startsWith("127.0.0.1")
+) ? BASE_LOCAL_URL : BASE_PROD_URL;
+
+console.log('patthhh', path);
+
+
 
 async function getData(route) {
   const response = await fetch(`${path}${route}`, {
@@ -13,7 +20,7 @@ async function getData(route) {
   });
 
   if (response.status === 401) {
-    window.location.assign("http://localhost:5173/login");
+    window.location.assign("/login");
   } else {
     const data = await response.json();
 
