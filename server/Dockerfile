@@ -1,24 +1,19 @@
-FROM node:16-alpine as cssBuilder
+FROM node:16-alpine as builder
 WORKDIR /code/
-
-ADD html .
-
+ADD frontend/package-lock.json .
+ADD frontend/package.json .
 RUN npm ci
-RUN ./node_modules/.bin/tailwindcss -i input.css -o dist/css/output.css
+ADD frontend .
+RUN npm run build
 
 FROM node:16-alpine
-
 WORKDIR /code/
-
 ADD package.json .
 ADD package-lock.json .
-
 RUN npm ci
 
-ADD html html
-COPY --from=cssBuilder /code/dist/ static/
-
 ADD . .
+COPY --from=builder /code/dist/ frontend/dist/ 
 
-CMD [ "/bin/sh", "-c", "node src/index.js" ]
+CMD ["node", "src/index.js" ]
 ENTRYPOINT []

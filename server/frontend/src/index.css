@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.donutChart-innertext {
+  opacity: 0 !important;
+}
+
+.donutChart {
+  position: fixed;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 8px;
+}
