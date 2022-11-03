@@ -15,6 +15,7 @@ const Login = () => {
 
   const loginAction = async () => {
     const data = await apiFetch({ username, password }, "login");
+    
     if (data && data.status !== "successful") {
       setInputsError(true);
     } else {
@@ -27,15 +28,23 @@ const Login = () => {
     if(data.error ==="Can`t access when authorized"){goToHome()}
     }
 
-    useEffect(()=>{checkAuth(),[]})
+    useEffect(()=>{checkAuth()},[])
 
   return (
     <div class="relative min-h-screen flex flex-col justify-center overflow-hidden sm:py-12">
       <div class="relative bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10 dark:bg-gray-800 dark:border-gray-700">
         <div class="mb-6">
+        {inputsError 
+          ? (
+          <div class="flex justify-center">
+            <div class="block mb-2 text-base font-medium text-red-700 dark:text-red-500 absolute top-0" >Incorect username or password</div>
+          </div>)
+          :null
+        }
           <label
             for="username"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            style={inputsError ? {color:"rgb(240,82,82)"} : null}
           >
             Username
           </label>
@@ -56,6 +65,7 @@ const Login = () => {
           <label
             for="password"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            style={inputsError ? {color:"rgb(240,82,82)"} : null}
           >
             Password
           </label>
@@ -72,11 +82,7 @@ const Login = () => {
             required
           />
         </div>
-        {inputsError && (
-          <div class="flex justify-center">
-            <div class="block mb-2 text-base font-medium text-red-700 dark:text-red-500"></div>
-          </div>
-        )}
+        
 
         <div class="flex items-center justify-center">
           <button
