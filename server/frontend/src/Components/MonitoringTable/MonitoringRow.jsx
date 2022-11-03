@@ -21,7 +21,7 @@ const MonitoringRow = (props) => {
       <td className="mobile:hidden py-4 pr-4 flex-shrink-0">
         <img
           className="min-w-[32px] min-h-[32px] rounded-full w-[8px]"
-          src={`/src/assets/${host.icon_name}.svg`}
+          src={`/assets/${host.icon_name}.svg`}
           alt="OS"
 
           // import PreviousMap from "postcss/lib/previous-map.js";
@@ -54,7 +54,7 @@ const MonitoringRow = (props) => {
               <Tooltip content={host.countryName} placement="bottom">
                 <img
                   className="h-4 w-4 m-1"
-                  src={`/src/assets/flags/${host.countryFlag}`}
+                  src={`/assets/flags/${host.countryFlag}`}
                   data-tooltip-placement="bottom"
                   data-tooltip-target="tooltip"
                   alt="country"
