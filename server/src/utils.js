@@ -180,7 +180,7 @@ export const calculateDataEvent = (prevData, newData) => {
   );
   events.push(ramEvent);
 
-  if (!prevData.online && newData.online) {
+  if (!prevData.online && newData.online ) {
     events.push("host_is_online");
   }
 
@@ -188,17 +188,25 @@ export const calculateDataEvent = (prevData, newData) => {
 };
 
 export const calculateAsyncEvents = async () => {
+  const {
+    HOST_IS_DOWN_CONFIRMATIONS,
+   
+  } = database.data.settings;
+
+
   await Promise.all(
     database.data.monitoringData.map((data) => {
+      const safePeriod = 0.1 * 1000
       const events = [];
-      const online =
-        data.updatedAt + +data.MONITOR_INTERVAL * 1000 * 2.5 >=
-        new Date().getTime();
+      
+      const online = data.updatedAt + +data.MONITOR_INTERVAL * 1000 * (1 + +HOST_IS_DOWN_CONFIRMATIONS) + safePeriod >= new Date().getTime();
       if (!online && data.online) {
-        events.push("host_is_offline");
-        data.online = false;
+          events.push("host_is_offline");
+          data.online = false;
         data.ONLINE_EVENT_TS = new Date().getTime();
-      }
+        }
+
+
       PluginManager().handleEvents(
         events.filter((e) => e),
         {
@@ -232,6 +240,8 @@ export const generateHttpEvent = (prevData, newData) => {
     }
   }
   if (prevData.okStatus && !newData.okStatus) {
+
+
     events.push("http_host_down");
     switch (newData.monitor_type) {
       case "status_code":
@@ -347,6 +357,7 @@ export const checkStatus = async (hostData) => {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2000);
+  
   const response = hostData.enable_auth
     ? await fetch(hostData.URL, {
         method: "GET",
@@ -361,24 +372,38 @@ export const checkStatus = async (hostData) => {
       }).catch(() => null)
     : await fetch(hostData.URL, { signal: controller.signal }).catch((e) => e);
   clearTimeout(timeout);
+  
+
+  if (!response) {
+    return { 
+      error: 'No response',
+      response: false 
+    }
+  }
+  if (response.errno) {
+    return { 
+      error: response.errno,
+      response: false 
+    }
+  }
   switch (hostData.monitor_type) {
     case "status_code":
       return {
-        status: response?.status,
-        response: !!(response?.status === 200),
+        status: response.status,
+        response: response.status === 200,
       };
-    case "keyword_exist":
+    case "keyword_exist": {
+      const respText = await response.text();
       return {
-        response: await response
-          ?.text()
-          .then((res) => res.includes(hostData.key_word)),
+        response: respText.includes(hostData.key_word)
       };
-    case "keyword_not_exist":
+    }
+    case "keyword_not_exist": {
+      const respText = await response.text();
       return {
-        response: await response
-          ?.text()
-          .then((res) => !res.includes(hostData.key_word)),
+        response: !respText.includes(hostData.key_word),
       };
+    }
   }
 };
 
@@ -391,26 +416,52 @@ export const startScheduler = () => {
 export const schedulerTask = [];
 
 export const createScheduleJob = (httpHostId, interval) => {
+ 
+
+
   const job = setInterval(async () => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
     const now = new Date().getTime();
+    const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
 
     const res = await checkStatus(dbData);
 
-    generateHttpEvent(dbData, {
-      ...dbData,
-      okStatus: !!res.response,
-      status: res.status,
-      event_created: now,
-    });
+    
+  
+    if (res.response !== dbData.okStatus  ) {
+     
+     
+      if (!dbData.numberOfFalseWarnings) {
+        dbData.numberOfFalseWarnings = 0
+       
+      }
+      if (!dbData.firstFalseConfirmationTime) {
+        dbData.firstFalseConfirmationTime = new Date().getTime();
+      }
+      dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1
 
-    if (res.response !== dbData.okStatus) {
-      dbData.event_created = now;
+     
+      if (dbData.numberOfFalseWarnings >= +HTTP_ISSUE_CONFIRMATION + 1) {
+        generateHttpEvent(dbData, {
+          ...dbData,
+          okStatus: !!res.response,
+          status: res.status,
+          event_created: dbData.firstFalseConfirmationTime,
+        });
+
+        dbData.okStatus = res.response;
+        dbData.event_created = dbData.firstFalseConfirmationTime;
+        dbData.numberOfFalseWarnings = 0;
+        dbData.firstFalseConfirmationTime = 0      
+      }
     }
-
-    dbData.okStatus = res.response;
+    else { dbData.numberOfFalseWarnings = 0;
+           dbData.firstFalseConfirmationTime = 0
+    }
+    
+    
     await database.write();
   }, interval * 1000);
 

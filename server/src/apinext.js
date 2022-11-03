@@ -363,7 +363,7 @@ router.post(
   "/login",
   mustNotBeAuthorizedView(async (req, res) => {
     const { username, password } = req.body;
-    console.log("try to log")
+    
     if (username && password) {
       const jwtToken = await authorizeUser(username, password);
 
