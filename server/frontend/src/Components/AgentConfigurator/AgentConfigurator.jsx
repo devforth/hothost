@@ -62,6 +62,7 @@ const AgentConfigurator = (props) => {
  --restart unless-stopped \\
  --cap-add SYS_PTRACE \\
  --security-opt apparmor=unconfined \\
+ --security-opt seccomp=unconfined \\
  ${e.isLocal ? `--network=host` : ""}  devforth/hothost-agent`}
         </pre>
       ),
@@ -94,7 +95,7 @@ services:
       - SYS_PTRACE
     security_opt:
       - apparmor:unconfined
-      - seccomp:unconfine
+      - seccomp:unconfined
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
