@@ -18,15 +18,17 @@ const Home = () => {
     navigate(`/${path}`);
   };
 
+  const fetchData = async (withLoader) => {
+    withLoader && setStatus("pending");
+    const data = await getData("getMonitoringData");
+    if (data) {
+      setMonitoringData(data);
+    }
+    withLoader && setStatus("fullfield");
+  };
+
   useEffect(() => {
-    const fetchData = async (withLoader) => {
-      withLoader && setStatus("pending");
-      const data = await getData("getMonitoringData");
-      if (data) {
-        setMonitoringData(data);
-      }
-      withLoader && setStatus("fullfield");
-    };
+   
     fetchData({ withLoader: true });
     const intervalId = setInterval(() => {
       fetchData();
@@ -122,6 +124,7 @@ const Home = () => {
                 {monitoringData && status === "fullfield" && (
                   <MonitoringTable
                     monitoringData={monitoringData}
+                    refreshData={fetchData}
                   ></MonitoringTable>
                 )}
                 {status === "pending" && <Spinner></Spinner>}

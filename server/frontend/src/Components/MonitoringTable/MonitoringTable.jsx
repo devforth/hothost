@@ -9,6 +9,7 @@ import MonitoringModal from "./MonitoringModal/MonitoringModal";
 
 const MonitoringTable = (props) => {
   const monitoringData = props.monitoringData;
+  const refreshData = props.refreshData
 
   const [labelModalIsVisible, setlabelModalIsVisible] = useState(false);
 
@@ -30,6 +31,7 @@ const MonitoringTable = (props) => {
     const data = await addLabel(body, "add_label");
     if (data[0].label) {
       setlabelModalIsVisible(false);
+      refreshData()
     }
   };
 
@@ -44,6 +46,7 @@ const MonitoringTable = (props) => {
     const data = await deleteHost(body, "remove_host");
     if (data.status === "successful") {
       setDeleteModalIsVisible(false);
+      refreshData()
     }
   };
 
