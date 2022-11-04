@@ -32,7 +32,7 @@ const Settings = () => {
   };
 
   let navigate = useNavigate();
-  function handleClick() {
+  function goToHome() {
     navigate("/home");
   }
   useEffect(() => {
@@ -130,6 +130,8 @@ const Settings = () => {
         setdiskStabilization(isArrNumber(inptValues)[1]);
         setRAMstabilization(isArrNumber(inptValues)[3]);
         setRAMusage(isArrNumber(inptValues)[2]);
+
+       
       }
     } else {
       setInpError(true);
@@ -141,7 +143,7 @@ const Settings = () => {
       <div class="container mx-auto flex justify-center">
         <div class=" p-4 my-5 mx-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
           <div class="flex justify-between items-center mb-5">
-            <div onClick={handleClick}>
+            <div onClick={goToHome}>
               <p
                 class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
