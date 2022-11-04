@@ -48,8 +48,8 @@ const Settings = () => {
   useEffect(() => {
     setDiskUsage (defaultSettings.disk_threshold);
     setdiskStabilization (defaultSettings.disk_stabilization_lvl);
-    setRAMstabilization (defaultSettings.ram_threshold);
-    setRAMusage (defaultSettings.ram_stabilization_lvl);
+    setRAMstabilization (defaultSettings.ram_stabilization_lvl);
+    setRAMusage (defaultSettings.ram_threshold);
     setHOSTDOWNnotificationDelay ({...HOSTDOWNnotificationDelay, value:defaultSettings.host_is_down_confirmations});
     setHTTPIssueNotification({...HTTPIssueNotificationDelay, value:defaultSettings.http_issue_confirmations});
     
