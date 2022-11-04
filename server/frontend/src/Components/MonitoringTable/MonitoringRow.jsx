@@ -136,7 +136,9 @@ const MonitoringRow = (props) => {
                 content={host.humanizeDurationDiskEvent}
                 placement="bottom"
               >
-                <span> ALERT </span>
+              <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900 ml-1">
+                ALERT
+              </span>
               </Tooltip>
             </>
           ) : (
