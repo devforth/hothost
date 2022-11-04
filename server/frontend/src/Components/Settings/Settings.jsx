@@ -96,7 +96,7 @@ const Settings = () => {
     });
 
 
-    console.log(HOSTDOWNnotificationDelay)
+    
 
 
     const inptValues = [
@@ -265,19 +265,10 @@ const Settings = () => {
                 }}
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              
-              <Tooltip content={<p class="text-xs text-gray-400 dark:text-gray-300">
-              0 - send notification and update status instantly once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (default 30 seconds). But might give false positive alerts during short-term network issue.
-              1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.
-              N - send notification after N confirmations. Notification is delayed by (N + 1) * (MONITORING_INTERVAL)
-              </p>} placement="bottom">
-              <p class="text-xs text-gray-400 dark:text-gray-300">
-              0 - send notification and update status instantly once you receive host is down event...
-              </p>
-              </Tooltip>
-             
-              {/* <!-- <p class="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}
-            </div>
+              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (default 30 seconds). But might give false positive alerts during short-term network issue.</p>
+              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
+              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
+              </div>
             <div class="mb-5">
               <label
                 for="HTTPnotificationDelay"
@@ -296,16 +287,16 @@ const Settings = () => {
                 }}
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-               <Tooltip content={<p class="text-xs text-gray-400 dark:text-gray-300">
-               0 - send notification and update status instantly once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (selected in settings). But might give false positive alerts during short-term network issue.
-               1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.
-               N - send notification after N confirmations. Notification is delayed by (N + 1) * (MONITORING_INTERVAL)
-              </p>} placement="bottom">
-              <p class="text-xs text-gray-400 dark:text-gray-300">
-              0 - send notification and update status instantly once you receive host is down event...
-              </p>
-              </Tooltip>
-              {/* <!-- <p class="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}
+              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (selected in settings). But might give false positive alerts during short-term network issue.</p>
+              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
+              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
+
+              
+
+
+              
+              
+             
             </div>
             <button
               type="button"
