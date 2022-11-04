@@ -292,13 +292,6 @@ const Settings = () => {
               <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (selected in settings). But might give false positive alerts during short-term network issue.</p>
               <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
               <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
-
-              
-
-
-              
-              
-             
             </div>
             <button
               type="button"

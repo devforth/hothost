@@ -28,7 +28,7 @@ const HttpTableRow = (props) => {
         <p>
           <span class="whitespace-normal">{monitor.url}</span>
           {monitor.label && monitor.label !== "" && (
-            <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
+            <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
               {monitor.label}
             </span>
           )}

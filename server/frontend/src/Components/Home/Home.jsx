@@ -114,6 +114,7 @@ const Home = () => {
                       key={`addHst-${el.id}`}
                       monitoringData={el}
                       deleteMonitorUpdate={setMonitoringData}
+                      refreshData={fetchData}
                     ></AddHostDlg>
                   ) : null;
                 })}

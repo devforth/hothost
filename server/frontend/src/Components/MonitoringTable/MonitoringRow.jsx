@@ -42,7 +42,7 @@ const MonitoringRow = (props) => {
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
           {host.hostname}
           {host.label && host.label !== "" && (
-            <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
+            <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
               {host.label}
             </span>
           )}
