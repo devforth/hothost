@@ -8,7 +8,7 @@ const path = (
   document.location.host.startsWith("127.0.0.1")
 ) ? BASE_LOCAL_URL : BASE_PROD_URL;
 
-console.log('patthhh', path);
+
 
 
 
