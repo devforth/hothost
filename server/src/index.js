@@ -31,7 +31,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = path.join(__dirname, '..')
 
-console.log('rootDir', rootDir)
+
 
 async function main() {
   await database.read();

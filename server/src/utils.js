@@ -372,6 +372,7 @@ export const checkStatus = async (hostData) => {
       }).catch(() => null)
     : await fetch(hostData.URL, { signal: controller.signal }).catch((e) => e);
   clearTimeout(timeout);
+
   
 
   if (!response) {
@@ -427,6 +428,8 @@ export const createScheduleJob = (httpHostId, interval) => {
     const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
 
     const res = await checkStatus(dbData);
+
+  
 
     
   
