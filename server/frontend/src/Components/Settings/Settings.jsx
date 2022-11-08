@@ -9,17 +9,18 @@ const Settings = () => {
   const [defaultSettings, setDefaultSettings] = useState("");
   const [inpError, setInpError] = useState(false);
 
-  const [diskUsage, setDiskUsage] = useState(defaultSettings.disk_threshold);
+  const [diskUsage, setDiskUsage] = useState(defaultSettings.disk_threshold || 0);
   const [diskStabilization, setdiskStabilization] = useState(
-    defaultSettings.disk_stabilization_lvl
+    defaultSettings.disk_stabilization_lvl || 0
   );
-  const [RAMusage, setRAMusage] = useState(defaultSettings.ram_threshold);
+  const [RAMusage, setRAMusage] = useState(defaultSettings.ram_threshold || 0);
   const [RAMstabilization, setRAMstabilization] = useState(
-    defaultSettings.ram_stabilization_lvl
+    defaultSettings.ram_stabilization_lvl || 0
   );
 
   const [HOSTDOWNnotificationDelay,setHOSTDOWNnotificationDelay] = useState({value:1,error:false})
   const [HTTPIssueNotificationDelay, setHTTPIssueNotification] = useState({value:1, erorr:false})
+  const [daysForSslExpireNotify,setDaysForSslExpireNotify] = useState({value:14})
 
   const [toastState, setToastState] = useState({
     isVisible: false,
@@ -52,6 +53,7 @@ const Settings = () => {
     setRAMusage (defaultSettings.ram_threshold);
     setHOSTDOWNnotificationDelay ({...HOSTDOWNnotificationDelay, value:defaultSettings.host_is_down_confirmations});
     setHTTPIssueNotification({...HTTPIssueNotificationDelay, value:defaultSettings.http_issue_confirmations});
+    setDaysForSslExpireNotify({...daysForSslExpireNotify,value:defaultSettings.days_for_ssl_expire})
     
   }, [defaultSettings]);
 
@@ -75,12 +77,13 @@ const Settings = () => {
     return finalArr;
   };
   const confirmationFieldValidation = function(value){
-   if (+value > 10)
-      {return 10}
-    else if ( +value <0 )
-      { return 0 }
-    else { return +value}     
-  }
+      if (+value > 10)
+          return 10
+        else if ( +value <0 )
+           return 0 
+        else { return +value || 1}     
+        }
+  
 
   const saveSettings = async function () {
    
@@ -95,25 +98,27 @@ const Settings = () => {
       value:confirmationFieldValidation(HTTPIssueNotificationDelay.value)
     });
 
-
-    
-
-
     const inptValues = [
       diskUsage,
       diskStabilization,
       RAMusage,
       RAMstabilization,
+      HOSTDOWNnotificationDelay.value,
+      HTTPIssueNotificationDelay.value,
+      daysForSslExpireNotify.value
+
     ];
     
-    if (isArrNumber(inptValues)[0] && isArrNumber(inptValues)[0] !== "err") {
+    if (isArrNumber(inptValues)[0] && isArrNumber(inptValues)[0] !== "err" && !inpError ) {
       const body = {
         disk_threshold: isArrNumber(inptValues)[0],
         disk_stabilization_lvl: isArrNumber(inptValues)[1],
         ram_threshold: isArrNumber(inptValues)[2],
         ram_stabilization_lvl: isArrNumber(inptValues)[3],
-        host_is_down_confirmations: confirmationFieldValidation(HOSTDOWNnotificationDelay.value),
-        http_issue_confirmations: confirmationFieldValidation(HTTPIssueNotificationDelay.value)
+        host_is_down_confirmations: isArrNumber(inptValues)[4],
+        http_issue_confirmations: isArrNumber(inptValues)[5],
+        days_for_ssl_expire:isArrNumber(inptValues)[6]
+
       };
       const data = await apiFetch(body, "edit_settings");
       if ((data.code = 200)) {
@@ -135,23 +140,24 @@ const Settings = () => {
       }
     } else {
       setInpError(true);
+      
     }
   };
 
   return (
     <div>
-      <div class="container mx-auto flex justify-center">
-        <div class=" p-4 my-5 mx-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
-          <div class="flex justify-between items-center mb-5">
+      <div className="container mx-auto flex justify-center">
+        <div className=" p-4 my-5 mx-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
+          <div className="flex justify-between items-center mb-5">
             <div onClick={goToHome}>
               <p
-                class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
+                className="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
             text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 mr-2"
+                  className="h-5 w-5 mr-2"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -166,133 +172,152 @@ const Settings = () => {
             </div>
           </div>
 
-          <div class="flex justify-between items-center mb-4">
-            <h5 class="mb-5 text-3xl font-bold leading-none text-gray-900 dark:text-white">
+          <div className="flex justify-between items-center mb-4">
+            <h5 className="mb-5 text-3xl font-bold leading-none text-gray-900 dark:text-white">
               Settings
             </h5>
           </div>
-          <div class="w-full block divide-gray-200 dark:divide-gray-700">
-            <div class="mb-5">
+          <div className="w-full block divide-gray-200 dark:divide-gray-700">
+            <div className="mb-5">
               <label
                 for="disk_threshold"
-                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               >
                 Disk usage threshold in percents.
               </label>
               <input
                 name="disk_threshold"
-                value={diskUsage}
+                value={diskUsage || ""}
                 onChange={(e) => {
                   setDiskUsage(e.currentTarget.value);
                   setInpError(false);
                 }}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              <p class="text-xs text-gray-400 dark:text-gray-300">
+              <p className="text-xs text-gray-400 dark:text-gray-300">
                 If disk usage exceeds this value then disk_is_almost_full alert
                 is generated
               </p>
             </div>
-            <div class="mb-5">
+            <div className="mb-5">
               <label
                 for="disk_stabilization_lvl"
-                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               >
                 Disk stabilization level in percents.
               </label>
               <input
                 name="disk_stabilization_lvl"
-                value={diskStabilization}
+                value={diskStabilization || ""}
                 onChange={(e) => {
                   setdiskStabilization(e.currentTarget.value);
                   setInpError(false);
                 }}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              {/* <!-- <p class="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}
-            </div>
-            <div class="mb-5">
+              
+            </div> 
+            <div className="mb-5">
               <label
                 for="ram_threshold"
-                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               >
                 Ram usage threshold in percents.
               </label>
               <input
                 name="ram_threshold"
-                value={RAMusage}
+                value={RAMusage || ""}
                 onChange={(e) => {
                   setRAMusage(e.currentTarget.value);
                 }}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              <p class="text-xs text-gray-400 dark:text-gray-300">
+              <p className="text-xs text-gray-400 dark:text-gray-300">
                 If RAM usage exceeds this value then ram_is_almost_full alert is
                 generated.
               </p>
             </div>
-            <div class="mb-5">
+            <div className="mb-5">
               <label
                 for="ram_stabilization_lvl"
-                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               >
                 Ram stabilization level in percents.
               </label>
               <input
                 name="ram_stabilization_lvl"
-                value={RAMstabilization}
+                value={RAMstabilization || ""}
                 onChange={(e) => {
                   setRAMstabilization(e.currentTarget.value);
                   setInpError(false);
                 }}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              {/* <!-- <p class="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}
+            
             </div>
-            <div class="mb-5">
+            <div className="mb-5">
               <label
                 for="notificationDelay"
-                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               >
                 Host is Down confirmations
               </label>
               <input
                 name="notificationDelay"
-                value={HOSTDOWNnotificationDelay.value}
+                value={HOSTDOWNnotificationDelay.value || ""}
                 onChange={(e) => {
                   setHOSTDOWNnotificationDelay({
                     ...HOSTDOWNnotificationDelay,
                     value:e.currentTarget.value});
                   
                 }}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (default 30 seconds). But might give false positive alerts during short-term network issue.</p>
-              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
-              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (default 30 seconds). But might give false positive alerts during short-term network issue.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
               </div>
-            <div class="mb-5">
+            <div className="mb-5">
               <label
                 for="HTTPnotificationDelay"
-                class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               >
                 Http issue confirmations
               </label>
               <input
                 name="HTTPnotificationDelay"
-                value={HTTPIssueNotificationDelay.value}
+                value={HTTPIssueNotificationDelay.value || ""}
                 onChange={(e) => {
                   setHTTPIssueNotification({
                     ...HTTPIssueNotificationDelay,
                     value:e.currentTarget.value});
                 
                 }}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
-              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (selected in settings). But might give false positive alerts during short-term network issue.</p>
-              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
-              <p class="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1"> 0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (selected in settings). But might give false positive alerts during short-term network issue.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1"> 1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1"> N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.</p>
             </div>
+            <div className="mb-5">
+              <label
+                for="ssl_notification period"
+                className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+              >
+               Days before SSL expiration
+              </label>
+              <input
+                name="ssl_notification period"
+                value={daysForSslExpireNotify.value || ""}
+                onChange={(e) => {
+                  setDaysForSslExpireNotify({value:e.currentTarget.value});
+                  setInpError(false);
+                }}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+              />
+              {/* <!-- <p className="text-xs text-gray-400 dark:text-gray-300">--------</p> --> */}
+            </div>
+            <div className="flex items-center">
             <button
               type="button"
               onClick={saveSettings}
@@ -302,11 +327,14 @@ const Settings = () => {
                 !diskStabilization ||
                 !RAMusage ||
                 !RAMstabilization ||
+                !daysForSslExpireNotify ||
                 inpError
               }
             >
               Submit
             </button>
+            { inpError ? <p className="block mb-2 text-sm font-semibold  ml-3  text-red-600">Inputs values must be numbers</p> : null}
+            </div>
           </div>
         </div>
       </div>

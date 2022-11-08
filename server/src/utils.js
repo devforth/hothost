@@ -3,12 +3,42 @@ import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import humanizeDuration from "humanize-duration";
 import fetch from "node-fetch";
+import https from "https"
+;
+
 
 import env from "./env.js";
 import database from "./database.js";
 import PluginManager from "./pluginManager.js";
 import levelDb from "./levelDB.js";
 import db from "./database.js";
+
+
+
+
+
+export const getPeerCertificateExpireDate = async (hostUrl) => {
+  const options = {
+    host: hostUrl,
+    port: 443,
+    method: 'GET'
+  };
+  let certificateExpireDate = ""
+
+  const req =  https.request(options, function(res) {
+    certificateExpireDate = res?.socket.getPeerCertificate().valid_to
+  })
+
+  req.end();
+  return certificateExpireDate
+}
+
+
+getPeerCertificateExpireDate("football.ua")
+
+
+
+
 
 export const DATE_HUMANIZER_CONFIG = {
   round: true,
@@ -26,6 +56,9 @@ export const DATE_HUMANIZER_CONFIG = {
     },
   },
 };
+
+const expiredError = "CERT_HAS_EXPIRED"
+const wrongHostNameError = "ERR_TLS_CERT_ALTNAME_INVALID"
 
 export const checkUserExistsOrCreate = async () => {
   if (database.data.users.length === 0) {
@@ -227,6 +260,10 @@ export const generateHttpEvent = (prevData, newData) => {
 
   if (!prevData.okStatus && newData.okStatus) {
     events.push("http_host_up");
+    if (prevData.SslError && !newData.SslError){
+      reason = `The hostname ${newData.url} is correctly listed in the certificate.`
+    }
+    else {
     switch (newData.monitor_type) {
       case "status_code":
         reason = "Response status code back to 200";
@@ -238,11 +275,20 @@ export const generateHttpEvent = (prevData, newData) => {
         reason = `Keyword ${newData.key_word} does not exist`;
         break;
     }
-  }
+    }
+   }
   if (prevData.okStatus && !newData.okStatus) {
 
 
     events.push("http_host_down");
+    if(newData.SslError) { 
+      if (newData.SslError === expiredError) {
+        reason = "Certificate has expired"
+      }
+      if (newData.SslError === wrongHostNameError) {
+        reason = `Hostname/IP does not match certificate's altnames: ${newData.url} is not in the cert's list: `
+      }
+    } else {
     switch (newData.monitor_type) {
       case "status_code":
         reason = newData.status
@@ -255,6 +301,7 @@ export const generateHttpEvent = (prevData, newData) => {
       case "keyword_not_exist":
         reason = `Keyword ${newData.key_word} exists again`;
         break;
+    }
     }
   }
 
@@ -374,14 +421,23 @@ export const checkStatus = async (hostData) => {
   clearTimeout(timeout);
 
   
-
+ 
   if (!response) {
     return { 
       error: 'No response',
       response: false 
     }
   }
-  if (response.errno) {
+  if (response.errno ) {
+    
+
+    if(response.errno === expiredError){
+      hostData.SslError = expiredError
+    }
+    if(response.errno === wrongHostNameError){
+      hostData.SslError = wrongHostNameError
+
+    }
     return { 
       error: response.errno,
       response: false 
@@ -426,13 +482,7 @@ export const createScheduleJob = (httpHostId, interval) => {
     );
     const now = new Date().getTime();
     const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
-
-    const res = await checkStatus(dbData);
-
-  
-
-    
-  
+    const res = await checkStatus(dbData);  
     if (res.response !== dbData.okStatus  ) {
      
      
@@ -457,11 +507,13 @@ export const createScheduleJob = (httpHostId, interval) => {
         dbData.okStatus = res.response;
         dbData.event_created = dbData.firstFalseConfirmationTime;
         dbData.numberOfFalseWarnings = 0;
-        dbData.firstFalseConfirmationTime = 0      
+        dbData.firstFalseConfirmationTime = 0; 
+        dbData.SslError = ""     
       }
     }
     else { dbData.numberOfFalseWarnings = 0;
            dbData.firstFalseConfirmationTime = 0
+           dbData.SslError = ""
     }
     
     
