@@ -3,14 +3,8 @@ import express from "express";
 import cors from "cors";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
-import { create } from "express-handlebars";
-
 import cookieParser from "cookie-parser";
-import formidable from "express-formidable";
-import humanizeDuration from "humanize-duration";
 
-import viewRouter from "./views.js";
 import apiRouter from "./api.js";
 import nextApiRouter from "./apinext.js";
 

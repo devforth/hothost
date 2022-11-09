@@ -3,42 +3,12 @@ import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import humanizeDuration from "humanize-duration";
 import fetch from "node-fetch";
-import https from "https"
-;
-
-
+import sslCertificate from 'get-ssl-certificate'
 import env from "./env.js";
 import database from "./database.js";
 import PluginManager from "./pluginManager.js";
 import levelDb from "./levelDB.js";
 import db from "./database.js";
-
-
-
-
-
-export const getPeerCertificateExpireDate = async (hostUrl) => {
-  const options = {
-    host: hostUrl,
-    port: 443,
-    method: 'GET'
-  };
-  let certificateExpireDate = ""
-
-  const req =  https.request(options, function(res) {
-    certificateExpireDate = res?.socket.getPeerCertificate().valid_to
-  })
-
-  req.end();
-  return certificateExpireDate
-}
-
-
-getPeerCertificateExpireDate("football.ua")
-
-
-
-
 
 export const DATE_HUMANIZER_CONFIG = {
   round: true,
@@ -480,8 +450,10 @@ export const createScheduleJob = (httpHostId, interval) => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
+    const certificateExpireDate = new Date((await getSSLCert(getHostName(dbData.URL))).valid_to).getTime()
     const now = new Date().getTime();
-    const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
+    const nullTime = new Date(0).getTime()
+    const { HTTP_ISSUE_CONFIRMATION,DAYS_FOR_SSL_EXPIRED } = database.data.settings;
     const res = await checkStatus(dbData);  
     if (res.response !== dbData.okStatus  ) {
      
@@ -515,6 +487,20 @@ export const createScheduleJob = (httpHostId, interval) => {
            dbData.firstFalseConfirmationTime = 0
            dbData.SslError = ""
     }
+    if (!dbData.lastSslCheckingTime){
+      dbData.lastSslCheckingTime = nullTime
+    }
+    const checkingSSLintervalHours = 24;
+
+    if (dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <= now) {
+      if (now >=  certificateExpireDate - daysToMs(DAYS_FOR_SSL_EXPIRED || 14)){
+        dbData.lastSslCheckingTime = now
+        console.log(" check ssl sert")
+      }
+      
+    }  
+   
+    
     
     
     await database.write();
@@ -549,3 +535,17 @@ export const dbClearScheduler = async () => {
     await dbIndex.clear({ lt: time.toString() }).catch((e) => console.log(e));
   });
 };
+
+const getSSLCert = async function (url) {
+  return  await sslCertificate.get(url)
+}
+
+const getHostName = (url)=>{
+  return new URL(url).host
+}
+
+ export const daysToMs = function(days){
+  return +days * 24 * 3600 * 1000 
+ }
+
+

@@ -413,6 +413,8 @@ router.post(
       ram_stabilization_lvl,
       host_is_down_confirmations,
       http_issue_confirmations,
+      days_for_ssl_expire,
+
 
 
     } = req.body;
@@ -423,7 +425,8 @@ router.post(
       DISK_THRESHOLD: +disk_threshold,
       DISK_STABILIZATION_LEVEL: +disk_stabilization_lvl,
       HOST_IS_DOWN_CONFIRMATIONS: +host_is_down_confirmations,
-      HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations
+      HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations,
+      DAYS_FOR_SSL_EXPIRED: +days_for_ssl_expire,
     };
     res.status(200).json({
       status: "sucessful",
@@ -440,9 +443,8 @@ const getSettings = () => {
     disk_threshold: settings.DISK_THRESHOLD,
     disk_stabilization_lvl: settings.DISK_STABILIZATION_LEVEL,
     host_is_down_confirmations:settings.HOST_IS_DOWN_CONFIRMATIONS || 1,  // FALLBACK FOR USERS WHO HAD hh INSTALLED BEFORE 1.2.1
-    http_issue_confirmations:settings.HTTP_ISSUE_CONFIRMATION || 1
-    
-
+    http_issue_confirmations:settings.HTTP_ISSUE_CONFIRMATION || 1,
+    days_for_ssl_expire:settings.DAYS_FOR_SSL_EXPIRED || 14,
   };
 };
 
