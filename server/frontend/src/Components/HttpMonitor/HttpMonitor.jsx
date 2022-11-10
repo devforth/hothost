@@ -63,7 +63,7 @@ const HttpMonitor = () => {
 
     if (checkInputs(monitorUrlInp, urlInpEl, setUrlError)) {
       validationIsOk = true;
-      if (!validator.isURL(monitorUrlInp)) {
+      if (!validator.isURL(monitorUrlInp) && monitorUrlInp.includes('locallhost')) {
         setUrlError("Field value must be url");
         urlInpEl.current.focus();
         validationIsOk = false;
