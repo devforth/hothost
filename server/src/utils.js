@@ -251,27 +251,28 @@ export const generateHttpEvent = (prevData, newData) => {
 
 
     events.push("http_host_down");
-    if(newData.SslError) { 
+    if (newData.SslError) { 
       if (newData.SslError === expiredError) {
         reason = "Certificate has expired"
       }
       if (newData.SslError === wrongHostNameError) {
         reason = `Hostname/IP does not match certificate's altnames: ${newData.url} is not in the cert's list: `
       }
-    } else {
-    switch (newData.monitor_type) {
-      case "status_code":
-        reason = newData.status
-          ? `Response status code is ${newData.status}`
-          : "Host down";
-        break;
-      case "keyword_exist":
-        reason = `Keyword ${newData.key_word} no longer exists`;
-        break;
-      case "keyword_not_exist":
-        reason = `Keyword ${newData.key_word} exists again`;
-        break;
-    }
+    } 
+    else {
+      switch (newData.monitor_type) {
+        case "status_code":
+          reason = newData.status
+            ? `Response status code is ${newData.status}`
+            : "Host down";
+          break;
+        case "keyword_exist":
+          reason = `Keyword ${newData.key_word} no longer exists`;
+          break;
+        case "keyword_not_exist":
+          reason = `Keyword ${newData.key_word} exists again`;
+          break;
+      }
     }
   }
 
@@ -291,6 +292,28 @@ export const generateHttpEvent = (prevData, newData) => {
     );
   }
 };
+
+export const generateHttpWarningEvents = (newData,expireDate)=>{
+  const events = [];
+  
+  let reason = `Ssl certificate expires ${new Date(expireDate)}  `;
+  if (newData.sslWarning) {
+    events.push("ssl_is_almost_expire")
+  }
+  if (events.length !== 0) {
+    PluginManager().handleEvents(
+      events.filter((e) => e),
+      {
+        HOST_NAME: newData.URL,
+        HOST_LABEL:
+          newData.label && newData.label !== "" ? `\`${newData.label}\`` : "",
+        CERT_VALID_UNTIL: new Date(expireDate),
+        EVENT_REASON: reason,
+      }
+    );
+  }
+
+}
 
 export const parseNestedForm = (fields) => {
   return Object.keys(fields).reduce((acc, key) => {
@@ -450,23 +473,19 @@ export const createScheduleJob = (httpHostId, interval) => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
-    const certificateExpireDate = new Date((await getSSLCert(getHostName(dbData.URL))).valid_to).getTime()
+    const certificateExpireDate =!dbData.URL.includes("localhost:") ? new Date((await getSSLCert(getHostName(dbData.URL))).valid_to).getTime() : null;
     const now = new Date().getTime();
     const nullTime = new Date(0).getTime()
     const { HTTP_ISSUE_CONFIRMATION,DAYS_FOR_SSL_EXPIRED } = database.data.settings;
     const res = await checkStatus(dbData);  
-    if (res.response !== dbData.okStatus  ) {
-     
-     
+    if (res.response !== dbData.okStatus  ) {     
       if (!dbData.numberOfFalseWarnings) {
         dbData.numberOfFalseWarnings = 0
-       
       }
       if (!dbData.firstFalseConfirmationTime) {
         dbData.firstFalseConfirmationTime = new Date().getTime();
       }
       dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1
-
      
       if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION||0) + 1) {
         generateHttpEvent(dbData, {
@@ -487,17 +506,23 @@ export const createScheduleJob = (httpHostId, interval) => {
            dbData.firstFalseConfirmationTime = 0
            dbData.SslError = ""
     }
-    if (!dbData.lastSslCheckingTime){
+    if (!dbData.lastSslCheckingTime && !dbData.URL.includes("localhost:")){
       dbData.lastSslCheckingTime = nullTime
     }
     const checkingSSLintervalHours = 24;
 
     if (dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <= now) {
       if (now >=  certificateExpireDate - daysToMs(DAYS_FOR_SSL_EXPIRED || 14)){
+       
         dbData.lastSslCheckingTime = now
-        console.log(" check ssl sert")
+        dbData.sslWarning = true
+        generateHttpWarningEvents(dbData,certificateExpireDate)
       }
-      
+      else {
+        dbData.sslWarning = false
+
+      }
+    
     }  
    
     
