@@ -86,7 +86,15 @@ Chat in which you send message will be used to publish notifications.
           default_value: "👌🏼 {{ HOST_NAME }}: RAM usage recovered\n Now it is {{ RAM_USED }} / {{ RAM_TOTAL }}. Time required to fix: {{ EVENT_DURATION }}",
           required: false,
           type: "text",
+          
       },
+      {
+          id: "ssl_is_almost_expire_message",
+          name: "What message will be shown when you get ssl_expire warning",
+          default_value: "⚠️ SSL certificate of HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} will expire soon. Certificate is valid until: {{CERT_VALID_UNTIL}} ",
+          required: false,
+          type: "text",
+    },
     ],
 
     async sendMessage(settings, text) {
@@ -99,7 +107,8 @@ Chat in which you send message will be used to publish notifications.
           headers: { 'Content-Type': 'application/json' },
       }).then(r => r.json());
       console.log('TG First resp', firstResp);
-      const chatId = firstResp.result.find(e => e.message)?.message?.chat?.id;
+      const chatId = firstResp.result.find(e => e.channel_post)?.channel_post?.chat?.id;
+     
       const secondResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
