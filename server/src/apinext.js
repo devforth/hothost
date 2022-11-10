@@ -540,32 +540,7 @@ router.get(
         },
       });
 
-      // res.locals.plugin = plugin;
-      // res.locals.pluginSettings = pluginSettings;
-      // res.locals.params = [
-      //   ...plugin.supportedEvents.map((e) => {
-      //     return {
-      //       id: e,
-      //       value: pluginSettings?.enabledEvents.includes(e) ?? true,
-      //       name: `Notify on ${e}`,
-      //       type: "bool",
-      //       inputName: `events[${e}]`,
-      //     };
-      //   }),
-      //   ...plugin.params.map((p) => {
-      //     const value = pluginSettings?.params[p.id];
-      //     return {
-      //       ...p,
-      //       value: value || p.default_value,
-      //       inputName: `params[${p.id}]`,
-      //       required: p.required ?? true,
-      //     };
-      //   }),
-      // ];
-
-      // res.locals.descriptionFull =
-      //   plugin.longDescriptionMD && md().render(plugin.longDescriptionMD);
-      // res.render("plugin");
+      
     }
   })
 );
