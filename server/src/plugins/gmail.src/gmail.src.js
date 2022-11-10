@@ -108,6 +108,13 @@ Just copy the password and use it here.
             required: false,
             type: "text",
         },
+          {
+            id: "ssl_is_almost_expire_message",
+            name: "What message will be shown when you get ssl_expire warning",
+            default_value: "⚠️ SSL certificate of HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} will expire soon. Certificate is valid until: {{CERT_VALID_UNTIL}} ",
+            required: false,
+            type: "text",
+          },
   ],
 
   configuration: {},
