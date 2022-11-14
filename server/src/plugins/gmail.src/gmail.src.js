@@ -42,6 +42,7 @@ Just copy the password and use it here.
         'host_is_online',
         'ram_is_almost_full',
         'ram_usage_recovered',
+        'ssl_is_almost_expire'
   ],
 
   params: [

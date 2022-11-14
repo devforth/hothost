@@ -36,6 +36,7 @@ Chat in which you send message will be used to publish notifications.
         'host_is_online',
         'ram_is_almost_full',
         'ram_usage_recovered',
+        'ssl_is_almost_expire'
     ],
 
     params: [
@@ -107,7 +108,7 @@ Chat in which you send message will be used to publish notifications.
           headers: { 'Content-Type': 'application/json' },
       }).then(r => r.json());
       console.log('TG First resp', firstResp);
-      const chatId = firstResp.result.find(e => e.channel_post)?.channel_post?.chat?.id;
+      const chatId = firstResp?.result?.find(e => e.channel_post)?.channel_post?.chat?.id;
      
       const secondResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`, {
           method: 'GET',
