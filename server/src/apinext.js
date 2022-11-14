@@ -18,6 +18,10 @@ import {
   createScheduleJob,
   readableRandomStringMaker,
   createMonitorDataset,
+  eventDuration,
+  getSSLCert,
+  getHostName,
+  checkSslCert,
 } from "./utils.js";
 import {
   getCountryName,
@@ -454,10 +458,14 @@ const getHttpMonitor = () => {
   return data.map((data) => ({
     id: data.id,
     url: data.URL,
-    label: data.label,
+    label: data.HOST_LABEL,
     status: data.okStatus,
+    sslWarning:data?.sslWarning ,
+    certificateExpireDate:data?.certificateExpireDate ,
     lastEventTs: data.event_created,
     monitorLastEventsTs: getDuration(data.event_created),
+    errno:data?.errno,
+    sslError:data?.SslError
   }));
 };
 
@@ -747,4 +755,23 @@ router.post("/data/:secret", async (req, res) => {
 
     res.send("OK");
   }
+});
+
+router.post("/check-ssl", async (req, res) => {
+  const { id } = req.body;
+  const now = new Date().getTime()
+
+  const monData = database.data.httpMonitoringData.find((el) => el.id === id);
+  const certificateExpireDate =!monData.URL.includes("localhost:") ? new Date((await getSSLCert(getHostName(monData.URL))).valid_to).getTime() : null; 
+  
+
+  if (monData) {
+    checkSslCert(now, certificateExpireDate, monData )
+    monData.lastSslCheckingTime = new Date().getTime();
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,})
+  }
+  
 });
