@@ -13,6 +13,15 @@ const HttpMonitor = () => {
       return false;
     } else return true;
   };
+  const fetchData = async () => {
+    setStatus("pending");
+
+    const data = await getData("http-monitor");
+    if (data.data) {
+      setMonitoringHttpData(data.data);
+    }
+    setStatus("fullfield");
+  };
 
   const [monitorIsVisible, setMonitorIsVisible] = useState(false);
   const [monitorUrlInp, setMonitorUrlInp] = useState("");
@@ -36,21 +45,19 @@ const HttpMonitor = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setStatus("pending");
-
-      const data = await getData("http-monitor");
-      if (data.data) {
-        setMonitoringHttpData(data.data);
-      }
-      setStatus("fullfield");
-    };
+    
     const intervalId = setInterval(fetchData, 10000);
     fetchData();
     return () => {
       clearInterval(intervalId);
     };
   }, []);
+
+  const checkSslWarn =  async function (id) {
+     const data = await apiFetch({id},"check-ssl");
+     if (data) { fetchData() }
+    
+  }
 
   const loginInpEl = useRef(null);
   const passwordInpEl = useRef(null);
@@ -343,6 +350,7 @@ const HttpMonitor = () => {
         <HttpMonitoringTable
           monitoringHttpData={monitoringHttpData}
           setMonitoringHttpData={setMonitoringHttpData}
+          checkSslWarn={checkSslWarn}
         ></HttpMonitoringTable>
       </div>
     </div>
