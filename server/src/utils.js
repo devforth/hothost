@@ -249,22 +249,25 @@ export const generateHttpEvent = (prevData, newData) => {
    }
   if (prevData.okStatus && !newData.okStatus) {
 
-
     events.push("http_host_down");
+    if (newData.errno){
+      reason = newData.errno
+      
+   
     if (newData.SslError) { 
       if (newData.SslError === expiredError) {
         reason = "Certificate has expired"
       }
       if (newData.SslError === wrongHostNameError) {
         reason = `Hostname/IP does not match certificate's altnames: ${newData.url} is not in the cert's list: `
-      }
+      } 
+    }
     } 
     else {
       switch (newData.monitor_type) {
         case "status_code":
-          reason = newData.status
-            ? `Response status code is ${newData.status}`
-            : "Host down";
+          reason = `Response status code is ${newData.status}`
+           
           break;
         case "keyword_exist":
           reason = `Keyword ${newData.key_word} no longer exists`;
@@ -277,7 +280,7 @@ export const generateHttpEvent = (prevData, newData) => {
   }
 
   if (events.length !== 0) {
-    PluginManager().handleEvents(
+   PluginManager().handleEvents(
       events.filter((e) => e),
       {
         HOST_NAME: newData.URL,
@@ -291,13 +294,15 @@ export const generateHttpEvent = (prevData, newData) => {
       }
     );
   }
-};
+ };
 
-export const generateHttpWarningEvents = (newData,expireDate)=>{
+
+export const generateHttpWarningEvents = (newData, prevData, expireDate)=>{
   const events = [];
   
   let reason = `Ssl certificate expires ${new Date(expireDate)}  `;
-  if (newData.sslWarning) {
+  if (newData.sslWarning && !prevData.sslWarning && prevData.hasOwnProperty("sslWarning")
+  ) {
     events.push("ssl_is_almost_expire")
   }
   if (events.length !== 0) {
@@ -418,24 +423,31 @@ export const checkStatus = async (hostData) => {
   if (!response) {
     return { 
       error: 'No response',
-      response: false 
+      response: false,
+    }
+  }
+  if (response.type === "aborted"){
+    hostData.errno = `Timed out (${hostData.monitor_interval} sec)`
+    return {
+      error: hostData.errno,
+      response: false
     }
   }
   if (response.errno ) {
-    
-
     if(response.errno === expiredError){
       hostData.SslError = expiredError
     }
     if(response.errno === wrongHostNameError){
       hostData.SslError = wrongHostNameError
-
     }
+    else {hostData.errno = response.errno }
     return { 
       error: response.errno,
       response: false 
     }
   }
+  else {cleanResponseError(hostData)}
+
   switch (hostData.monitor_type) {
     case "status_code":
       return {
@@ -444,12 +456,14 @@ export const checkStatus = async (hostData) => {
       };
     case "keyword_exist": {
       const respText = await response.text();
+      hostData.errno = "Keyword doesn`t exist."
       return {
         response: respText.includes(hostData.key_word)
       };
     }
     case "keyword_not_exist": {
       const respText = await response.text();
+      hostData.errno = "Keyword doesn`t exist."
       return {
         response: !respText.includes(hostData.key_word),
       };
@@ -465,6 +479,10 @@ export const startScheduler = () => {
 
 export const schedulerTask = [];
 
+export const cleanResponseError = (host) => {
+  host.SslError = ""
+}
+
 export const createScheduleJob = (httpHostId, interval) => {
  
 
@@ -473,10 +491,10 @@ export const createScheduleJob = (httpHostId, interval) => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
-    const certificateExpireDate =!dbData.URL.includes("localhost:") ? new Date((await getSSLCert(getHostName(dbData.URL))).valid_to).getTime() : null;
+    const certificateExpireDate =!dbData.URL.includes("localhost:") ? new Date((await getSSLCert(getHostName(dbData.URL)))?.valid_to).getTime() : null;
     const now = new Date().getTime();
     const nullTime = new Date(0).getTime()
-    const { HTTP_ISSUE_CONFIRMATION,DAYS_FOR_SSL_EXPIRED } = database.data.settings;
+    const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
     const res = await checkStatus(dbData);  
     if (res.response !== dbData.okStatus  ) {     
       if (!dbData.numberOfFalseWarnings) {
@@ -488,7 +506,7 @@ export const createScheduleJob = (httpHostId, interval) => {
       dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1
      
       if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION||0) + 1) {
-        generateHttpEvent(dbData, {
+         generateHttpEvent(dbData, {
           ...dbData,
           okStatus: !!res.response,
           status: res.status,
@@ -498,35 +516,30 @@ export const createScheduleJob = (httpHostId, interval) => {
         dbData.okStatus = res.response;
         dbData.event_created = dbData.firstFalseConfirmationTime;
         dbData.numberOfFalseWarnings = 0;
-        dbData.firstFalseConfirmationTime = 0; 
-        dbData.SslError = ""     
+        dbData.firstFalseConfirmationTime = 0;
+        
+        cleanResponseError(dbData) 
+        if(res.response){
+          dbData.errno = ""
+        }    
       }
     }
-    else { dbData.numberOfFalseWarnings = 0;
-           dbData.firstFalseConfirmationTime = 0
-           dbData.SslError = ""
+    else { 
+      dbData.numberOfFalseWarnings = 0;
+      dbData.firstFalseConfirmationTime = 0;
     }
-    if (!dbData.lastSslCheckingTime && !dbData.URL.includes("localhost:")){
+
+    if (!dbData.lastSslCheckingTime ){      
       dbData.lastSslCheckingTime = nullTime
     }
     const checkingSSLintervalHours = 24;
 
-    if (dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <= now) {
-      if (now >=  certificateExpireDate - daysToMs(DAYS_FOR_SSL_EXPIRED || 14)){
-       
-        dbData.lastSslCheckingTime = now
-        dbData.sslWarning = true
-        generateHttpWarningEvents(dbData,certificateExpireDate)
-      }
-      else {
-        dbData.sslWarning = false
-
-      }
-    
+    if ( dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <= now) {
+      dbData.lastSslCheckingTime = now;
+      checkSslCert( now, certificateExpireDate,  dbData )
+      
     }  
-   
-    
-    
+
     
     await database.write();
   }, interval * 1000);
@@ -535,6 +548,19 @@ export const createScheduleJob = (httpHostId, interval) => {
     id: httpHostId,
     scheduleJob: job,
   });
+};
+
+export const checkSslCert = (nowTime, certExpTime,  dbData ) => {
+  const { DAYS_FOR_SSL_EXPIRED } = database.data.settings;
+  if ( nowTime >= certExpTime - daysToMs(DAYS_FOR_SSL_EXPIRED || 14) && nowTime <= certExpTime ){
+    generateHttpWarningEvents({...dbData, sslWarning : true } ,dbData ,certExpTime)
+    dbData.sslWarning = true,
+    dbData.certificateExpireDate = certExpTime
+  }
+  else {
+    dbData.sslWarning = false
+
+  }
 };
 
 export const stopScheduleJob = (id) => {
@@ -561,15 +587,19 @@ export const dbClearScheduler = async () => {
   });
 };
 
-const getSSLCert = async function (url) {
-  return  await sslCertificate.get(url)
+ export const getSSLCert = async function (url) {
+  try { 
+    return  await sslCertificate.get(url)
+  }
+  catch(e) {console.log(e)}
+  
 }
 
-const getHostName = (url)=>{
+ export const getHostName = (url)=>{
   return new URL(url).host
 }
 
- export const daysToMs = function(days){
+export const daysToMs = function(days){
   return +days * 24 * 3600 * 1000 
  }
 
