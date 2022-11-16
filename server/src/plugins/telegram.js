@@ -125,6 +125,10 @@ Chat in which you send message will be used to publish notifications.
       const template = this.hbs.compile(settings.params[`${eventType}_message`]);
       const text = template(data);
 
-      this.sendMessage(settings, text);
+      try {
+         this.sendMessage(settings, text);
+      }
+      catch(e){console.log(e)}
+
     },
 };

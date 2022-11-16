@@ -141,6 +141,9 @@ Webhook is URL which look like this:
         const template = this.hbs.compile(settings.params[`${eventType}_message`], {noEscape: true});
         const text = template(data);
 
-        this.sendMessage(settings, text);
+        try {
+            this.sendMessage(settings, text);
+        }
+        catch (e) {console.log(e)}
     },
 };

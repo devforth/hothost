@@ -140,6 +140,9 @@ E.g. by googling Nodemailer mailgun you can find this answer https://stackoverfl
     const template = this.hbs.compile(settings.params[`${eventType}_message`]);
     const text = template(data);
 
-    this.sendMessage(settings, text);
+    try {
+      this.sendMessage(settings, text);
+    }
+    catch(e){console.log(e)}
   },
 };
