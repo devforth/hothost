@@ -6,18 +6,19 @@ import MonitoringRow from "./MonitoringRow";
 import DonutChart from "react-donut-chart";
 import DonutChartModal from "./DonutChartModal";
 import MonitoringModal from "./MonitoringModal/MonitoringModal";
+import NotificationModal from "./MonitoringModal/NotificationModal";
 
 const MonitoringTable = (props) => {
   const monitoringData = props.monitoringData;
   const refreshData = props.refreshData
 
   const [labelModalIsVisible, setlabelModalIsVisible] = useState(false);
-
-  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
-  const [chosenHost, setChosenHost] = useState("");
-
+  const [notifyModalIsVisible, setNotifyModalIsVisible] = useState(false)
   const [deleteModalIsVisible, setDeleteModalIsVisible] = useState(false);
   const [donutModalIsVisible, setDonutModalIsVisible] = useState(false);
+ 
+  
+  const [chosenHost, setChosenHost] = useState("");
 
   const saveLabel = async (labelName) => {
     const body = {
@@ -79,6 +80,7 @@ const MonitoringTable = (props) => {
                 setDelModalIsVisible={setDeleteModalIsVisible}
                 setlabelModalIsVisible={setlabelModalIsVisible}
                 setDonutModalIsVisible={setDonutModalIsVisible}
+                setNotifyModalIsVisible={setNotifyModalIsVisible}
               />
             ))}
 
@@ -104,6 +106,24 @@ const MonitoringTable = (props) => {
             acceptText={" Enter label name for "}
             additionalAcceptText={""}
             alertIcoVisible={false}
+            hostname={
+              (monitoringData &&
+                monitoringData.filter((e) => {
+                  return e.id === chosenHost;
+                })[0].hostname) ||
+              ""
+            }
+            action={saveLabel}
+          ></MonitoringModal>
+        ) : null}
+        {notifyModalIsVisible ? (
+          <MonitoringModal
+            setModalIsVisible={setNotifyModalIsVisible}
+            acceptText={" Enter label name for "}
+            additionalAcceptText={""}
+            alertIcoVisible={false}
+            notifySettings={true}
+            chosenHost={chosenHost}
             hostname={
               (monitoringData &&
                 monitoringData.filter((e) => {
