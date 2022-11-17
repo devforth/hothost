@@ -23,12 +23,12 @@ const Login = () => {
     }
   };
 
-  const checkAuth = async () => {
-    const data = await getData("checkAuth");
-    if(data.error ==="Can`t access when authorized"){goToHome()}
-    }
+  // const checkAuth = async () => {
+  //   const data = await getData("checkAuth");
+  //   if(data.error ==="Can`t access when authorized"){goToHome()}
+  //   }
 
-    useEffect(()=>{checkAuth()},[])
+  //   useEffect(()=>{checkAuth()},[])
 
   return (
     <div class="relative min-h-screen flex flex-col justify-center overflow-hidden sm:py-12">

@@ -128,13 +128,15 @@ const MonitoringRow = (props) => {
           </span>
         </div>
       </td>
+      
+      <td className="flex-1 pr-4 col-start-2 row-start-3 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max relative">
       {Object?.keys(host?.isNotificationDisabled)[0] ? (
-        <td className="dark:text-white text-black">
+        <div className="dark:text-white text-black absolute top-[24px] left-[-25px]">
           <Tooltip
             content={`disabled notification${
               Object.keys(host.isNotificationDisabled).length > 1 ? "s" : ""
             }: ${Object.keys(host.isNotificationDisabled).join(" | ")}`}
-            placement="bottom"
+            placement="left"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -151,9 +153,8 @@ const MonitoringRow = (props) => {
               />
             </svg>
           </Tooltip>
-        </td>
+        </div>
       ) : null}
-      <td className="flex-1 pr-4 col-start-2 row-start-3 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
         <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
         <p className="text-sm text-gray-500 truncate dark:text-gray-400 flex ">
           <p>{host.disk_used}% used</p>

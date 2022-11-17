@@ -23,10 +23,15 @@ const NotificationModal = ({ chosenHost, hostname, setModalIsVisible }) => {
     getHostSettings({ id: chosenHost });
   }, []);
 
+
+
   const [modalInputs, setModalInputs] = useState({
-    disk_is_almost_full: { value: true },
-    host_is_offline: { value: true },
-    ram_is_almost_full: { value: true },
+    disk_is_almost_full: { value: true, events: [ "disk_is_almost_full",
+    "disk_usage_recovered"]},
+    host_is_offline: { value: true,events: [ "host_is_offline",
+    "host_is_online"] },
+    ram_is_almost_full: { value: true,events: [ "ram_is_almost_full",
+    "ram_usage_recovered"] },
   });
 
   return (
@@ -54,7 +59,7 @@ const NotificationModal = ({ chosenHost, hostname, setModalIsVisible }) => {
 
                   setModalInputs({
                     ...modalInputs,
-                    [notifName]: { value: togledValue },
+                    [notifName]: { ...modalInputs[notifName], value: togledValue },
                   });
                 }}
                 className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"

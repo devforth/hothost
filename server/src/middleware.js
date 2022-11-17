@@ -7,6 +7,7 @@ export const authMiddleware = (req, res, next) => {
     req.user = jwt.decode(jwtToken, env.WEB_JWT_SECRET);
   } catch (e) {
     req.user = null;
+    
   }
 
   res.locals.authorized = !!req.user;

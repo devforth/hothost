@@ -1,8 +1,8 @@
 import path from "path";
 import express from "express";
 import cors from "cors";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import cookieParser from "cookie-parser";
 
 import apiRouter from "./api.js";
@@ -23,9 +23,7 @@ import { authMiddleware } from "./middleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const rootDir = path.join(__dirname, '..')
-
-
+const rootDir = path.join(__dirname, "..");
 
 async function main() {
   await database.read();
@@ -48,7 +46,7 @@ async function main() {
       credentials: true,
     })
   );
-  
+
   app.use(express.static(`${rootDir}/frontend/dist`));
   app.use(authMiddleware);
 
@@ -56,10 +54,8 @@ async function main() {
   app.use("/api/v2/", nextApiRouter);
   app.use("/v2/", nextApiRouter);
 
-
-  app.get('*', function (request, response) {
-  
-    response.sendFile(path.resolve('frontend/dist/index.html'));
+  app.get("*", function (request, response) {
+    response.sendFile(path.resolve("frontend/dist/index.html"));
   });
 
   app.listen(port, "0.0.0.0", () => {
