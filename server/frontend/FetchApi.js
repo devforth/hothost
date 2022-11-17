@@ -73,6 +73,9 @@ async function apiFetch(body, route) {
 
     credentials: "include",
   });
+  if (response.status === 401) {
+    window.location.assign("/login");
+  }
 
   const data = await response.json();
 
