@@ -264,7 +264,7 @@ const Settings = () => {
               </label>
               <input
                 name="notificationDelay"
-                value={HOSTDOWNnotificationDelay.value || ""}
+                value={HOSTDOWNnotificationDelay.value === undefined ? "" : HOSTDOWNnotificationDelay.value }
                 onChange={(e) => {
                   setHOSTDOWNnotificationDelay({
                     ...HOSTDOWNnotificationDelay,
@@ -286,7 +286,7 @@ const Settings = () => {
               </label>
               <input
                 name="HTTPnotificationDelay"
-                value={HTTPIssueNotificationDelay.value || ""}
+                value={HTTPIssueNotificationDelay.value === undefined ? "" : HTTPIssueNotificationDelay.value}
                 onChange={(e) => {
                   setHTTPIssueNotification({
                     ...HTTPIssueNotificationDelay,
