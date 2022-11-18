@@ -34,6 +34,7 @@ Webhook is URL which look like this:
         'ram_usage_recovered',
         'http_host_down',
         'http_host_up',
+        'ssl_is_almost_expire'
     ],
 
     // parameters which should be configured by user
@@ -102,6 +103,13 @@ Webhook is URL which look like this:
             required: false,
             type: "text",
         },
+        {
+            id: "ssl_is_almost_expire_message",
+            name: "What message will be shown when you get ssl_expire warning",
+            default_value: "⚠️ SSL certificate of HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} will expire soon. Certificate is valid until: {{CERT_VALID_UNTIL}} ",
+            required: false,
+            type: "text",
+        },
     ],
 
     async sendMessage(settings, text) {
@@ -133,6 +141,9 @@ Webhook is URL which look like this:
         const template = this.hbs.compile(settings.params[`${eventType}_message`], {noEscape: true});
         const text = template(data);
 
-        this.sendMessage(settings, text);
+        try {
+            this.sendMessage(settings, text);
+        }
+        catch (e) {console.log(e)}
     },
 };

@@ -10,6 +10,7 @@ const MonitoringRow = (props) => {
   const setDelModalIsVisible = props.setDelModalIsVisible;
   const setlabelModalIsVisible = props.setlabelModalIsVisible;
   const setDonutModalIsVisible = props.setDonutModalIsVisible;
+  const setNotifyModalIsVisible = props.setNotifyModalIsVisible;
 
   const index = props.index;
 
@@ -28,21 +29,22 @@ const MonitoringRow = (props) => {
         />
       </td>
       <td className="pr-4 flex-1 col-start-3 row-start-1  items-center text-base font-semibold text-gray-900 dark:text-white place-self-center">
-        {host.online
-         ?
-          <span>🟢 On</span> 
-         :
-          <Tooltip content={host.humanizeDurationOnlineEvent} placement="bottom">
-           <span>🔴 Off</span>
-          </Tooltip>}
-        
-        
+        {host.online ? (
+          <span>🟢 On</span>
+        ) : (
+          <Tooltip
+            content={host.humanizeDurationOnlineEvent}
+            placement="bottom"
+          >
+            <span>🔴 Off</span>
+          </Tooltip>
+        )}
       </td>
       <td className="pr-4 flex-1 col-start-1 row-start-1 min-w-max">
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
           {host.hostname}
           {host.label && host.label !== "" && (
-            <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
+            <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
               {host.label}
             </span>
           )}
@@ -126,7 +128,33 @@ const MonitoringRow = (props) => {
           </span>
         </div>
       </td>
-      <td className="flex-1 pr-4 col-start-2 row-start-3 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max">
+      
+      <td className="flex-1 pr-4 col-start-2 row-start-3 items-center text-base font-semibold text-gray-900 dark:text-white min-w-max relative">
+      {Object?.keys(host?.isNotificationDisabled)[0] ? (
+        <div className="dark:text-white text-black absolute top-[24px] left-[-25px]">
+          <Tooltip
+            content={`disabled notification${
+              Object.keys(host.isNotificationDisabled).length > 1 ? "s" : ""
+            }: ${Object.keys(host.isNotificationDisabled).join(" | ")}`}
+            placement="left"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-5 h-5 mr-1"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.94a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.757 3.63 8.25 4.51 8.25H6.75z"
+              />
+            </svg>
+          </Tooltip>
+        </div>
+      ) : null}
         <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
         <p className="text-sm text-gray-500 truncate dark:text-gray-400 flex ">
           <p>{host.disk_used}% used</p>
@@ -136,7 +164,9 @@ const MonitoringRow = (props) => {
                 content={host.humanizeDurationDiskEvent}
                 placement="bottom"
               >
-                <span> ALERT </span>
+                <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900 ml-1">
+                  ALERT
+                </span>
               </Tooltip>
             </>
           ) : (
@@ -146,6 +176,7 @@ const MonitoringRow = (props) => {
           )}
         </p>
       </td>
+
       <td className=" mobile:flex mobile:self-center col-start-3 row-start-3 place-self-end">
         <OutsideHider state={dotsIsVisible} setstate={setDotsIsvisible}>
           <svg
@@ -230,6 +261,32 @@ const MonitoringRow = (props) => {
                 />
               </svg>
               RAM by process
+            </button>
+
+            <button
+              type="button"
+              id={index}
+              className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
+              onClick={(e) => {
+                setNotifyModalIsVisible(true);
+                setDotsIsvisible(false);
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-6 w-6 pr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                />
+              </svg>
+              Notification settings
             </button>
             <button
               type="button"

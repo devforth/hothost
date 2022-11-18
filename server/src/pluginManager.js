@@ -39,7 +39,16 @@ class PluginManager {
     }
 
     async handleEvents(events, newData) {
+        let hostEvents = []
+      
+        if(newData.enabledNotifList) { 
+            const eventsList = Object.values(newData.enabledNotifList).filter(e=>!e.value).map(e=>e.events).flat()
+            hostEvents=[...eventsList]
+        }
+       
+       
         events.forEach(eventType => {
+           
             const plugins = this.plugins
                 .map(p => {
                     const settings = database.data.pluginSettings.find(ps => ps.id === p.id) || {};
@@ -48,7 +57,10 @@ class PluginManager {
                         settings,
                     }
                 })
-                .filter(p => p.settings.enabled && p.settings.enabledEvents.includes(eventType));
+               
+                .filter(p => p.settings.enabled && p.settings.enabledEvents.includes(eventType) 
+                && !hostEvents.includes(eventType));
+                
 
             plugins.forEach(p => {
                 p.plugin.handleEvent({ eventType, data: newData, settings: p.settings }).catch((e) => {

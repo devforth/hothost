@@ -147,7 +147,7 @@ services:
   return (
     <div>
       {
-        <div className=" py-4  relative rounded-lg dark:bg-gray-800 min-h-[461px]">
+        <div className=" py-4  relative rounded-lg dark:bg-gray-800 ">
           {textContent[active].header}
           {textContent[active].text}
           <button

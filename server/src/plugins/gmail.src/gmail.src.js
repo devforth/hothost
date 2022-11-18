@@ -42,6 +42,7 @@ Just copy the password and use it here.
         'host_is_online',
         'ram_is_almost_full',
         'ram_usage_recovered',
+        'ssl_is_almost_expire'
   ],
 
   params: [
@@ -108,6 +109,13 @@ Just copy the password and use it here.
             required: false,
             type: "text",
         },
+          {
+            id: "ssl_is_almost_expire_message",
+            name: "What message will be shown when you get ssl_expire warning",
+            default_value: "⚠️ SSL certificate of HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} will expire soon. Certificate is valid until: {{CERT_VALID_UNTIL}} ",
+            required: false,
+            type: "text",
+          },
   ],
 
   configuration: {},
@@ -140,6 +148,10 @@ Just copy the password and use it here.
     const template = this.hbs.compile(settings.params[`${eventType}_message`]);
     const text = template(data);
 
-    this.sendMessage(settings, text);    
+    try {
+      this.sendMessage(settings, text);
+    }
+    catch (e){ console.log(e)}
+
   },
 };

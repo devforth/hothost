@@ -66,7 +66,7 @@ const Plugin = () => {
         settingsWithoutFalseValue.notify = true;
       }
 
-      const data = await apiFetch(
+      const data = await apiFetch (
         settingsWithoutFalseValue,
         `plugin/${params.pluginName}`
       );
@@ -145,7 +145,7 @@ const Plugin = () => {
         <div className="flex justify-between items-center mb-5">
           <div>
             <a
-              href="/plugins/"
+              onClick={()=>{ clickAndNavigate("plugins")}}
               className="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
               focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
               text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center"
@@ -388,102 +388,6 @@ const Plugin = () => {
   );
 };
 
-// <div
-//   id="toast-saved"
-//   className=" fixed right-2 bottom-2 hidden flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-green-900 dark:bg-green-100"
-//   role="alert"
-// >
-//   <div className="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-100 dark:text-green-900">
-//     <svg
-//       className="w-5 h-5"
-//       fill="currentColor"
-//       viewBox="0 0 20 20"
-//       xmlns="http://www.w3.org/2000/svg"
-//     >
-//       <path
-//         fillRule="evenodd"
-//         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-//         clipRule="evenodd"
-//       ></path>
-//     </svg>
-//   </div>
-//   <div className="ml-3 text-sm font-normal">Test notification sent</div>
-//   <button
-//     type="button"
-//     className="bg-transparent ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex h-8 w-8 dark:text-green-900 dark:hover:text-black "
-//     //onClick="hideToast()"
-//     aria-label="Close"
-//   >
-//     <span className="sr-only">Close</span>
-//     <svg
-//       className="w-5 h-5"
-//       fill="currentColor"
-//       viewBox="0 0 20 20"
-//       xmlns="http://www.w3.org/2000/svg"
-//     >
-//       <path
-//         fillRule="evenodd"
-//         d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-//         clipRule="evenodd"
-//       ></path>
-//     </svg>
-//   </button>
-// </div>
 
-// };
-
-// {
-/* <script>
-  const notification = document.getElementById('notification');
-  const plugin_form = document.getElementById("plugin_form");
-  const save = document.getElementById("save");
-  const save_notify = document.getElementById("save_notify");
-
-  function hideToast() {
-    document.getElementById('toast-saved').classList.add('hidden');
-  }
-
-  function showToast() {
-    document.getElementById('toast-saved').classList.remove('hidden');
-    setTimeout(hideToast, 5000);
-
-  }
-
-  async function postPlugin(data) {
-    const url = window.location.href;
-    const response = await fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-      redirect: 'manual',
-    })}
-
-  const onSubmit = async (notify) => {
-    event.preventDefault();
-    const formData = new FormData(plugin_form);
-    const fromValues = Object.fromEntries(formData);
-
-    if (notify) {
-      fromValues.notify = true;
-    } else {
-      fromValues.notify = false;
-    }
-    await postPlugin(fromValues)
-      .catch(err => console.log(err));
-
-    if (!notify) {
-     window.location = "/plugins/" 
-    } else {
-      showToast();
-      save.textContent = 'Save settings'; 
-      save_notify.textContent = 'Save & Send test notification';
-    }
-}
-
-</script> */
-// }
 
 export default Plugin;

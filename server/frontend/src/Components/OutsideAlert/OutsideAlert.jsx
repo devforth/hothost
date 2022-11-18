@@ -5,7 +5,7 @@ import React, { useRef, useEffect } from "react";
  */
 function useOutsideHider(ref, state, setstate) {
   useEffect(() => {
-    console.log(state);
+  
     /**
      *
      * Alert if clicked on outside of element
