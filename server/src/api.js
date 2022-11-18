@@ -23,13 +23,18 @@ const router = express.Router();
 router.post("/process/:secret", async (req, res) => {
   const procData = req.body;
   const process = procData.PROCESS;
-  console.log( "params--------" ,req.params, "data--------", database.data.monitoringData)
 
   const isRestart = +procData.IS_RESTART;
   const now = roundToNearestMinute(new Date().getTime());
-  const hostId = database.data.monitoringData.find(
+  const host = database.data.monitoringData.find(
     (el) => el.secret === req.params.secret
-  ).id;
+  );
+  if (!host) {
+    res.statusCode = 401;
+    res.send(`HOST NOT FOUND with such secret ${req.params.secret}`);
+    return;
+  }
+  const hostId = host.id;
   const dbIndex = db.sublevel(hostId, { valueEncoding: "json" });
   const dbHostState = db.sublevel("options", { valueEncoding: "json" });
   dbIndex.put(now, process);
@@ -50,7 +55,8 @@ router.post("/data/:secret", async (req, res) => {
   );
   if (index === -1) {
     res.statusCode = 401;
-    res.send("Unauthorized");
+    res.send(`HOST NOT FOUND with such secret ${req.params.secret}`);
+    return;
   } else {
     const data = Object.keys(monitorData).reduce((acc, key) => {
       const value = monitorData[key];
