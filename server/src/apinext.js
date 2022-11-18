@@ -547,7 +547,10 @@ router.get(
         status: "success",
         code: 200,
         data: {
-          plugin,
+          plugin: {
+            name: plugin.name,
+            id: plugin.id,
+          },
           pluginSettings,
           params: [
             ...plugin.supportedEvents.map((e) => {

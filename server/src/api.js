@@ -108,20 +108,5 @@ router.post("/data/:secret", async (req, res) => {
   }
 });
 
-router.post(
-  "/add_http_label",
-  mustBeAuthorizedView(async (req, res) => {
-    const { id } = req.query;
-    const { label } = req.fields;
-
-    const data = database.data.httpMonitoringData.find((el) => el.id === id);
-    if (data) {
-      data.label = label.trim();
-      await database.write();
-    }
-
-    res.redirect("/http-monitor");
-  })
-);
 
 export default router;
