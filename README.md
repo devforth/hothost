@@ -10,6 +10,7 @@ Lightweight and minimalistic free and opensource Servers and HTTP monitor.
 * ⏰️ Configurable monitoring interval
 * 📈 View top 10 processes consuming RAM, historically over last 2 days.
 * 🌐 HTTP / HTTPS Monitor, status code check, webpage keywords existence, basic auth, notifications
+* 🔒 HTTPS SSL check with expiration reminder (default is 14 days prior to expire, configurable)
 
 For each host it allows to see:
 
