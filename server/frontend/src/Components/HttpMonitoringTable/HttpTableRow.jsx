@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import OutsideHider from "../OutsideAlert/OutsideAlert";
+import { Tooltip, Dropdown } from "flowbite-react";
 
 const HttpTableRow = (props) => {
   const [chosenHost, setChosenHost] = useState("");
@@ -10,30 +11,69 @@ const HttpTableRow = (props) => {
   const getDeleteId = props.getDeleteId;
   const getLabelId = props.getLabelId;
 
+  const checkSslWarn = props.checkSslWarn
+
+  
+
   return (
     <tr class="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
       <td class="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
         {monitor.status ? (
           <span>🟢OK</span>
         ) : (
-          <span
+          <Tooltip content={`Host error: ${monitor.sslError || monitor.errno}`} placement="bottom">
+            <span
             data-tooltip-placement="bottom"
             data-tooltip-target="tooltip_online_alert-{{@index}}"
-          >
+            >
             🔴 Error
-          </span>
+            </span>
+          </Tooltip>
+          
         )}
       </td>
       <td class="pr-4 row-start-2 col-start-1   flex-1 text-gray-900 dark:text-white">
         <p>
           <span class="whitespace-normal">{monitor.url}</span>
           {monitor.label && monitor.label !== "" && (
-            <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5">
+            <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
               {monitor.label}
             </span>
           )}
         </p>
+        { monitor.sslWarning 
+        ?  <div className="flex items-center">
+              <Tooltip content={`SSL certificate will expire soon. Certificate is valid until: ${new Date(monitor.certificateExpireDate)}`} placement="bottom">
+                <span class="bg-yellow-200 text-yellow-500 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-500">
+                    Warning
+                </span>
+              </Tooltip>
+              <button onClick={()=>{checkSslWarn(monitor.id)}}>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" viewBox="0 0 24 24" 
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 ml-1">
+                    <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                        strokeWidth="2" />
+                  </svg>
+                </button>      
+           </div>
+           
+
+        : null
+        }
       </td>
+      {/* <td>
+        { !monitor.status ?
+         <p>{`reason ${null}`}</p> :
+         null
+        }
+      </td> */}
       <td class="pr-4 flex-1 text-gray-900 dark:text-white min-w-max">
         <p class="text-sm text-gray-500 truncate dark:text-gray-400">
           Up\down time

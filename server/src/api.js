@@ -43,6 +43,7 @@ router.post("/process/:secret", async (req, res) => {
 router.post("/data/:secret", async (req, res) => {
   const monitorData = req.body;
 
+
   const index = database.data.monitoringData.findIndex(
     (md) => md.secret === req.params.secret
   );
@@ -80,7 +81,7 @@ router.post("/data/:secret", async (req, res) => {
     await PluginManager().handleEvents(events, {
       ...newData,
 
-      // variables which might be used in template
+      // variables which might be used in plugin template
       DISK_USED: sizeFormat(+newData.DISK_USED),
       DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
       RAM_USED: sizeFormat(

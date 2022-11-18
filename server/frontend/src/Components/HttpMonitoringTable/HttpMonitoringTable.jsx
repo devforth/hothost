@@ -8,6 +8,7 @@ import ModalAddLabel from "./ModalAddLabel";
 const httpMonitoringTable = (props) => {
   const httpMOnitors = props.monitoringHttpData;
   const setMonitoringHttpData = props.setMonitoringHttpData;
+  const checkSslWarn = props.checkSslWarn;
   const [deleteModalIsVisible, setDeleteModalIsVisible] = useState(false);
   const [labelModalIsVisible, setLabelModalIsVisible] = useState(false);
   const [chosenId, setChosenId] = useState("");
@@ -37,6 +38,7 @@ const httpMonitoringTable = (props) => {
                   setChosenId(e);
                   setLabelModalIsVisible(true);
                 }}
+                checkSslWarn={checkSslWarn}
               ></HttpTableRow>
             );
           })}

@@ -24,7 +24,8 @@ db.read = async function () {
         DISK_THRESHOLD: 90,
         DISK_STABILIZATION_LEVEL: 1,
         HOST_IS_DOWN_CONFIRMATIONS: 1,
-        HTTP_ISSUE_CONFIRMATION: 1
+        HTTP_ISSUE_CONFIRMATION: 1,
+        DAYS_FOR_SSL_EXPIRED: 14,
 
 
     };

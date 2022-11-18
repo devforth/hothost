@@ -18,6 +18,12 @@ import {
   createScheduleJob,
   readableRandomStringMaker,
   createMonitorDataset,
+  eventDuration,
+  getSSLCert,
+  getHostName,
+  checkSslCert,
+  anyNotificationDisabled,
+  calculateDataEvent
 } from "./utils.js";
 import {
   getCountryName,
@@ -45,7 +51,25 @@ const ifUnknown = (value, trueValue, falseValue) => {
 
 const getMonitoringData = async (req) => {
   const { RAM_THRESHOLD, DISK_THRESHOLD } = database.data.settings;
+  const initialHostSettings = {
+    disk_is_almost_full: {
+      value: true,
+      events: [ "disk_is_almost_full",
+      "disk_usage_recovered"]
+    },
+    host_is_offline: {
+      value: true,
+      events: [ "host_is_offline",
+      "host_is_online"]
+    },
+    ram_is_almost_full: {
+      value: true,
+      events: [ "ram_is_almost_full",
+      "ram_usage_recovered"]
+    }
+  };
   const monitoringData = database.data.monitoringData
+ 
     // Return all if user logged in or only those that have data
     .filter((data) => req.user || data.createdAt !== data.updatedAt)
     .sort((a, b) => b.createdAt - a.createdAt);
@@ -121,11 +145,14 @@ const getMonitoringData = async (req) => {
           countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
           humanizeDurationRamEvent: getDuration(data.RAM_EVENT_TS),
           humanizeDurationDiskEvent: getDuration(data.DISK_EVENT_TS),
-        
+          enabledNotifList:data?.enabledNotifList?.events || initialHostSettings,
+          isNotificationDisabled:anyNotificationDisabled(data.enabledNotifList||initialHostSettings)
 
         }
   );
 };
+
+
 
 router.get(
   "/getMonitoringData",
@@ -275,11 +302,9 @@ router.post(
   "/add_http_label",
   mustBeAuthorizedView(async (req, res) => {
     const { id, label } = req.body;
-  
 
     const data = database.data.httpMonitoringData.find((el) => el.id === id);
     if (data) {
-      
       data.HOST_LABEL = label.trim();
       await database.write();
     }
@@ -356,14 +381,18 @@ router.post("/add_label", async (req, res) => {
   res.json([req.body]);
 });
 
-
-router.get("/checkAuth",mustNotBeAuthorizedView(async (req, res) => {return res.status(403).json({status:"ok"})}))
+router.get(
+  "/checkAuth",
+  mustNotBeAuthorizedView(async (req, res) => {
+    return res.status(200).json({ status: "ok" });
+  })
+);
 
 router.post(
   "/login",
   mustNotBeAuthorizedView(async (req, res) => {
     const { username, password } = req.body;
-    
+
     if (username && password) {
       const jwtToken = await authorizeUser(username, password);
 
@@ -413,8 +442,7 @@ router.post(
       ram_stabilization_lvl,
       host_is_down_confirmations,
       http_issue_confirmations,
-
-
+      days_for_ssl_expire,
     } = req.body;
 
     database.data.settings = {
@@ -423,7 +451,8 @@ router.post(
       DISK_THRESHOLD: +disk_threshold,
       DISK_STABILIZATION_LEVEL: +disk_stabilization_lvl,
       HOST_IS_DOWN_CONFIRMATIONS: +host_is_down_confirmations,
-      HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations
+      HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations,
+      DAYS_FOR_SSL_EXPIRED: +days_for_ssl_expire,
     };
     res.status(200).json({
       status: "sucessful",
@@ -439,10 +468,9 @@ const getSettings = () => {
     ram_stabilization_lvl: settings.RAM_STABILIZATION_LEVEL,
     disk_threshold: settings.DISK_THRESHOLD,
     disk_stabilization_lvl: settings.DISK_STABILIZATION_LEVEL,
-    host_is_down_confirmations:settings.HOST_IS_DOWN_CONFIRMATIONS || 1,  // FALLBACK FOR USERS WHO HAD hh INSTALLED BEFORE 1.2.1
-    http_issue_confirmations:settings.HTTP_ISSUE_CONFIRMATION || 1
-    
-
+    host_is_down_confirmations: settings.HOST_IS_DOWN_CONFIRMATIONS === undefined ? 1 : settings.HOST_IS_DOWN_CONFIRMATIONS, // FALLBACK FOR USERS WHO HAD hh INSTALLED BEFORE 1.2.1
+    http_issue_confirmations: settings.HTTP_ISSUE_CONFIRMATION  === undefined ? 1 : settings.HTTP_ISSUE_CONFIRMATION,
+    days_for_ssl_expire: settings.DAYS_FOR_SSL_EXPIRED  === undefined ? 14 : settings.DAYS_FOR_SSL_EXPIRED ,
   };
 };
 
@@ -452,10 +480,14 @@ const getHttpMonitor = () => {
   return data.map((data) => ({
     id: data.id,
     url: data.URL,
-    label: data.label,
+    label: data.HOST_LABEL,
     status: data.okStatus,
+    sslWarning: data?.sslWarning,
+    certificateExpireDate: data?.certificateExpireDate,
     lastEventTs: data.event_created,
     monitorLastEventsTs: getDuration(data.event_created),
+    errno: data?.errno,
+    sslError: data?.SslError,
   }));
 };
 
@@ -472,14 +504,18 @@ export default router;
 router.get(
   "/plugins/",
   mustBeAuthorizedView((req, res) => {
-    
+   
+
     return res.status(200).json({
       status: "successful",
       code: 200,
       plugins: PluginManagerSingleton()
         .plugins.map((p) => {
           return {
-            ...p,
+            //...p,
+            iconUrlOrBase64: p.iconUrlOrBase64,
+            id: p.id,
+
             pluginEnabled: database.data.pluginSettings.find(
               (ps) => ps.id === p.id
             )?.enabled,
@@ -537,33 +573,6 @@ router.get(
             plugin.longDescriptionMD && md().render(plugin.longDescriptionMD),
         },
       });
-
-      // res.locals.plugin = plugin;
-      // res.locals.pluginSettings = pluginSettings;
-      // res.locals.params = [
-      //   ...plugin.supportedEvents.map((e) => {
-      //     return {
-      //       id: e,
-      //       value: pluginSettings?.enabledEvents.includes(e) ?? true,
-      //       name: `Notify on ${e}`,
-      //       type: "bool",
-      //       inputName: `events[${e}]`,
-      //     };
-      //   }),
-      //   ...plugin.params.map((p) => {
-      //     const value = pluginSettings?.params[p.id];
-      //     return {
-      //       ...p,
-      //       value: value || p.default_value,
-      //       inputName: `params[${p.id}]`,
-      //       required: p.required ?? true,
-      //     };
-      //   }),
-      // ];
-
-      // res.locals.descriptionFull =
-      //   plugin.longDescriptionMD && md().render(plugin.longDescriptionMD);
-      // res.render("plugin");
     }
   })
 );
@@ -654,8 +663,73 @@ router.post(
   })
 );
 
+router.post(
+  "/get_host_settings/",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const host = database.data.monitoringData.find((host) => host.id === id);
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+
+    if (!host.enabledNotifList) {
+      host.enabledNotifList = {
+        disk_is_almost_full: {
+          value: true,
+          events: [ "disk_is_almost_full",
+          "disk_usage_recovered"]
+        },
+        host_is_offline: {
+          value: true,
+          events: [ "host_is_offline",
+          "host_is_online"]
+        },
+        ram_is_almost_full: {
+          value: true,
+          events: [ "ram_is_almost_full",
+          "ram_usage_recovered"]
+        }
+      };
+    }
+
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: host.enabledNotifList,
+    });
+  })
+);
+
+router.post(
+  "/save_host_settings/",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const settings = req.body.settings;
+    const host = database.data.monitoringData.find((host) => host.id === id);
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+    if (settings) {
+      host.enabledNotifList = settings;
+    }
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+    });
+  })
+);
+
 const generateProcessData = (data) => {
- 
   const colors = [
     "#22d4bc",
     "#56AEE2",
@@ -712,62 +786,82 @@ router.get(
   })
 );
 
-router.post("/data/:secret", async (req, res) => {
-  const monitorData = req.fields;
+// router.post("/data/:secret", async (req, res) => {
+//   const monitorData = req.fields;
 
-  const index = database.data.monitoringData.findIndex(
-    (md) => md.secret === req.params.secret
-  );
-  if (index === -1) {
-    res.statusCode = 401;
-    res.send("Unauthorized");
-  } else {
-    const data = Object.keys(monitorData).reduce((acc, key) => {
-      const value = monitorData[key];
-      acc[key] =
-        value !== undefined && value !== null ? value.toString() : value;
-      return acc;
-    }, {});
-    const dataItem = database.data.monitoringData[index];
-    setWarning(data, dataItem);
-    const newData = {
-      ...dataItem,
-      ...data,
-      updatedAt: new Date().getTime(),
-      online: true,
-    };
-    // for testing
-    // const DIST_TOTAL = +newData.DISK_AVAIL + +newData.DISK_USED;
-    // const DISK_USED_PERCENT = 0.87;
-    // newData.DISK_AVAIL = DIST_TOTAL * ( 1 - DISK_USED_PERCENT );
-    // newData.DISK_USED = DIST_TOTAL * DISK_USED_PERCENT;
+//   const index = database.data.monitoringData.findIndex(
+//     (md) => md.secret === req.params.secret
+//   );
+//   if (index === -1) {
+//     res.statusCode = 401;
+//     res.send("Unauthorized");
+//   } else {
+//     const data = Object.keys(monitorData).reduce((acc, key) => {
+//       const value = monitorData[key];
+//       acc[key] =
+//         value !== undefined && value !== null ? value.toString() : value;
+//       return acc;
+//     }, {});
+//     const dataItem = database.data.monitoringData[index];
+//     setWarning(data, dataItem);
+//     const newData = {
+//       ...dataItem,
+//       ...data,
+//       updatedAt: new Date().getTime(),
+//       online: true,
+//     };
+//     // for testing
+//     // const DIST_TOTAL = +newData.DISK_AVAIL + +newData.DISK_USED;
+//     // const DISK_USED_PERCENT = 0.87;
+//     // newData.DISK_AVAIL = DIST_TOTAL * ( 1 - DISK_USED_PERCENT );
+//     // newData.DISK_USED = DIST_TOTAL * DISK_USED_PERCENT;
 
-    // const RAM_USED_PERCENT = 0.80;
-    // newData.SYSTEM_FREE_RAM = +newData.SYSTEM_TOTAL_RAM * (1 - RAM_USED_PERCENT);
+//     // const RAM_USED_PERCENT = 0.80;
+//     // newData.SYSTEM_FREE_RAM = +newData.SYSTEM_TOTAL_RAM * (1 - RAM_USED_PERCENT);
 
-    const events = calculateDataEvent(
-      database.data.monitoringData[index],
-      newData
-    );
-    await PluginManager().handleEvents(events, {
-      ...newData,
+//     const events = calculateDataEvent(
+//       database.data.monitoringData[index],
+//       newData
+//     );
+//     await PluginManager().handleEvents(events, {
+//       ...newData,
 
-      // variables which might be used in template
-      DISK_USED: sizeFormat(+newData.DISK_USED),
-      DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
-      RAM_USED: sizeFormat(
-        +newData.SYSTEM_TOTAL_RAM - +newData.SYSTEM_FREE_RAM
-      ),
-      RAM_TOTAL: sizeFormat(+newData.SYSTEM_TOTAL_RAM),
-      HOST_LABEL:
-        newData.HOST_LABEL && newData.HOST_LABEL !== ""
-          ? `\`${newData.HOST_LABEL}\``
-          : "",
-      EVENT_DURATION: eventDuration(newData, events),
-    });
-    database.data.monitoringData[index] = newData;
+//       // variables which might be used in template
+//       DISK_USED: sizeFormat(+newData.DISK_USED),
+//       DISK_TOTAL: sizeFormat(+newData.DISK_USED + +newData.DISK_AVAIL),
+//       RAM_USED: sizeFormat(
+//         +newData.SYSTEM_TOTAL_RAM - +newData.SYSTEM_FREE_RAM
+//       ),
+//       RAM_TOTAL: sizeFormat(+newData.SYSTEM_TOTAL_RAM),
+//       HOST_LABEL:
+//         newData.HOST_LABEL && newData.HOST_LABEL !== ""
+//           ? `\`${newData.HOST_LABEL}\``
+//           : "",
+//       EVENT_DURATION: eventDuration(newData, events),
+//     });
+//     database.data.monitoringData[index] = newData;
+//     await database.write();
+
+//     res.send("OK");
+//   }
+// });
+
+router.post("/check-ssl", async (req, res) => {
+  const { id } = req.body;
+  const now = new Date().getTime();
+
+  const monData = database.data.httpMonitoringData.find((el) => el.id === id);
+  const certificateExpireDate = !monData.URL.includes("localhost:")
+    ? new Date((await getSSLCert(getHostName(monData.URL))).valid_to).getTime()
+    : null;
+
+  if (monData) {
+    checkSslCert(now, certificateExpireDate, monData);
+    monData.lastSslCheckingTime = new Date().getTime();
     await database.write();
-
-    res.send("OK");
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+    });
   }
 });

@@ -8,7 +8,7 @@ const path = (
   document.location.host.startsWith("127.0.0.1")
 ) ? BASE_LOCAL_URL : BASE_PROD_URL;
 
-console.log('patthhh', path);
+
 
 
 
@@ -73,6 +73,9 @@ async function apiFetch(body, route) {
 
     credentials: "include",
   });
+  if (response.status === 401) {
+    window.location.assign("/login");
+  }
 
   const data = await response.json();
 
