@@ -6,6 +6,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Spinner } from "flowbite-react";
 import AddHostDlg from "../AddHostDlg/AddHostDlg.jsx";
 import HttpMonitor from "../HttpMonitor/HttpMonitor.jsx";
+import MyHostsTableSceleton from "../../Components/Utils/Components/Sceleton";
 
 const Home = () => {
   const [monitoringData, setMonitoringData] = useState([]);
@@ -28,7 +29,6 @@ const Home = () => {
   };
 
   useEffect(() => {
-   
     fetchData({ withLoader: true });
     const intervalId = setInterval(() => {
       fetchData();
@@ -128,7 +128,9 @@ const Home = () => {
                     refreshData={fetchData}
                   ></MonitoringTable>
                 )}
-                {status === "pending" && <Spinner></Spinner>}
+                {status === "pending" && (
+                  <MyHostsTableSceleton></MyHostsTableSceleton>
+                )}
               </div>
             </>
           ) : (
@@ -178,51 +180,6 @@ const Home = () => {
           </svg>
         </button>
       </div>
-
-      {/* <script>
-
-  function hideCOpyTost() {
-    document.getElementById('toast-copied').classNameList.add('hidden');
-  }
-
-  function copyToCb(idOfPre) {
-    const copyText = document.getElementById(idOfPre).textContent;
-    const textArea = document.createElement('textarea');
-    textArea.textContent = copyText;
-    document.body.append(textArea);
-    textArea.select();
-    document.execCommand("copy");
-    textArea.remove();
-    document.getElementById('toast-copied').classNameList.remove('hidden');
-    setTimeout(hideCOpyTost, 5000);
-
-  }
-
-  function checkHost(hostName, index) {
-    const confirmHost = document.getElementById('confirmHost-'+index);
-    const deleteHostBtn = document.getElementById('deleteHostBtn-'+index);
-    if (hostName === confirmHost.value) {
-      deleteHostBtn.disabled = false;
-    } else {
-      deleteHostBtn.disabled = true;
-    }
-  }
-
-  function onCloseModal() {
-    window.location = "/"
-  }
-
-  const monitoringTable = document.getElementById('monitoring');
-  setInterval(async () => {
-    const response = await fetch('/update');
-    const data = await response.text();
-    if (monitoringTable) {
-      monitoringTable.innerHTML = data;
-
-      window.document.dispatchEvent(new Event("DOMContentLoaded"));
-    }
-  }, 10000);
-            </script> */}
     </div>
   );
 };
