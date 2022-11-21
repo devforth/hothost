@@ -60,7 +60,6 @@ export const authorizeUser = async (username, password) => {
 };
 export const mustNotBeAuthorizedView = (callback) => {
   return (req, res) => {
-   
     if (req.user)
       res.status(403).json({ error: "Can`t access when authorized" });
     else callback(req, res);
@@ -121,7 +120,6 @@ export const calculateWarning = (
 ) => {
   const onEventBound = threshold + stabilizationLvl;
   const offEventBound = threshold - stabilizationLvl;
-  
 
   if (usage > onEventBound) {
     return true;
@@ -142,7 +140,6 @@ export const calculateDataEvent = (prevData, newData) => {
   } = database.data.settings;
 
   const calculateDiskWarning = (data) => {
-    
     const diskUsage =
       (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100;
     const warning = calculateWarning(
@@ -170,11 +167,10 @@ export const calculateDataEvent = (prevData, newData) => {
     return warning;
   };
 
-
   const diskSpaceEvent = calculateEvent(
     calculateDiskWarning(prevData),
     calculateDiskWarning(newData),
-        "disk_is_almost_full",
+    "disk_is_almost_full",
     "disk_usage_recovered"
   );
   events.push(diskSpaceEvent);
@@ -210,7 +206,6 @@ export const calculateAsyncEvents = async () => {
           safePeriod >=
         new Date().getTime();
       if (!online && data.online) {
-        
         events.push("host_is_offline");
         data.online = false;
         data.ONLINE_EVENT_TS = new Date().getTime();
@@ -406,29 +401,28 @@ export const checkStatus = async (hostData) => {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2000);
-  const reqHeaders = {}
-  if (hostData.enable_auth){
-    const base64Auth = Buffer.from(`${hostData.login}:${hostData.password}`).toString(
-      "base64"
-    )
-    reqHeaders.Authorization = `Basic ${base64Auth}`
-    
+  const reqHeaders = {};
+  if (hostData.enable_auth) {
+    const base64Auth = Buffer.from(
+      `${hostData.login}:${hostData.password}`
+    ).toString("base64");
+    reqHeaders.Authorization = `Basic ${base64Auth}`;
   }
-  let response = ""
+  let response = "";
   try {
-     response = await fetch(hostData.URL, {
+    response = await fetch(hostData.URL, {
       method: "GET",
       headers: reqHeaders,
       signal: controller.signal,
-    })
-  } catch(e){
-    console.log('Check http status error:', e)
+    });
+  } catch (e) {
+    console.log("Check http status error:", e);
   }
-  
-    
+
   clearTimeout(timeout);
 
   if (!response) {
+    hostData.errno = "No response";
     return {
       error: "No response",
       response: false,
@@ -465,18 +459,32 @@ export const checkStatus = async (hostData) => {
         response: response.status === 200,
       };
     case "keyword_exist": {
-      const respText = await response.text();
-      hostData.errno = "Keyword doesn`t exist.";
+      let respText = "";
+      try {
+        respText = await response.text();
+        hostData.errno = "Keyword doesn`t exist.";
+      } catch (e) {
+        console.log(" http response text error", e);
+      }
+
       return {
         response: respText.includes(hostData.key_word),
       };
     }
     case "keyword_not_exist": {
-      const respText = await response.text();
+      let respText = "";
       hostData.errno = "Keyword doesn`t exist.";
-      return {
-        response: !respText.includes(hostData.key_word),
-      };
+      try {
+        respText = await response.text();
+        return {
+          response: !respText.includes(hostData.key_word),
+        };
+      } catch (e) {
+        console.log(" http response text error", e);
+        return {
+          response: false,
+        };
+      }
     }
   }
 };
@@ -534,8 +542,7 @@ export const createScheduleJob = (httpHostId, interval) => {
           dbData.errno = "";
         }
       }
-    } 
-    else {
+    } else {
       dbData.numberOfFalseWarnings = 0;
       dbData.firstFalseConfirmationTime = 0;
     }
@@ -620,14 +627,13 @@ export const daysToMs = function (days) {
 };
 
 export const anyNotificationDisabled = function (obj) {
-  let newProp={}
+  let newProp = {};
   const keys = Object.keys(obj);
   keys.reduce((acc, key) => {
     if (!obj[key].value) {
-      newProp =  { ...acc, [key]: { value: false },  };
-        }
-    return newProp
-    
+      newProp = { ...acc, [key]: { value: false } };
+    }
+    return newProp;
   }, {});
   return newProp;
 };
