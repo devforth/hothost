@@ -406,20 +406,26 @@ export const checkStatus = async (hostData) => {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2000);
-
-  const response = hostData.enable_auth
-    ? await fetch(hostData.URL, {
-        method: "GET",
-        headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(`${hostData.login}:${hostData.password}`).toString(
-              "base64"
-            ),
-        },
-        signal: controller.signal,
-      }).catch(() => null)
-    : await fetch(hostData.URL, { signal: controller.signal }).catch((e) => e);
+  const reqHeaders = {}
+  if (hostData.enable_auth){
+    const base64Auth = Buffer.from(`${hostData.login}:${hostData.password}`).toString(
+      "base64"
+    )
+    reqHeaders.Authorization = `Basic ${base64Auth}`
+    
+  }
+  let response = ""
+  try {
+     response = await fetch(hostData.URL, {
+      method: "GET",
+      headers: reqHeaders,
+      signal: controller.signal,
+    })
+  } catch(e){
+    console.log('Check http status error:', e)
+  }
+  
+    
   clearTimeout(timeout);
 
   if (!response) {
