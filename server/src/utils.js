@@ -416,7 +416,7 @@ export const checkStatus = async (hostData) => {
       signal: controller.signal,
     });
   } catch (e) {
-    console.log("Check http status error fetch url() - ",hostData.URL,new Date(), e);
+    console.log("Check http status error fetch url() - ",hostData.URL,new Date(), 'response :',response );
   }
 
   clearTimeout(timeout);
@@ -441,7 +441,8 @@ export const checkStatus = async (hostData) => {
     }
     if (response.errno === wrongHostNameError) {
       hostData.SslError = wrongHostNameError;
-    } else {
+    }
+    else {
       hostData.errno = response.errno;
     }
     return {
@@ -463,7 +464,7 @@ export const checkStatus = async (hostData) => {
       try {
         respText = await response.text();
       } catch (e) {
-        console.log("Http response text error  exist",new Date(), e);
+        console.log("Http response text error  exist",new Date(), "response:", response);
         return { response: false }
       }
       const kwExists = respText.includes(hostData.key_word);
