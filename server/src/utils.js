@@ -462,29 +462,34 @@ export const checkStatus = async (hostData) => {
       let respText = "";
       try {
         respText = await response.text();
-        hostData.errno = "Keyword doesn`t exist.";
       } catch (e) {
-        console.log(" http response text error", e);
+        console.log("Http response text error", e);
+        return { response: true }
       }
-
+      const kwExists = respText.includes(hostData.key_word);
+      if (!kwExists) {
+        hostData.errno = "Keyword doesn`t exist.";
+      }
       return {
-        response: respText.includes(hostData.key_word),
+        response: kwExists,
       };
     }
     case "keyword_not_exist": {
       let respText = "";
-      hostData.errno = "Keyword doesn`t exist.";
       try {
         respText = await response.text();
-        return {
-          response: !respText.includes(hostData.key_word),
-        };
       } catch (e) {
-        console.log(" http response text error", e);
-        return {
-          response: false,
-        };
+        console.log("Http response text error", e);
+        return { response: false }
       }
+
+      const kwNotExists = !respText.includes(hostData.key_word);
+      if (!kwNotExists) {
+        hostData.errno = "Keyword exist.";
+      }
+      return {
+        response: kwNotExists,
+      };
     }
   }
 };
