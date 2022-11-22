@@ -416,7 +416,7 @@ export const checkStatus = async (hostData) => {
       signal: controller.signal,
     });
   } catch (e) {
-    console.log("Check http status error:", e);
+    console.log("Check http status error fetch url() - ",hostData.URL,new Date(), e);
   }
 
   clearTimeout(timeout);
@@ -463,8 +463,8 @@ export const checkStatus = async (hostData) => {
       try {
         respText = await response.text();
       } catch (e) {
-        console.log("Http response text error", e);
-        return { response: true }
+        console.log("Http response text error  exist",new Date(), e);
+        return { response: false }
       }
       const kwExists = respText.includes(hostData.key_word);
       if (!kwExists) {
@@ -479,7 +479,7 @@ export const checkStatus = async (hostData) => {
       try {
         respText = await response.text();
       } catch (e) {
-        console.log("Http response text error", e);
+        console.log("Http response text error not exist",new Date(), e);
         return { response: false }
       }
 
