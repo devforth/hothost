@@ -114,6 +114,12 @@ const MonitoringTable = (props) => {
               ""
             }
             action={saveLabel}
+            label={(monitoringData &&
+              monitoringData.filter((e) => {
+               
+                return e.id === chosenHost;
+              })[0].label) ||
+            ""}
           ></MonitoringModal>
         ) : null}
         {notifyModalIsVisible ? (
