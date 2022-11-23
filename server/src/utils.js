@@ -174,6 +174,7 @@ export const calculateDataEvent = (prevData, newData) => {
     "disk_usage_recovered"
   );
   events.push(diskSpaceEvent);
+
   if (diskSpaceEvent === "disk_is_almost_full") {
     if ( !data.lastDiskNotifTime ) {
       data.lastDiskNotifTime = new Date().getTime()
@@ -186,16 +187,12 @@ export const calculateDataEvent = (prevData, newData) => {
     if ( !data.lastDiskNotifTime ) {
       data.lastDiskNotifTime = new Date().getTime()
     }
-
-
     if (data.lastDiskNotifTime && HOURS_FOR_NEXT_ALERT !==0 ){
       const forNextAlertMS = HOURS_FOR_NEXT_ALERT * 60 * 60 * 1000
       if (data.lastDiskNotifTime + forNextAlertMS <= new Date().getTime()) {
-        console.log(data)
         const diskWarning = (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 > DISK_THRESHOLD;
         if ( diskWarning ) {
-          events.push("disk_is_almost_full")
-          
+          events.push("disk_is_almost_full")          
           }
           data.lastDiskNotifTime = new Date().getTime()      
       }
