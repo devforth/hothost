@@ -1,5 +1,5 @@
 import hbs from 'handlebars';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
 
 export default {
     id: 'telegram-notifications',

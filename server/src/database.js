@@ -26,6 +26,7 @@ db.read = async function () {
         HOST_IS_DOWN_CONFIRMATIONS: 1,
         HTTP_ISSUE_CONFIRMATION: 1,
         DAYS_FOR_SSL_EXPIRED: 14,
+        HOURS_FOR_NEXT_ALERT: 12,
 
 
     };

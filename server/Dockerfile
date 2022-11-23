@@ -6,7 +6,7 @@ RUN npm ci
 ADD frontend .
 RUN npm run build
 
-FROM node:16-alpine
+FROM node:18-alpine
 WORKDIR /code/
 ADD package.json .
 ADD package-lock.json .
