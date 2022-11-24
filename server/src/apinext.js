@@ -500,6 +500,7 @@ const getHttpMonitor = () => {
     monitorLastEventsTs: getDuration(data.event_created),
     errno: data?.errno,
     sslError: data?.SslError,
+    monitor_type:data.monitor_type
   }));
 };
 
