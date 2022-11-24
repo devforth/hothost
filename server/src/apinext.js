@@ -69,7 +69,7 @@ const getMonitoringData = async (req) => {
     }
   };
   const monitoringData = database.data.monitoringData
- 
+
     // Return all if user logged in or only those that have data
     .filter((data) => req.user || data.createdAt !== data.updatedAt)
     .sort((a, b) => b.createdAt - a.createdAt);
@@ -151,8 +151,6 @@ const getMonitoringData = async (req) => {
         }
   );
 };
-
-
 
 router.get(
   "/getMonitoringData",
@@ -443,6 +441,7 @@ router.post(
       host_is_down_confirmations,
       http_issue_confirmations,
       days_for_ssl_expire,
+      hours_for_next_alert,
     } = req.body;
 
     database.data.settings = {
@@ -453,6 +452,7 @@ router.post(
       HOST_IS_DOWN_CONFIRMATIONS: +host_is_down_confirmations,
       HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations,
       DAYS_FOR_SSL_EXPIRED: +days_for_ssl_expire,
+      HOURS_FOR_NEXT_ALERT: +hours_for_next_alert,
     };
     res.status(200).json({
       status: "sucessful",
@@ -468,9 +468,21 @@ const getSettings = () => {
     ram_stabilization_lvl: settings.RAM_STABILIZATION_LEVEL,
     disk_threshold: settings.DISK_THRESHOLD,
     disk_stabilization_lvl: settings.DISK_STABILIZATION_LEVEL,
-    host_is_down_confirmations: settings.HOST_IS_DOWN_CONFIRMATIONS === undefined ? 1 : settings.HOST_IS_DOWN_CONFIRMATIONS, // FALLBACK FOR USERS WHO HAD hh INSTALLED BEFORE 1.2.1
-    http_issue_confirmations: settings.HTTP_ISSUE_CONFIRMATION  === undefined ? 1 : settings.HTTP_ISSUE_CONFIRMATION,
-    days_for_ssl_expire: settings.DAYS_FOR_SSL_EXPIRED  === undefined ? 14 : settings.DAYS_FOR_SSL_EXPIRED ,
+    host_is_down_confirmations:
+      settings.HOST_IS_DOWN_CONFIRMATIONS === undefined
+        ? 1
+        : settings.HOST_IS_DOWN_CONFIRMATIONS, // FALLBACK FOR USERS WHO HAD hh INSTALLED BEFORE 1.2.1
+    http_issue_confirmations:
+      settings.HTTP_ISSUE_CONFIRMATION === undefined
+        ? 1
+        : settings.HTTP_ISSUE_CONFIRMATION,
+    days_for_ssl_expire:
+      settings.DAYS_FOR_SSL_EXPIRED === undefined
+        ? 14
+        : settings.DAYS_FOR_SSL_EXPIRED,
+    hours_for_next_alert:settings.HOURS_FOR_NEXT_ALERT === undefined
+        ? 12
+        : settings.HOURS_FOR_NEXT_ALERT,
   };
 };
 
@@ -488,6 +500,7 @@ const getHttpMonitor = () => {
     monitorLastEventsTs: getDuration(data.event_created),
     errno: data?.errno,
     sslError: data?.SslError,
+    monitor_type:data.monitor_type
   }));
 };
 
@@ -504,8 +517,6 @@ export default router;
 router.get(
   "/plugins/",
   mustBeAuthorizedView((req, res) => {
-   
-
     return res.status(200).json({
       status: "successful",
       code: 200,

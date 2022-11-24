@@ -1,5 +1,5 @@
 import hbs from 'handlebars';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
 
 export default {
     id: 'slack-notifications',  // this is just ID of plugin, should have slug format

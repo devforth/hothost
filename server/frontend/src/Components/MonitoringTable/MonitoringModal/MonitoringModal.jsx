@@ -12,9 +12,11 @@ const MonitoringModal = ({
   confrimButtonName = "OK",
   alertIcoVisible = true,
   notifySettings = false,
+  label="",
 }) => {
+  
   const [confrimName, setConfrimName] = useState("");
-  const [labelName, setLabelName] = useState("");
+  const [labelName, setLabelName] = useState(label);
   const getLabel = (evt) => {
     setLabelName(evt.currentTarget.value);
   };
