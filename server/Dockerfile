@@ -15,5 +15,5 @@ RUN npm ci
 ADD . .
 COPY --from=builder /code/dist/ frontend/dist/ 
 
-CMD ["node", "src/index.js" ]
+CMD ["node", "--prof", "src/index.js" ]
 ENTRYPOINT []
