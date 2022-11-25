@@ -286,10 +286,9 @@ router.post(
 
     createScheduleJob(monitor.id, monitor.monitor_interval);
 
-    await checkStatus(monitor).then((res) => {
-      monitor.event_created = new Date().getTime();
-      monitor.okStatus = res.response;
-    });
+    const res = await checkStatus(monitor)
+    monitor.event_created = new Date().getTime();
+    monitor.okStatus = res.response;
     res
       .status(200)
       .json({ status: "successful", code: 200, data: getHttpMonitor() });
