@@ -23,7 +23,7 @@ import {
   getHostName,
   checkSslCert,
   anyNotificationDisabled,
-  calculateDataEvent
+  calculateDataEvent,
 } from "./utils.js";
 import {
   getCountryName,
@@ -54,19 +54,16 @@ const getMonitoringData = async (req) => {
   const initialHostSettings = {
     disk_is_almost_full: {
       value: true,
-      events: [ "disk_is_almost_full",
-      "disk_usage_recovered"]
+      events: ["disk_is_almost_full", "disk_usage_recovered"],
     },
     host_is_offline: {
       value: true,
-      events: [ "host_is_offline",
-      "host_is_online"]
+      events: ["host_is_offline", "host_is_online"],
     },
     ram_is_almost_full: {
       value: true,
-      events: [ "ram_is_almost_full",
-      "ram_usage_recovered"]
-    }
+      events: ["ram_is_almost_full", "ram_usage_recovered"],
+    },
   };
   const monitoringData = database.data.monitoringData
 
@@ -145,9 +142,11 @@ const getMonitoringData = async (req) => {
           countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
           humanizeDurationRamEvent: getDuration(data.RAM_EVENT_TS),
           humanizeDurationDiskEvent: getDuration(data.DISK_EVENT_TS),
-          enabledNotifList:data?.enabledNotifList?.events || initialHostSettings,
-          isNotificationDisabled:anyNotificationDisabled(data.enabledNotifList||initialHostSettings)
-
+          enabledNotifList:
+            data?.enabledNotifList?.events || initialHostSettings,
+          isNotificationDisabled: anyNotificationDisabled(
+            data.enabledNotifList || initialHostSettings
+          ),
         }
   );
 };
@@ -286,9 +285,9 @@ router.post(
 
     createScheduleJob(monitor.id, monitor.monitor_interval);
 
-    const res = await checkStatus(monitor)
+    const statusRes = await checkStatus(monitor);
     monitor.event_created = new Date().getTime();
-    monitor.okStatus = res.response;
+    monitor.okStatus = statusRes.response;
     res
       .status(200)
       .json({ status: "successful", code: 200, data: getHttpMonitor() });
@@ -479,7 +478,8 @@ const getSettings = () => {
       settings.DAYS_FOR_SSL_EXPIRED === undefined
         ? 14
         : settings.DAYS_FOR_SSL_EXPIRED,
-    hours_for_next_alert:settings.HOURS_FOR_NEXT_ALERT === undefined
+    hours_for_next_alert:
+      settings.HOURS_FOR_NEXT_ALERT === undefined
         ? 12
         : settings.HOURS_FOR_NEXT_ALERT,
   };
@@ -499,7 +499,7 @@ const getHttpMonitor = () => {
     monitorLastEventsTs: getDuration(data.event_created),
     errno: data?.errno,
     sslError: data?.SslError,
-    monitor_type:data.monitor_type
+    monitor_type: data.monitor_type,
   }));
 };
 
@@ -693,19 +693,16 @@ router.post(
       host.enabledNotifList = {
         disk_is_almost_full: {
           value: true,
-          events: [ "disk_is_almost_full",
-          "disk_usage_recovered"]
+          events: ["disk_is_almost_full", "disk_usage_recovered"],
         },
         host_is_offline: {
           value: true,
-          events: [ "host_is_offline",
-          "host_is_online"]
+          events: ["host_is_offline", "host_is_online"],
         },
         ram_is_almost_full: {
           value: true,
-          events: [ "ram_is_almost_full",
-          "ram_usage_recovered"]
-        }
+          events: ["ram_is_almost_full", "ram_usage_recovered"],
+        },
       };
     }
 
