@@ -13,7 +13,7 @@ RUN make
 FROM ubuntu
 COPY --from=psbuilder /procps/ps/pscommand /pscommand
 
-RUN apt-get update -y && apt-get -y install curl
+RUN apt-get update -y && apt-get -y install curl && apt-get -y install moreutils
 ADD getinfo.sh .
 
 CMD [ "bash", "getinfo.sh" ]
