@@ -502,18 +502,20 @@ do
     \"HOST_PUBLIC_IP_COUNTRY\":\"${HOST_PUBLIC_IP_COUNTRY}\",
     \"MONITOR_INTERVAL\":\"${HOTHOST_MONITOR_INTERVAL}\"
   }"
-  curl --silent --output /dev/null --show-error --fail \
+   curl -sS \
    -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$JSON_DATA" \
-   -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
+   -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36' \
+    2>&1 | ts | while read line; do echo ${line} ℹ️ HostInfo; done \
 
-  curl --silent --output /dev/null --show-error --fail \
+   curl -sS \
    -X POST $HOTHOST_SERVER_BASE/api/process/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$PROC_DATA" \
-   -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
-
+   -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36' \
+    2>&1 | ts | while read line; do echo ${line} ℹ️ ProcessInfo; done \
+ 
   IS_RESTART=0
   sleep $HOTHOST_MONITOR_INTERVAL
 done
