@@ -523,83 +523,85 @@ export const checkStatus = async (hostData) => {
 };
 
 export const startScheduler = () => {
-  database.data.httpMonitoringData.map((data) => {
+
+  database.data.httpMonitoringData.forEach((data) => {
     createScheduleJob(data.id, data.monitor_interval);
   });
 };
 
-export const schedulerTask = [];
+// export const schedulerTask = [];
 
 export const cleanResponseError = (host) => {
   host.SslError = "";
 };
 
-export const createScheduleJob = (httpHostId, interval) => {
-  const job = setInterval(async () => {
-    const dbData = database.data.httpMonitoringData.find(
-      (host) => host.id == httpHostId
-    );
-    const certificateExpireDate = !dbData.URL.includes("localhost:")
-      ? new Date(
-          (await getSSLCert(getHostName(dbData.URL)))?.valid_to
-        ).getTime()
-      : null;
-    const now = new Date().getTime();
-    const nullTime = new Date(0).getTime();
-    const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
-    const res = await checkStatus(dbData);
-    if (res.response !== dbData.okStatus) {
-      if (!dbData.numberOfFalseWarnings) {
-        dbData.numberOfFalseWarnings = 0;
-      }
-      if (!dbData.firstFalseConfirmationTime) {
-        dbData.firstFalseConfirmationTime = new Date().getTime();
-      }
-      dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
+export const createScheduleJob = async (httpHostId, interval) => {
+  await (new Promise((rslv) => setTimeout(rslv)), interval * 1000);
 
-      if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION || 0) + 1) {
-        generateHttpEvent(dbData, {
-          ...dbData,
-          okStatus: !!res.response,
-          status: res.status,
-          event_created: dbData.firstFalseConfirmationTime,
-        });
+  const dbData = database.data.httpMonitoringData.find(
+    (host) => host.id == httpHostId
+  );
+  const certificateExpireDate = !dbData.URL.includes("localhost:")
+    ? new Date(
+        (await getSSLCert(getHostName(dbData.URL)))?.valid_to
+      ).getTime()
+    : null;
+  const now = new Date().getTime();
+  const nullTime = new Date(0).getTime();
+  const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
+  const res = await checkStatus(dbData);
+  if (res.response !== dbData.okStatus) {
+    if (!dbData.numberOfFalseWarnings) {
+      dbData.numberOfFalseWarnings = 0;
+    }
+    if (!dbData.firstFalseConfirmationTime) {
+      dbData.firstFalseConfirmationTime = new Date().getTime();
+    }
+    dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
 
-        dbData.okStatus = res.response;
-        dbData.event_created = dbData.firstFalseConfirmationTime;
-        dbData.numberOfFalseWarnings = 0;
-        dbData.firstFalseConfirmationTime = 0;
+    if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION || 0) + 1) {
+      generateHttpEvent(dbData, {
+        ...dbData,
+        okStatus: !!res.response,
+        status: res.status,
+        event_created: dbData.firstFalseConfirmationTime,
+      });
 
-        cleanResponseError(dbData);
-        if (res.response) {
-          dbData.errno = "";
-        }
-      }
-    } else {
+      dbData.okStatus = res.response;
+      dbData.event_created = dbData.firstFalseConfirmationTime;
       dbData.numberOfFalseWarnings = 0;
       dbData.firstFalseConfirmationTime = 0;
+
+      cleanResponseError(dbData);
+      if (res.response) {
+        dbData.errno = "";
+      }
     }
+  } else {
+    dbData.numberOfFalseWarnings = 0;
+    dbData.firstFalseConfirmationTime = 0;
+  }
 
-    if (!dbData.lastSslCheckingTime) {
-      dbData.lastSslCheckingTime = nullTime;
-    }
-    const checkingSSLintervalHours = 24;
+  if (!dbData.lastSslCheckingTime) {
+    dbData.lastSslCheckingTime = nullTime;
+  }
+  const checkingSSLintervalHours = 24;
 
-    if (
-      dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
-      now
-    ) {
-      dbData.lastSslCheckingTime = now;
-      checkSslCert(now, certificateExpireDate, dbData);
-    }
+  if (
+    dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
+    now
+  ) {
+    dbData.lastSslCheckingTime = now;
+    checkSslCert(now, certificateExpireDate, dbData);
+  }
 
-    await database.write();
-  }, interval * 1000);
+  await database.write();
 
-  schedulerTask.push({
-    id: httpHostId,
-    scheduleJob: job,
-  });
+  createScheduleJob(httpHostId, interval)
+  // schedulerTask.push({
+  //   id: httpHostId,
+  //   scheduleJob: job,
+  // });
 };
 
 export const checkSslCert = (nowTime, certExpTime, dbData) => {
@@ -620,8 +622,8 @@ export const checkSslCert = (nowTime, certExpTime, dbData) => {
 };
 
 export const stopScheduleJob = (id) => {
-  const task = schedulerTask.find((el) => el.id === id);
-  clearInterval(task?.scheduleJob);
+  // const task = schedulerTask.find((el) => el.id === id);
+  // clearInterval(task?.scheduleJob);
 };
 
 export const roundToNearestMinute = (date) => {
