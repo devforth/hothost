@@ -426,6 +426,8 @@ export const createMonitorDataset = (data) => {
 export const checkStatus = async (hostData) => {
   // const {URL, monitor_type, key_word, enable_auth, login, password} = hostData;
   // const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
+  
+  
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
@@ -442,10 +444,13 @@ export const checkStatus = async (hostData) => {
       method: "GET",
       headers: reqHeaders,
       signal: controller.signal,
+      cache: 'no-cache' 
     });
   } catch (e) {
     console.log("Check http status error fetch url() - ",hostData.URL,new Date(),  );
   }
+
+  
 
   clearTimeout(timeout);
 
@@ -537,13 +542,19 @@ export const cleanResponseError = (host) => {
 };
 
 export const createScheduleJob = async (httpHostId, targetInterval) => {
+  
   schedulerIsRunningForHost[httpHostId] = true;
   let intervalCorrection = 0;
+
+
+ 
+ 
   while (schedulerIsRunningForHost[httpHostId]) {
+    
 
     let waitTime = (targetInterval - intervalCorrection) * 1000;
     if (waitTime > 0) {
-      await (new Promise((resolve) => setTimeout(resolve)), waitTime);
+      await (new Promise((resolve) => setTimeout(resolve,waitTime)));
     }
 
     const iterationStartMs = +new Date();
