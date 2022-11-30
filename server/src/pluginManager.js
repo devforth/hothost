@@ -46,7 +46,7 @@ class PluginManager {
             hostEvents=[...eventsList]
         }
        
-        for (eventType of events) {
+        for ( let eventType of events) {
             const plugins = this.plugins
                 .map(p => {
                     const settings = database.data.pluginSettings.find(ps => ps.id === p.id) || {};
@@ -58,11 +58,12 @@ class PluginManager {
             
                 .filter(p => p.settings.enabled && p.settings.enabledEvents.includes(eventType) 
                 && !hostEvents.includes(eventType));
+                
             
             // handle event by all plugins in parallel
             await Promise.all(
                 plugins.map( 
-                    async () => {
+                    async (p) => {
                         try {
                             await p.plugin.handleEvent({ eventType, data: newData, settings: p.settings });
                         } catch (e) {
@@ -71,6 +72,7 @@ class PluginManager {
                     }
                 )
             );
+       
                 
         }
     }
