@@ -176,12 +176,13 @@ export const calculateDataEvent = (prevData, newData) => {
   events.push(diskSpaceEvent);
 
   if (diskSpaceEvent === "disk_is_almost_full") {
-    if ( !data.lastDiskNotifTime ) {
-      data.lastDiskNotifTime = new Date().getTime()
+    if ( !newData.lastDiskNotifTime ) {
+      newData.lastDiskNotifTime = new Date().getTime()
     }
-   
+
   }
 
+  
   const checkRepeatDiskNotif = (data) => {
     const {HOURS_FOR_NEXT_ALERT} = database.data.settings;
     if ( !data.lastDiskNotifTime ) {
