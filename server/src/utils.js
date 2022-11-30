@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import humanizeDuration from "humanize-duration";
 // import fetch from "node-fetch";
-import sslCertificate from "get-ssl-certificate";
+import sslChecker from "ssl-checker";
 import env from "./env.js";
 import database from "./database.js";
 import PluginManager from "./pluginManager.js";
@@ -428,6 +428,7 @@ export const checkStatus = async (hostData) => {
   // const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
   
   
+  
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
@@ -563,20 +564,12 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
-
-    let certificateExpireDate = null;
+    
+    let cert = null;
     if (!dbData.URL.includes("localhost:")) {
-      
-      const cert = await getSSLCert(getHostName(dbData.URL));
+      cert = await sslChecker(getHostName(dbData.URL));
       if (!cert) {
         console.error(`Failed to get SSL cert for ${dbData.URL}`);
-        certificateExpireDate = null;
-      } else {
-        if (!cert.valid_to) {
-          console.error(`Failed to get SSL cert valid to for ${dbData.URL}`);
-        } else {
-          certificateExpireDate = (new Date(cert.valid_to)).getTime()
-        }
       }
     }
     const now = new Date().getTime();
@@ -625,7 +618,7 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
       now
     ) {
       dbData.lastSslCheckingTime = now;
-      await checkSslCert(now, certificateExpireDate, dbData);
+      await checkSslCert( cert, dbData);
     }
 
     await database.write();
@@ -637,16 +630,15 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
 
 const DEFAULT_DAYS_FOR_SSL_EXPIRED = 14;
 
-export const checkSslCert = async (nowTime, certExpTime, dbData) => {
-  if (certExpTime === null) {
+export const checkSslCert = async ( cert, dbData) => {
+  if (cert === null) {
     dbData.sslWarning = false;
     return;
   }
 
   const { DAYS_FOR_SSL_EXPIRED } = database.data.settings;
   if (
-    nowTime >= certExpTime - daysToMs(DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) &&
-    nowTime <= certExpTime
+    cert.daysRemaining < (DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) && cert.valid
   ) {
     await generateHttpWarningEvents(
       { 
@@ -654,10 +646,10 @@ export const checkSslCert = async (nowTime, certExpTime, dbData) => {
         sslWarning: true
       },
       dbData,
-      certExpTime
+      cert.validTo
     );
     dbData.sslWarning = true;
-    dbData.certificateExpireDate = certExpTime;
+    dbData.certificateExpireDate = cert.validTo;
   } else {
     dbData.sslWarning = false;
   }
@@ -686,13 +678,7 @@ export const dbClearScheduler = async () => {
   });
 };
 
-export const getSSLCert = async function (url) {
-  try {
-    return await sslCertificate.get(url);
-  } catch (e) {
-    console.log(e);
-  }
-};
+
 
 export const getHostName = (url) => {
   return new URL(url).host;

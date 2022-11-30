@@ -5,6 +5,7 @@ import env from "./env.js";
 import PluginManagerSingleton from "./pluginManager.js";
 import md from "markdown-it";
 import db from "./levelDB.js";
+import sslChecker from "ssl-checker";
 
 import {
   sizeFormat,
@@ -19,7 +20,7 @@ import {
   readableRandomStringMaker,
   createMonitorDataset,
   eventDuration,
-  getSSLCert,
+  
   getHostName,
   checkSslCert,
   anyNotificationDisabled,
@@ -859,19 +860,30 @@ router.get(
 router.post("/check-ssl", async (req, res) => {
   const { id } = req.body;
   const now = new Date().getTime();
-
+  
   const monData = database.data.httpMonitoringData.find((el) => el.id === id);
-  const certificateExpireDate = !monData.URL.includes("localhost:")
-    ? new Date((await getSSLCert(getHostName(monData.URL))).valid_to).getTime()
-    : null;
+  
+  
 
   if (monData) {
-    checkSslCert(now, certificateExpireDate, monData);
+    let cert = null;
+    if(!monData.URL.includes("localhost:")){
+      try {
+      cert = await sslChecker(getHostName(monData.URL));
+      }
+      catch(e){console.log("ssl certificate request error:",e)}
+        if (!cert) {
+          console.error(`Failed to get SSL cert for ${monData.URL}`);
+        }
+      
+    
+    checkSslCert( cert, monData);
     monData.lastSslCheckingTime = new Date().getTime();
     await database.write();
     return res.status(200).json({
       status: "success",
       code: 200,
     });
+  }
   }
 });
