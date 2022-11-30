@@ -253,7 +253,7 @@ export const calculateAsyncEvents = async () => {
 };
 
 
-export const generateHttpEvent = (prevData, newData) => {
+export const generateHttpEvent = async (prevData, newData) => {
   const events = [];
   let reason = "";
 
@@ -305,7 +305,7 @@ export const generateHttpEvent = (prevData, newData) => {
   }
 
   if (events.length !== 0) {
-    PluginManager().handleEvents(
+    await PluginManager().handleEvents(
       events.filter((e) => e),
       {
         HOST_NAME: newData.URL,
@@ -321,7 +321,7 @@ export const generateHttpEvent = (prevData, newData) => {
   }
 };
 
-export const generateHttpWarningEvents = (newData, prevData, expireDate) => {
+export const generateHttpWarningEvents = async (newData, prevData, expireDate) => {
   const events = [];
 
   let reason = `Ssl certificate expires ${new Date(expireDate)}  `;
@@ -333,7 +333,7 @@ export const generateHttpWarningEvents = (newData, prevData, expireDate) => {
     events.push("ssl_is_almost_expire");
   }
   if (events.length !== 0) {
-    PluginManager().handleEvents(
+    await PluginManager().handleEvents(
       events.filter((e) => e),
       {
         HOST_NAME: newData.URL,
@@ -427,7 +427,7 @@ export const checkStatus = async (hostData) => {
   // const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 2000);
+  const timeout = setTimeout(() => controller.abort(), 5000);
   const reqHeaders = {};
   if (hostData.enable_auth) {
     const base64Auth = Buffer.from(
@@ -529,101 +529,128 @@ export const startScheduler = () => {
   });
 };
 
-// export const schedulerTask = [];
+export const schedulerIsRunningForHost = {};
 
 export const cleanResponseError = (host) => {
   host.SslError = "";
 };
 
-export const createScheduleJob = async (httpHostId, interval) => {
-  await (new Promise((rslv) => setTimeout(rslv)), interval * 1000);
+export const createScheduleJob = async (httpHostId, targetInterval) => {
+  schedulerIsRunningForHost[httpHostId] = true;
+  let intervalCorrection = 0;
+  while (schedulerIsRunningForHost[httpHostId]) {
 
-  const dbData = database.data.httpMonitoringData.find(
-    (host) => host.id == httpHostId
-  );
-  const certificateExpireDate = !dbData.URL.includes("localhost:")
-    ? new Date(
-        (await getSSLCert(getHostName(dbData.URL)))?.valid_to
-      ).getTime()
-    : null;
-  const now = new Date().getTime();
-  const nullTime = new Date(0).getTime();
-  const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
-  const res = await checkStatus(dbData);
-  if (res.response !== dbData.okStatus) {
-    if (!dbData.numberOfFalseWarnings) {
-      dbData.numberOfFalseWarnings = 0;
+    let waitTime = (targetInterval - intervalCorrection) * 1000;
+    if (waitTime > 0) {
+      await (new Promise((resolve) => setTimeout(resolve)), waitTime);
     }
-    if (!dbData.firstFalseConfirmationTime) {
-      dbData.firstFalseConfirmationTime = new Date().getTime();
-    }
-    dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
 
-    if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION || 0) + 1) {
-      generateHttpEvent(dbData, {
-        ...dbData,
-        okStatus: !!res.response,
-        status: res.status,
-        event_created: dbData.firstFalseConfirmationTime,
-      });
+    const iterationStartMs = +new Date();
+    const dbData = database.data.httpMonitoringData.find(
+      (host) => host.id == httpHostId
+    );
 
-      dbData.okStatus = res.response;
-      dbData.event_created = dbData.firstFalseConfirmationTime;
-      dbData.numberOfFalseWarnings = 0;
-      dbData.firstFalseConfirmationTime = 0;
-
-      cleanResponseError(dbData);
-      if (res.response) {
-        dbData.errno = "";
+    let certificateExpireDate = null;
+    if (!dbData.URL.includes("localhost:")) {
+      
+      const cert = await getSSLCert(getHostName(dbData.URL));
+      if (!cert) {
+        console.error(`Failed to get SSL cert for ${dbData.URL}`);
+        certificateExpireDate = null;
+      } else {
+        if (!cert.valid_to) {
+          console.error(`Failed to get SSL cert valid to for ${dbData.URL}`);
+        } else {
+          certificateExpireDate = (new Date(cert.valid_to)).getTime()
+        }
       }
     }
-  } else {
-    dbData.numberOfFalseWarnings = 0;
-    dbData.firstFalseConfirmationTime = 0;
+    const now = new Date().getTime();
+    const nullTime = new Date(0).getTime();
+    const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
+    const res = await checkStatus(dbData);
+    if (res.response !== dbData.okStatus) {
+      if (!dbData.numberOfFalseWarnings) {
+        dbData.numberOfFalseWarnings = 0;
+      }
+      if (!dbData.firstFalseConfirmationTime) {
+        dbData.firstFalseConfirmationTime = new Date().getTime();
+      }
+      dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
+
+      if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION || 0) + 1) {
+        await generateHttpEvent(dbData, {
+          ...dbData,
+          okStatus: !!res.response,
+          status: res.status,
+          event_created: dbData.firstFalseConfirmationTime,
+        });
+
+        dbData.okStatus = res.response;
+        dbData.event_created = dbData.firstFalseConfirmationTime;
+        dbData.numberOfFalseWarnings = 0;
+        dbData.firstFalseConfirmationTime = 0;
+
+        cleanResponseError(dbData);
+        if (res.response) {
+          dbData.errno = "";
+        }
+      }
+    } else {
+      dbData.numberOfFalseWarnings = 0;
+      dbData.firstFalseConfirmationTime = 0;
+    }
+
+    if (!dbData.lastSslCheckingTime) {
+      dbData.lastSslCheckingTime = nullTime;
+    }
+    const checkingSSLintervalHours = 24;
+
+    if (
+      dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
+      now
+    ) {
+      dbData.lastSslCheckingTime = now;
+      await checkSslCert(now, certificateExpireDate, dbData);
+    }
+
+    await database.write();
+    const iterationEndMs = +new Date();
+    intervalCorrection = (iterationEndMs - iterationStartMs) / 1000;
+
   }
-
-  if (!dbData.lastSslCheckingTime) {
-    dbData.lastSslCheckingTime = nullTime;
-  }
-  const checkingSSLintervalHours = 24;
-
-  if (
-    dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
-    now
-  ) {
-    dbData.lastSslCheckingTime = now;
-    checkSslCert(now, certificateExpireDate, dbData);
-  }
-
-  await database.write();
-
-  createScheduleJob(httpHostId, interval)
-  // schedulerTask.push({
-  //   id: httpHostId,
-  //   scheduleJob: job,
-  // });
 };
 
-export const checkSslCert = (nowTime, certExpTime, dbData) => {
+const DEFAULT_DAYS_FOR_SSL_EXPIRED = 14;
+
+export const checkSslCert = async (nowTime, certExpTime, dbData) => {
+  if (certExpTime === null) {
+    dbData.sslWarning = false;
+    return;
+  }
+
   const { DAYS_FOR_SSL_EXPIRED } = database.data.settings;
   if (
-    nowTime >= certExpTime - daysToMs(DAYS_FOR_SSL_EXPIRED || 14) &&
+    nowTime >= certExpTime - daysToMs(DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) &&
     nowTime <= certExpTime
   ) {
-    generateHttpWarningEvents(
-      { ...dbData, sslWarning: true },
+    await generateHttpWarningEvents(
+      { 
+        ...dbData,
+        sslWarning: true
+      },
       dbData,
       certExpTime
     );
-    (dbData.sslWarning = true), (dbData.certificateExpireDate = certExpTime);
+    dbData.sslWarning = true;
+    dbData.certificateExpireDate = certExpTime;
   } else {
     dbData.sslWarning = false;
   }
 };
 
-export const stopScheduleJob = (id) => {
-  // const task = schedulerTask.find((el) => el.id === id);
-  // clearInterval(task?.scheduleJob);
+export const stopScheduleJob = (httpHostId) => {
+  schedulerIsRunningForHost[httpHostId] = false;
 };
 
 export const roundToNearestMinute = (date) => {
