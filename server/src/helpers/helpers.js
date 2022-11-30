@@ -1,7 +1,6 @@
 import humanizeDuration from "humanize-duration";
 import {
   calculateAsyncEvents,
-  checkUserExistsOrCreate,
   DATE_HUMANIZER_CONFIG,
   // startScheduler,
   // dbClearScheduler,

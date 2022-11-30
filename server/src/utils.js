@@ -221,7 +221,7 @@ export const calculateAsyncEvents = async () => {
   const { HOST_IS_DOWN_CONFIRMATIONS } = database.data.settings;
 
   await Promise.all(
-    database.data.monitoringData.map((data) => {
+    database.data.monitoringData.map(async (data) => {
       const safePeriod = 0.1 * 1000;
       const events = [];
 
@@ -238,7 +238,7 @@ export const calculateAsyncEvents = async () => {
         data.ONLINE_EVENT_TS = new Date().getTime();
       }
 
-      PluginManager().handleEvents(
+      await PluginManager().handleEvents(
         events.filter((e) => e),
         {
           enabledNotifList: data.enabledNotifList,
@@ -436,7 +436,7 @@ export const checkStatus = async (hostData) => {
     ).toString("base64");
     reqHeaders.Authorization = `Basic ${base64Auth}`;
   }
-  let response = "";
+  let response = null;
   try {
     response = await fetch(hostData.URL, {
       method: "GET",
@@ -444,8 +444,18 @@ export const checkStatus = async (hostData) => {
       signal: controller.signal,
     });
   } catch (e) {
-    console.log("Check http status error fetch url() - ",hostData.URL,new Date(), 'response :',response );
+    console.log("Check http status error fetch url() - ", hostData.URL, new Date(), 'response :', response );
   }
+
+  let respText = null;
+  if (response !== null) {
+    try {
+      respText = await response.text();
+    } catch (e) {
+      console.log("Http response reading error", new Date(), "response errno:", response.errno, "response status:", response.status);
+    }
+  }
+ 
 
   clearTimeout(timeout);
 
@@ -488,27 +498,19 @@ export const checkStatus = async (hostData) => {
         response: response.status === 200,
       };
     case "keyword_exist": {
-      let respText = "";
-      try {
-        respText = await response.text();
-      } catch (e) {
-        console.log("Http response text error  exist",new Date(), "response:", response);
+      if (respText === null) {
         return { response: false }
       }
       const kwExists = respText.includes(hostData.key_word);
       if (!kwExists) {
-        hostData.errno = "Keyword doesn`t exist.";
+        hostData.errno = "Keyword doesn't exist.";
       }
       return {
         response: kwExists,
       };
     }
     case "keyword_not_exist": {
-      let respText = "";
-      try {
-        respText = await response.text();
-      } catch (e) {
-        console.log("Http response text error not exist",new Date(), e);
+      if (respText === null) {
         return { response: false }
       }
 
