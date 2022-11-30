@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "cross-env ENV=local nodemon --ignore data/ src/index.js",
-    "watch-tailwindcss": "cd html && npm run watch-tailwindcss"
+    "watch-tailwindcss": "cd html && npm run watch-tailwindcss",
+    "test": "cross-env ENV=local nodemon --ignore data/ src/index.js"
   },
   "author": "",
   "license": "ISC",

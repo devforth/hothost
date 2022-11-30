@@ -444,7 +444,7 @@ export const checkStatus = async (hostData) => {
       signal: controller.signal,
     });
   } catch (e) {
-    console.log("Check http status error fetch url() - ",hostData.URL,new Date(), 'response :',response );
+    console.log("Check http status error fetch url() - ",hostData.URL,new Date(),  );
   }
 
   clearTimeout(timeout);
