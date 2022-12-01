@@ -20,9 +20,7 @@
     <span>48 hours ago</span>
     <span>Now</span>
   </div>
-  <h4 className="mt-10 dark:text-gray-200">
-    Selected time: <span id={`selectedTime-${chosenHost}`}></span>
-  </h4>
+ 
   <div className="flex justify-between h-96 max-h-96">
     <div
       id={`processArea-${chosenHost}`}

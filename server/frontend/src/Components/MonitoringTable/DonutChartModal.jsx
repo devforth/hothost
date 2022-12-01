@@ -74,6 +74,10 @@ const DonutChartModal = (props) => {
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
                 Top 10 processes by memory at time
               </h3>
+              <h4 className=" dark:text-gray-200  flex justify-center font-bold text-lg">
+                Selected time: {calculateSelectedTime(2880 - selectedTimeFromInput)}
+               
+              </h4>
               <DonutChartInput
                 setSelectedTime={setSelectedTime}
                 restartTime={donutData.restartTime}
@@ -84,12 +88,7 @@ const DonutChartModal = (props) => {
                 <span>48 hours ago</span>
                 <span>Now</span>
               </div>
-              <h4 className="mt-10 dark:text-gray-200 inline-block">
-                Selected time:{" "}
-                <span>
-                  {calculateSelectedTime(2880 - selectedTimeFromInput)}
-                </span>
-              </h4>
+             
               {isPending ? (
                 <div className="w-[52px] mx-auto ">
                   {" "}

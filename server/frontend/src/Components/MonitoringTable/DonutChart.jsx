@@ -72,9 +72,9 @@ const MyDonutChart = (props) => {
       />
       <div
         className="w-[65%] ml-auto mobile:w-15
-        mobile:ml-0"
+        mobile:ml-0 mobile:mt-0 mt-5"
       >
-        {ramUsage? <p className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">Occupied RAM : {ramUsage} </p>:null}
+        {ramUsage? <p className="text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal flex justify-center mobile:opacity-[0] mobile:h-0  ">Occupied RAM : {ramUsage} </p>:null}
         
         <ul
           onMouseLeave={() => {

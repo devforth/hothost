@@ -42,7 +42,7 @@ const DonutChartInput = (props) => {
 
   return (
     <div className="relative">
-      <div className=" m-auto mt-14 w-[100%]" ref={refRange}>
+      <div className=" m-auto mt-12 w-[100%]" ref={refRange}>
         {minutes >= max ? (
           ""
         ) : (
