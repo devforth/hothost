@@ -792,7 +792,7 @@ router.get(
       .then((res) => res.restartTime)
       .catch(() => 0);
     
-    let ramUsage = "1";
+    let ramUsage = "0";
     const processByTime = await dbIndex
       .get(+time)
       .then((res) => {
@@ -806,7 +806,7 @@ router.get(
     res.json({
       restartTime: restartTime,
       process: processByTime,
-      ramUsage:ramUsage
+      totalRamUsage: sizeFormat(ramUsage ),
     });
   })
 );

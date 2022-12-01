@@ -23,7 +23,7 @@ const DonutChartModal = (props) => {
 
   const [selectedTimeFromInput, setSelectedTime] = useState("");
   const debouncedValue = useDebounce(selectedTimeFromInput, 200);
-  const [donutData, setDonutData] = useState({ process: [], restartTime: "" });
+  const [donutData, setDonutData] = useState({ process: [], restartTime: "", totalRamUsage:"" });
   const [isPending, setIsPending] = useState(false);
 
   const getDataForChart = async (id) => {
@@ -84,7 +84,7 @@ const DonutChartModal = (props) => {
                 <span>48 hours ago</span>
                 <span>Now</span>
               </div>
-              <h4 className="mt-10 dark:text-gray-200">
+              <h4 className="mt-10 dark:text-gray-200 inline-block">
                 Selected time:{" "}
                 <span>
                   {calculateSelectedTime(2880 - selectedTimeFromInput)}

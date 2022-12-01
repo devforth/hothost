@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 
 const MyDonutChart = (props) => {
   const chartData = props.chartData.process;
+  const ramUsage = props.chartData.totalRamUsage
   let totallUsageAll = 0;
 
   const addTransitionToSector = function (color) {
@@ -73,6 +74,8 @@ const MyDonutChart = (props) => {
         className="w-[65%] ml-auto mobile:w-15
         mobile:ml-0"
       >
+        {ramUsage? <p className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">Occupied RAM : {ramUsage} </p>:null}
+        
         <ul
           onMouseLeave={() => {
             setSelectedProcess("");
