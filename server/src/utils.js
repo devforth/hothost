@@ -448,7 +448,7 @@ export const checkStatus = async (hostData) => {
       cache: 'no-cache' 
     });
   } catch (e) {
-    console.log("Check http status error fetch url() - ", hostData.URL, new Date(), 'response :', response );
+    
   }
 
   let respText = null;

@@ -23,6 +23,11 @@ const router = express.Router();
 router.post("/process/:secret", async (req, res) => {
   const procData = req.body;
   const process = procData.PROCESS;
+  const freeRam = procData.SYSTEM_FREE_RAM;
+  const totalRam = procData.SYSTEM_TOTAL_RAM;
+  const usedRam = () => { if ( totalRam !== "unknown" ) { return totalRam - freeRam }
+    else { return 0 }
+   } 
 
   const isRestart = +procData.IS_RESTART;
   const now = roundToNearestMinute(new Date().getTime());
@@ -37,7 +42,7 @@ router.post("/process/:secret", async (req, res) => {
   const hostId = host.id;
   const dbIndex = db.sublevel(hostId, { valueEncoding: "json" });
   const dbHostState = db.sublevel("options", { valueEncoding: "json" });
-  dbIndex.put(now, process);
+  dbIndex.put(now, {...process,usedRam:usedRam()});
   if (isRestart) {
     dbHostState.put(hostId, {
       restartTime: now,
@@ -48,6 +53,7 @@ router.post("/process/:secret", async (req, res) => {
 
 router.post("/data/:secret", async (req, res) => {
   const monitorData = req.body;
+ 
 
 
   const index = database.data.monitoringData.findIndex(
