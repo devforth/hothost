@@ -567,10 +567,9 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
     
     let cert = null;
     if (!dbData.URL.includes("localhost:")) {
-      cert = await sslChecker(getHostName(dbData.URL));
-      if (!cert) {
-        console.error(`Failed to get SSL cert for ${dbData.URL}`);
-      }
+      try {cert = await sslChecker(getHostName(dbData.URL));}
+      catch(e) { console.log( `sslChecker error for ${dbData.URL}`, new Date(),e) }
+      
     }
     const now = new Date().getTime();
     const nullTime = new Date(0).getTime();

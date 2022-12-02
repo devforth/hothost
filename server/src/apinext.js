@@ -828,10 +828,8 @@ router.post("/check-ssl", async (req, res) => {
       try {
       cert = await sslChecker(getHostName(monData.URL));
       }
-      catch(e){console.log("ssl certificate request error:",e)}
-        if (!cert) {
-          console.error(`Failed to get SSL cert for ${monData.URL}`);
-        }
+      catch (e) { console.log( `sslChecker error for ${monData.URL}`, new Date(),e)}
+        
       
     
     checkSslCert( cert, monData);
