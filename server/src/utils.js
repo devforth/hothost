@@ -618,6 +618,8 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
       now
     ) {
       dbData.lastSslCheckingTime = now;
+      //add cert information to DB
+      dbData.cert = cert;
       await checkSslCert( cert, dbData);
     }
 

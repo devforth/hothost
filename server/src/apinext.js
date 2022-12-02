@@ -501,6 +501,7 @@ const getHttpMonitor = () => {
     errno: data?.errno,
     sslError: data?.SslError,
     monitor_type: data.monitor_type,
+    certInfo: data.cert
   }));
 };
 
@@ -835,6 +836,7 @@ router.post("/check-ssl", async (req, res) => {
     
     checkSslCert( cert, monData);
     monData.lastSslCheckingTime = new Date().getTime();
+    monData.cert = cert;
     await database.write();
     return res.status(200).json({
       status: "success",
