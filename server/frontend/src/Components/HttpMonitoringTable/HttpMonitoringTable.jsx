@@ -18,7 +18,7 @@ const httpMonitoringTable = (props) => {
       <table
         id="httpMonitoring"
         role="list"
-        class="divide-y divide-gray-200 dark:divide-gray-700 w-full"
+        className="divide-y divide-gray-200 dark:divide-gray-700 w-full"
       >
         {httpMOnitors &&
           httpMOnitors.length > 0 &&

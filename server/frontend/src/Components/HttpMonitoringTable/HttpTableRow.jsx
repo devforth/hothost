@@ -16,8 +16,8 @@ const HttpTableRow = (props) => {
   
 
   return (
-    <tr class="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
-      <td class="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+    <tr className="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
+      <td className="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
         {monitor.status ? (
           <span>🟢OK</span>
         ) : (
@@ -34,15 +34,15 @@ const HttpTableRow = (props) => {
           </Tooltip>
         )}
       </td>
-      <td class="pr-4 row-start-2 col-start-1   flex-1 text-gray-900 dark:text-white">
+      <td className="pr-4 row-start-2 col-start-1   flex-1 text-gray-900 dark:text-white">
         <Tooltip
           content={`Monitor type : ${monitor.monitor_type}`}
           placement="bottom"
         >
           <p>
-            <span class="whitespace-normal">{monitor.url}</span>
+            <span className="whitespace-normal">{monitor.url}</span>
             {monitor.label && monitor.label !== "" && (
-              <span class="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
+              <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
                 {monitor.label}
               </span>
             )}
@@ -57,7 +57,7 @@ const HttpTableRow = (props) => {
               )}`}
               placement="bottom"
             >
-              <span class="bg-yellow-200 text-yellow-500 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-500">
+              <span className="bg-yellow-200 text-yellow-500 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-500">
                 Warning
               </span>
             </Tooltip>
@@ -89,13 +89,13 @@ const HttpTableRow = (props) => {
         <SSLinfo certInfo={monitor.certInfo}></SSLinfo>
       </td>
 
-      <td class="pr-4 flex-1 text-gray-900 dark:text-white min-w-max">
-        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+      <td className="pr-4 flex-1 text-gray-900 dark:text-white min-w-max">
+        <p className="text-sm text-gray-500 truncate dark:text-gray-400">
           Up\down time
         </p>
         <p>{monitor.monitorLastEventsTs}</p>
       </td>
-      <td class="mobile:flex mobile:self-center mobile:place-content-end">
+      <td className="mobile:flex mobile:self-center mobile:place-content-end">
         <OutsideHider state={dotsIsVisible} setstate={setDotsIsvisible}>
           <button
             id={monitor.id}
@@ -109,7 +109,7 @@ const HttpTableRow = (props) => {
               id="dropdownDots-{{@index}}"
               data-dropdown-toggle="dropdownDotsInfo-{{@index}}"
               data-dropdown-placement="bottom-end"
-              class="h-6 w-6 text-gray-700 dark:text-gray-100 cursor-pointer"
+              className="h-6 w-6 text-gray-700 dark:text-gray-100 cursor-pointer"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -124,7 +124,7 @@ const HttpTableRow = (props) => {
           </button>
           <div
             id="dropdownDotsInfo-{{@index}}"
-            class={`z-10 ${
+            className={`z-10 ${
               dotsIsVisible ? "absolute translate-x-[-75%]" : "hidden "
             }  w-max bg-white shadow text-sm font-medium text-white rounded-lg transition-opacity duration-300 dark:bg-gray-700`}
           >
@@ -136,11 +136,11 @@ const HttpTableRow = (props) => {
                 setDotsIsvisible(false);
               }}
               data-modal-toggle="modal_label-{{@index}}"
-              class="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
+              className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 pr-2"
+                className="h-6 w-6 pr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -162,11 +162,11 @@ const HttpTableRow = (props) => {
                 setDotsIsvisible(false);
               }}
               data-modal-toggle="modal_delete-{{@index}}"
-              class="mx-3 my-2 flex text-left text-red-600 hover:underline"
+              className="mx-3 my-2 flex text-left text-red-600 hover:underline"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 pr-2"
+                className="h-6 w-6 pr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

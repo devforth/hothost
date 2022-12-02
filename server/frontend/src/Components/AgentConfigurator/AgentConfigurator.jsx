@@ -77,7 +77,7 @@ const AgentConfigurator = (props) => {
       text: (
         <pre
           id="composepre"
-          class="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
+          className="p-4 mb-4 overflow-x-scroll text-gray-500 dark:text-white text-xs bg-white border dark:border-gray-600 dark:bg-gray-700 block rounded shadow-md mt-5 whitespace-pre overflow-x-none "
         >
           {`version: '3'
 services:

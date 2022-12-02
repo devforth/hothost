@@ -132,8 +132,8 @@ const HttpMonitor = () => {
   };
   return (
     <div>
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="mobile:w-min text-xl font-bold leading-none text-gray-900 dark:text-white">
+      <div className="flex justify-between items-center mb-4">
+        <h5 className="mobile:w-min text-xl font-bold leading-none text-gray-900 dark:text-white">
           Add Http(s) monitoring
         </h5>
         <div>
@@ -141,11 +141,11 @@ const HttpMonitor = () => {
             onClick={() => {
               setMonitorIsVisible(!monitorIsVisible);
             }}
-            class="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center "
+            className="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 mr-1"
+              className="h-6 w-6 mr-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -161,10 +161,10 @@ const HttpMonitor = () => {
           </button>
         </div>
       </div>
-      <div id="monitor_form" class={monitorIsVisible ? "" : "hidden"}>
+      <div id="monitor_form" className={monitorIsVisible ? "" : "hidden"}>
         <label
-          for="URL"
-          class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${
+          htmlFor="URL"
+          className={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${
             urlError ? "text-red-700 " : ""
           }`}
           style={{ color: urlError ? "red" : "" }}
@@ -188,16 +188,16 @@ const HttpMonitor = () => {
           type="text"
           placeholder="https://example.com"
           required
-          class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+          className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
 
         <label
-          for="monitor_interval"
-          class="block text-sm font-semibold text-gray-900 dark:text-gray-200"
+          htmlFor="monitor_interval"
+          className="block text-sm font-semibold text-gray-900 dark:text-gray-200"
         >
           Monitor interval (sec)
         </label>
-        <div class="flex justify-between items-center mb-5">
+        <div className="flex justify-between items-center mb-5">
           <input
             name="monitor_interval"
             id="monitorInterval"
@@ -208,15 +208,15 @@ const HttpMonitor = () => {
             min="1"
             max="120"
             value={monitorIntervalRng}
-            class="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            className="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
           />
-          <div class="text-gray-900 dark:text-gray-200">
+          <div className="text-gray-900 dark:text-gray-200">
             <span id="interval">{monitorIntervalRng}</span> sec.
           </div>
         </div>
         <label
-          for="enable_auth"
-          class="relative inline-flex items-center mb-4 cursor-pointer"
+          htmlFor="enable_auth"
+          className="relative inline-flex items-center mb-4 cursor-pointer"
         >
           <input
             name="enable_auth"
@@ -226,17 +226,17 @@ const HttpMonitor = () => {
             }}
             type="checkbox"
             value={basicAuthChk}
-            class="sr-only peer"
+            className="sr-only peer"
           />
-          <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-          <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+          <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+          <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
             Enable basic auth
           </span>
         </label>
-        <div id="baseAuth" class={`${basicAuthChk ? "" : "hidden"}`}>
+        <div id="baseAuth" className={`${basicAuthChk ? "" : "hidden"}`}>
           <label
-            for="login"
-            class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 
+            htmlFor="login"
+            className={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 
             }`}
             style={{ color: loginError ? "red" : "" }}
           >
@@ -253,11 +253,11 @@ const HttpMonitor = () => {
             id="login"
             type="text"
             placeholder="login"
-            class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
           />
           <label
-            for="password"
-            class={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 `}
+            htmlFor="password"
+            className={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 `}
             style={{ color: passwordError ? "red" : "" }}
           >
             {passwordError ? "Password is required" : "Password"}
@@ -272,13 +272,13 @@ const HttpMonitor = () => {
             }}
             id="password"
             type="password"
-            class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
           />
         </div>
-        <div class="mb-6">
+        <div className="mb-6">
           <label
-            for="monitor_type"
-            class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-400"
+            htmlFor="monitor_type"
+            className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-400"
           >
             Select monitor type
           </label>
@@ -289,7 +289,7 @@ const HttpMonitor = () => {
               setMonitorTypeSlt(e.target.value);
             }}
             name="monitor_type"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="status_code">Status code is 200</option>
             <option value="keyword_exist">Keyword exists</option>
@@ -299,8 +299,8 @@ const HttpMonitor = () => {
         {monitorTypeSlt !== "status_code" ? (
           <div id="keyWordPlace">
             <label
-              for="key_word"
-              class="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+              htmlFor="key_word"
+              className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
               style={{ color: keyWordError ? "red" : "" }}
             >
               {" "}
@@ -319,7 +319,7 @@ const HttpMonitor = () => {
               id="keyWordInp"
               type="text"
               placeholder="Keyword"
-              class="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+              className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
             />
           </div>
         ) : null}
@@ -340,13 +340,13 @@ const HttpMonitor = () => {
           onClick={() => {
             setMonitorIsVisible(false);
           }}
-          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+          className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
         >
           Close
         </button>
-        <div class="my-4 border-b-2 border-gray-200 dark:border-gray-700"></div>
+        <div className="my-4 border-b-2 border-gray-200 dark:border-gray-700"></div>
       </div>
-      <div class="flow-root overflow-auto mobile:truncate">
+      <div className="flow-root overflow-auto mobile:truncate">
         <HttpMonitoringTable
           monitoringHttpData={monitoringHttpData}
           setMonitoringHttpData={setMonitoringHttpData}
