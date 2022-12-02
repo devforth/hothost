@@ -8,7 +8,9 @@ import { Spinner } from "flowbite-react";
 const DonutChartModal = (props) => {
   const setDonutModalIsVisible = props.setDonutModalIsVisible;
   const hostId = props.hostId;
+  const hostTotalRam = props.hostTotalRam;
 
+  console.log(hostTotalRam);
   const calculateSelectedTime = (timeStep) => {
     const minutesLeft = timeStep * 1000 * 60;
     const now = new Date().getTime();
@@ -23,7 +25,11 @@ const DonutChartModal = (props) => {
 
   const [selectedTimeFromInput, setSelectedTime] = useState("");
   const debouncedValue = useDebounce(selectedTimeFromInput, 200);
-  const [donutData, setDonutData] = useState({ process: [], restartTime: "", totalRamUsage:"" });
+  const [donutData, setDonutData] = useState({
+    process: [],
+    restartTime: "",
+    totalRamUsage: "",
+  });
   const [isPending, setIsPending] = useState(false);
 
   const getDataForChart = async (id) => {
@@ -75,8 +81,8 @@ const DonutChartModal = (props) => {
                 Top 10 processes by memory at time
               </h3>
               <h4 className=" dark:text-gray-200  flex justify-center font-bold text-lg">
-                Selected time: {calculateSelectedTime(2880 - selectedTimeFromInput)}
-               
+                Selected time:{" "}
+                {calculateSelectedTime(2880 - selectedTimeFromInput)}
               </h4>
               <DonutChartInput
                 setSelectedTime={setSelectedTime}
@@ -88,14 +94,17 @@ const DonutChartModal = (props) => {
                 <span>48 hours ago</span>
                 <span>Now</span>
               </div>
-             
+
               {isPending ? (
                 <div className="w-[52px] mx-auto ">
                   {" "}
                   <Spinner size="3xl"></Spinner>
                 </div>
               ) : donutData.process.length > 0 ? (
-                <MyDonutChart chartData={donutData}></MyDonutChart>
+                <MyDonutChart
+                  chartData={donutData}
+                  hostTotalRam={hostTotalRam}
+                ></MyDonutChart>
               ) : (
                 <h2 className="text-2xl font-bold align-middle flex justify-center mt-5   text-gray-500 dark:text-gray-400">
                   No data for now

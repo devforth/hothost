@@ -10,14 +10,13 @@ import NotificationModal from "./MonitoringModal/NotificationModal";
 
 const MonitoringTable = (props) => {
   const monitoringData = props.monitoringData;
-  const refreshData = props.refreshData
+  const refreshData = props.refreshData;
 
   const [labelModalIsVisible, setlabelModalIsVisible] = useState(false);
-  const [notifyModalIsVisible, setNotifyModalIsVisible] = useState(false)
+  const [notifyModalIsVisible, setNotifyModalIsVisible] = useState(false);
   const [deleteModalIsVisible, setDeleteModalIsVisible] = useState(false);
   const [donutModalIsVisible, setDonutModalIsVisible] = useState(false);
- 
-  
+
   const [chosenHost, setChosenHost] = useState("");
 
   const saveLabel = async (labelName) => {
@@ -32,7 +31,7 @@ const MonitoringTable = (props) => {
     const data = await addLabel(body, "add_label");
     if (data[0].label) {
       setlabelModalIsVisible(false);
-      refreshData()
+      refreshData();
     }
   };
 
@@ -47,7 +46,7 @@ const MonitoringTable = (props) => {
     const data = await deleteHost(body, "remove_host");
     if (data.status === "successful") {
       setDeleteModalIsVisible(false);
-      refreshData()
+      refreshData();
     }
   };
 
@@ -114,12 +113,13 @@ const MonitoringTable = (props) => {
               ""
             }
             action={saveLabel}
-            label={(monitoringData &&
-              monitoringData.filter((e) => {
-               
-                return e.id === chosenHost;
-              })[0].label) ||
-            ""}
+            label={
+              (monitoringData &&
+                monitoringData.filter((e) => {
+                  return e.id === chosenHost;
+                })[0].label) ||
+              ""
+            }
           ></MonitoringModal>
         ) : null}
         {notifyModalIsVisible ? (
@@ -148,6 +148,11 @@ const MonitoringTable = (props) => {
             monitoringData.filter((e) => {
               return e.id === chosenHost;
             })[0].id
+          }
+          hostTotalRam={
+            monitoringData.filter((e) => {
+              return e.id === chosenHost;
+            })[0].ram_total
           }
         ></DonutChartModal>
       )}

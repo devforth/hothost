@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 
 const MyDonutChart = (props) => {
   const chartData = props.chartData.process;
-  const ramUsage = props.chartData.totalRamUsage
+  const ramUsage = props.chartData.totalRamUsage;
+  const hostTotalRam = props.hostTotalRam;
   let totallUsageAll = 0;
 
   const addTransitionToSector = function (color) {
@@ -54,6 +55,18 @@ const MyDonutChart = (props) => {
 
   const colors = chartData.map((e) => e.color);
 
+  const sizeFormatToNumber = (a) => {
+    const valuesCortege = a.split(" ");
+    let indexOfFormat = 0;
+    let formatsArr = ["B", "KiB", "MiB", "GiB", "TiB"];
+    formatsArr.forEach((el, i) => {
+      if (el === valuesCortege[1]) {
+        indexOfFormat = i;
+      }
+    });
+    return valuesCortege[0] * Math.pow(1024, indexOfFormat);
+  };
+
   return (
     <div className="flex justify-between mobile:justify-start">
       <DonutChart
@@ -74,8 +87,21 @@ const MyDonutChart = (props) => {
         className="w-[65%] ml-auto mobile:w-15
         mobile:ml-0 mobile:mt-0 mt-5"
       >
-        {ramUsage? <p className="text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal flex justify-center mobile:opacity-[0] mobile:h-0  ">Occupied RAM : {ramUsage} </p>:null}
-        
+        {ramUsage ? (
+          <p className=" font-normal text-gray-500 dark:text-gray-400 whitespace-normal flex justify-end mobile:opacity-[0] mobile:h-0  ">
+            Occupied RAM : {ramUsage} (
+            <span className="ml-1">
+              {(
+                (sizeFormatToNumber(ramUsage) /
+                  sizeFormatToNumber(hostTotalRam)) *
+                100
+              ).toFixed()}{" "}
+              %
+            </span>
+            )
+          </p>
+        ) : null}
+
         <ul
           onMouseLeave={() => {
             setSelectedProcess("");
