@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import OutsideHider from "../OutsideAlert/OutsideAlert";
 import { Tooltip, Dropdown } from "flowbite-react";
+import SSLinfo from "./SSLinfo";
 
 const HttpTableRow = (props) => {
   const [chosenHost, setChosenHost] = useState("");
@@ -12,6 +13,7 @@ const HttpTableRow = (props) => {
   const getLabelId = props.getLabelId;
 
   const checkSslWarn = props.checkSslWarn;
+  
 
   return (
     <tr class="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
@@ -82,6 +84,9 @@ const HttpTableRow = (props) => {
             </button>
           </div>
         ) : null}
+      </td>
+      <td className="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+        <SSLinfo certInfo={monitor.certInfo}></SSLinfo>
       </td>
 
       <td class="pr-4 flex-1 text-gray-900 dark:text-white min-w-max">
