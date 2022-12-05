@@ -47,7 +47,7 @@ router.post("/process/:secret", async (req, res) => {
   const dbIndex = db.sublevel(hostId, { valueEncoding: "json" });
   const dbHostState = db.sublevel("options", { valueEncoding: "json" });
   dbIndex.put(now, { ...process, usedRam: usedRam() });
-  if (!isRestart) {
+  if (isRestart) {
     const restartTimeArr = await dbHostState
       .get(hostId)
       .then((res) => {
