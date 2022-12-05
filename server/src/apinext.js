@@ -20,7 +20,6 @@ import {
   readableRandomStringMaker,
   createMonitorDataset,
   eventDuration,
-  
   getHostName,
   checkSslCert,
   anyNotificationDisabled,
@@ -255,6 +254,7 @@ router.post(
     }
   })
 );
+
 router.post(
   "/add_monitor",
   mustBeAuthorizedView(async (req, res) => {
@@ -292,6 +292,26 @@ router.post(
     res
       .status(200)
       .json({ status: "successful", code: 200, data: getHttpMonitor() });
+  })
+);
+
+router.post(
+  "/edit_http_monitor",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id, ...newSettings } = req.body;
+    const monitorIndex = database.data.httpMonitoringData.findIndex(
+      (m) => m.id === id
+    );
+    if (monitorIndex !== -1) {
+      database.data.httpMonitoringData[monitorIndex] = {
+        ...database.data.httpMonitoringData[monitorIndex],
+        ...newSettings,
+      };
+      await database.write();
+      res.status(200).json({ status: "successful", code: 200 });
+    } else {
+      res.status(400).json({ error: "invalid data" });
+    }
   })
 );
 
@@ -501,7 +521,11 @@ const getHttpMonitor = () => {
     errno: data?.errno,
     sslError: data?.SslError,
     monitor_type: data.monitor_type,
-    certInfo: data.cert
+    certInfo: data.cert,
+    interval: data.monitor_interval,
+    login: data.login,
+    password: data.password,
+    keyWord: data.key_word,
   }));
 };
 
@@ -757,24 +781,27 @@ const generateProcessData = (data) => {
   let processEntries = [];
   let id = 0;
   for (const [key, value] of Object.entries(data)) {
-    if ( key !=="usedRam") {
-    processEntries.push({
-      id: id + 1,
-      data: value,
-      total_usage: key,
-      ram_usage: sizeFormat(key * 1024),
-      color: colors[id],
-    });
-    id++;} 
+    if (key !== "usedRam") {
+      processEntries.push({
+        id: id + 1,
+        data: value,
+        total_usage: key,
+        ram_usage: sizeFormat(key * 1024),
+        color: colors[id],
+      });
+      id++;
+    }
   }
   return processEntries;
 };
 
 const getRamUsage = (data) => {
   for (const [key, value] of Object.entries(data)) {
-   if ( key ==="usedRam") { return value }
+    if (key === "usedRam") {
+      return value;
+    }
   }
-}
+};
 
 router.get(
   "/getProcess/:id/:timeStep/",
@@ -792,54 +819,47 @@ router.get(
       .get(id)
       .then((res) => res.restartTime)
       .catch(() => 0);
-    
+
     let ramUsage = "0";
     const processByTime = await dbIndex
       .get(+time)
       .then((res) => {
         ramUsage = getRamUsage(res);
-        return generateProcessData(res).reverse()})
+        return generateProcessData(res).reverse();
+      })
       .catch((err) => []);
-      
-
-      
 
     res.json({
       restartTime: restartTime,
       process: processByTime,
-      totalRamUsage: sizeFormat(ramUsage ),
+      totalRamUsage: sizeFormat(ramUsage),
     });
   })
 );
 
-
-
 router.post("/check-ssl", async (req, res) => {
   const { id } = req.body;
   const now = new Date().getTime();
-  
+
   const monData = database.data.httpMonitoringData.find((el) => el.id === id);
-  
-  
 
   if (monData) {
     let cert = null;
-    if(!monData.URL.includes("localhost:")){
+    if (!monData.URL.includes("localhost:")) {
       try {
-      cert = await sslChecker(getHostName(monData.URL));
+        cert = await sslChecker(getHostName(monData.URL));
+      } catch (e) {
+        console.log(`sslChecker error for ${monData.URL}`, new Date(), e);
       }
-      catch (e) { console.log( `sslChecker error for ${monData.URL}`, new Date(),e)}
-        
-      
-    
-    checkSslCert( cert, monData);
-    monData.lastSslCheckingTime = new Date().getTime();
-    monData.cert = cert;
-    await database.write();
-    return res.status(200).json({
-      status: "success",
-      code: 200,
-    });
-  }
+
+      checkSslCert(cert, monData);
+      monData.lastSslCheckingTime = new Date().getTime();
+      monData.cert = cert;
+      await database.write();
+      return res.status(200).json({
+        status: "success",
+        code: 200,
+      });
+    }
   }
 });

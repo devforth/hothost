@@ -545,6 +545,7 @@ export const cleanResponseError = (host) => {
 };
 
 export const createScheduleJob = async (httpHostId, targetInterval) => {
+
   schedulerIsRunningForHost[httpHostId] = true;
   let intervalCorrection = 0;
 
@@ -558,12 +559,14 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
+    
     if (dbData) {
       const now = new Date().getTime();
       const nullTime = new Date(0).getTime();
       const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
       const res = await checkStatus(dbData);
       if (res.response !== dbData.okStatus) {
+        
         if (!dbData.numberOfFalseWarnings) {
           dbData.numberOfFalseWarnings = 0;
         }
@@ -597,7 +600,7 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
         dbData.numberOfFalseWarnings = 0;
         dbData.firstFalseConfirmationTime = 0;
       }
-
+      //
       if (!dbData.lastSslCheckingTime) {
         dbData.lastSslCheckingTime = nullTime;
       }
@@ -610,6 +613,7 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
         dbData.lastSslCheckingTime = now;
         //add cert information to DB
         let cert = null;
+        //get sslCert information
         if (!dbData.URL.includes("localhost:")) {
           try {
             cert = await sslChecker(getHostName(dbData.URL));
@@ -658,9 +662,9 @@ export const checkSslCert = async (cert, dbData) => {
 };
 
 export const stopScheduleJob = (httpHostId) => {
-  console.log("before stop", schedulerIsRunningForHost);
+  
   schedulerIsRunningForHost[httpHostId] = false;
-  console.log("after stop", schedulerIsRunningForHost);
+  
 };
 
 export const roundToNearestMinute = (date) => {

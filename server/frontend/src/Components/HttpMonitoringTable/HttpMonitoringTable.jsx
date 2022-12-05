@@ -4,13 +4,16 @@ import { getData } from "../../../FetchApi";
 import HttpTableRow from "./HttpTableRow";
 import ModalDelete from "./ModalDelete";
 import ModalAddLabel from "./ModalAddLabel";
+import HttpMonitor from "../HttpMonitor/HttpMonitor";
 
 const httpMonitoringTable = (props) => {
   const httpMOnitors = props.monitoringHttpData;
   const setMonitoringHttpData = props.setMonitoringHttpData;
   const checkSslWarn = props.checkSslWarn;
+  const changeMonitorSetting = props.changeMonitorSetting;
   const [deleteModalIsVisible, setDeleteModalIsVisible] = useState(false);
   const [labelModalIsVisible, setLabelModalIsVisible] = useState(false);
+  const [settingsViewIsVisible, setSettingsViewIsVisible] = useState(true);
   const [chosenId, setChosenId] = useState("");
 
   return (
@@ -39,6 +42,7 @@ const httpMonitoringTable = (props) => {
                   setLabelModalIsVisible(true);
                 }}
                 checkSslWarn={checkSslWarn}
+                changeMonitorSetting={changeMonitorSetting}
               ></HttpTableRow>
             );
           })}
@@ -72,6 +76,7 @@ const httpMonitoringTable = (props) => {
           setLabelModalIsVisible={setLabelModalIsVisible}
         ></ModalAddLabel>
       ) : null}
+      {/* {settingsViewIsVisible ? <HttpMonitor></HttpMonitor> : null} */}
     </>
   );
 };
