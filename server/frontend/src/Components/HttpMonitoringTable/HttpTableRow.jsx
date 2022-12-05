@@ -40,7 +40,11 @@ const HttpTableRow = (props) => {
           placement="bottom"
         >
           <p>
-            <span className="whitespace-normal">{monitor.url}</span>
+            <span className="whitespace-normal">
+              <a href={monitor.url} target="_blank">
+                {monitor.url}
+              </a>
+            </span>
             {monitor.label && monitor.label !== "" && (
               <span className="bg-gray-200 text-gray-800 text-sm dark:text-white dark:bg-gray-700 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
                 {monitor.label}
