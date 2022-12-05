@@ -10,7 +10,6 @@ const DonutChartModal = (props) => {
   const hostId = props.hostId;
   const hostTotalRam = props.hostTotalRam;
 
-  console.log(hostTotalRam);
   const calculateSelectedTime = (timeStep) => {
     const minutesLeft = timeStep * 1000 * 60;
     const now = new Date().getTime();
@@ -90,7 +89,7 @@ const DonutChartModal = (props) => {
                 getDataForChart={donutData}
                 setIsPending={setIsPending}
               ></DonutChartInput>
-              <div className="flex justify-between font-normal text-gray-500 dark:text-gray-400 whitespace-normal mt-2">
+              <div className="flex justify-between font-normal text-gray-500 dark:text-gray-400 whitespace-normal mt-7">
                 <span>48 hours ago</span>
                 <span>Now</span>
               </div>

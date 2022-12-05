@@ -545,7 +545,6 @@ export const cleanResponseError = (host) => {
 };
 
 export const createScheduleJob = async (httpHostId, targetInterval) => {
-
   schedulerIsRunningForHost[httpHostId] = true;
   let intervalCorrection = 0;
 
@@ -559,14 +558,13 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
-    
+
     if (dbData) {
       const now = new Date().getTime();
       const nullTime = new Date(0).getTime();
       const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
       const res = await checkStatus(dbData);
       if (res.response !== dbData.okStatus) {
-        
         if (!dbData.numberOfFalseWarnings) {
           dbData.numberOfFalseWarnings = 0;
         }
@@ -662,9 +660,7 @@ export const checkSslCert = async (cert, dbData) => {
 };
 
 export const stopScheduleJob = (httpHostId) => {
-  
   schedulerIsRunningForHost[httpHostId] = false;
-  
 };
 
 export const roundToNearestMinute = (date) => {

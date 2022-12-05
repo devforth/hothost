@@ -17,8 +17,8 @@ const DonutChartInput = (props) => {
   const max = 2880;
   const min = 1;
   const now = new Date().getTime();
-  const minutes = Math.floor((now - restartTime) / 1000 / 60);
-  const position = (max - minutes) / max;
+  const minutesArr =restartTime && restartTime.map(t=>{return Math.floor((now - t) / 1000 / 60); }) 
+   
 
   const calculateSelectedTime = (timeStep) => {
     const minutesLeft = timeStep * 1000 * 60;
@@ -43,15 +43,16 @@ const DonutChartInput = (props) => {
   return (
     <div className="relative">
       <div className=" m-auto mt-12 w-[100%]" ref={refRange}>
-        {minutes >= max ? (
+        {minutesArr&&minutesArr.map((m)=>{ 
+          console.log("m",m);return m >= max ? (
           ""
         ) : (
           <RestartTime
-            position={{ left: position * refRange.current.offsetWidth }}
-            restartTime={calculateSelectedTime(minutes)}
-            restartTextIsLeft={max - minutes > max / 2}
+            position={{ left: (max - m) / max * refRange.current.offsetWidth }}
+            restartTime={calculateSelectedTime(m)}
+            restartTextIsLeft={max - m > max / 2}
           ></RestartTime>
-        )}
+        )})  }
         <div
           className={`absolute bg-gray-600 h-12 w-[1px] left-[`}
           style={{

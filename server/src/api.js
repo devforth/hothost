@@ -25,9 +25,13 @@ router.post("/process/:secret", async (req, res) => {
   const process = procData.PROCESS;
   const freeRam = procData.SYSTEM_FREE_RAM;
   const totalRam = procData.SYSTEM_TOTAL_RAM;
-  const usedRam = () => { if ( totalRam !== "unknown" ) { return totalRam - freeRam }
-    else { return 0 }
-   } 
+  const usedRam = () => {
+    if (totalRam !== "unknown") {
+      return totalRam - freeRam;
+    } else {
+      return 0;
+    }
+  };
 
   const isRestart = +procData.IS_RESTART;
   const now = roundToNearestMinute(new Date().getTime());
@@ -42,10 +46,21 @@ router.post("/process/:secret", async (req, res) => {
   const hostId = host.id;
   const dbIndex = db.sublevel(hostId, { valueEncoding: "json" });
   const dbHostState = db.sublevel("options", { valueEncoding: "json" });
-  dbIndex.put(now, {...process,usedRam:usedRam()});
-  if (isRestart) {
+  dbIndex.put(now, { ...process, usedRam: usedRam() });
+  if (!isRestart) {
+    const restartTimeArr = await dbHostState
+      .get(hostId)
+      .then((res) => {
+        return res.restartTime;
+      })
+      .catch(() => 0);
+
+    const prevRestTimes = restartTimeArr.isArray
+      ? restartTimeArr
+      : [restartTimeArr];
+
     dbHostState.put(hostId, {
-      restartTime: now,
+      restartTime: [...prevRestTimes, now].flat(),
     });
   }
   res.send("OK");
@@ -53,8 +68,6 @@ router.post("/process/:secret", async (req, res) => {
 
 router.post("/data/:secret", async (req, res) => {
   const monitorData = req.body;
- 
-
 
   const index = database.data.monitoringData.findIndex(
     (md) => md.secret === req.params.secret
@@ -113,6 +126,5 @@ router.post("/data/:secret", async (req, res) => {
     res.send("OK");
   }
 });
-
 
 export default router;
