@@ -47,9 +47,6 @@ HTTP(s) Monitor setup:
 <img src="https://user-images.githubusercontent.com/1838656/196887413-14055152-4114-42e8-841f-cd5ec7c33e50.png" width="500"/>
 
 
-# RoadMap
-
-* Porting UI from server-side to React
 
 # Installation
 
