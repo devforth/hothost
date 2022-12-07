@@ -383,6 +383,8 @@ export const eventDuration = (data, events) => {
   switch (events[0]) {
     case "host_is_online":
       duration = now - data.ONLINE_EVENT_TS;
+      //use when show host uptime
+      data.ONLINE_EVENT_TS = now
       break;
     case "ram_usage_recovered":
       duration = now - data.RAM_EVENT_TS;
