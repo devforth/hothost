@@ -114,9 +114,11 @@ services:
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 relative">
             First make sure you have{" "}
-            <code className="rounded bg-pink-100 text-red-900 p-1">bash</code>{" "}
+            <code className="rounded bg-pink-100 text-red-900 p-1 mr-1">bash</code>{" "},
+           
+            <code className="rounded bg-pink-100 text-red-900 p-1 ml-1">curl</code>{" "}
             and{" "}
-            <code className="rounded bg-pink-100 text-red-900 p-1">curl</code>{" "}
+            <code className="rounded bg-pink-100 text-red-900 p-1">moreutils</code>{" "}
             installed then use{" "}
             <code className="rounded bg-pink-100 text-red-900 p-1">
               crontab -e
