@@ -176,31 +176,31 @@ export const calculateDataEvent = (prevData, newData) => {
   events.push(diskSpaceEvent);
 
   if (diskSpaceEvent === "disk_is_almost_full") {
-    if ( !newData.lastDiskNotifTime ) {
-      newData.lastDiskNotifTime = new Date().getTime()
+    if (!newData.lastDiskNotifTime) {
+      newData.lastDiskNotifTime = new Date().getTime();
     }
-
   }
 
-  
   const checkRepeatDiskNotif = (data) => {
-    const {HOURS_FOR_NEXT_ALERT} = database.data.settings;
-    if ( !data.lastDiskNotifTime ) {
-      data.lastDiskNotifTime = new Date().getTime()
+    const { HOURS_FOR_NEXT_ALERT } = database.data.settings;
+    if (!data.lastDiskNotifTime) {
+      data.lastDiskNotifTime = new Date().getTime();
     }
-    if (data.lastDiskNotifTime && HOURS_FOR_NEXT_ALERT !==0 ){
-      const forNextAlertMS = HOURS_FOR_NEXT_ALERT * 60 * 60 * 1000
+    if (data.lastDiskNotifTime && HOURS_FOR_NEXT_ALERT !== 0) {
+      const forNextAlertMS = HOURS_FOR_NEXT_ALERT * 60 * 60 * 1000;
       if (data.lastDiskNotifTime + forNextAlertMS <= new Date().getTime()) {
-        const diskWarning = (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 > DISK_THRESHOLD;
-        if ( diskWarning ) {
-          events.push("disk_is_almost_full")          
-          }
-          data.lastDiskNotifTime = new Date().getTime()      
+        const diskWarning =
+          (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 >
+          DISK_THRESHOLD;
+        if (diskWarning) {
+          events.push("disk_is_almost_full");
+        }
+        data.lastDiskNotifTime = new Date().getTime();
       }
     }
-  }
+  };
 
-  checkRepeatDiskNotif(newData)
+  checkRepeatDiskNotif(newData);
 
   const ramEvent = calculateEvent(
     calculateRamWarning(prevData),
@@ -252,7 +252,6 @@ export const calculateAsyncEvents = async () => {
     })
   );
 };
-
 
 export const generateHttpEvent = async (prevData, newData) => {
   const events = [];
@@ -322,7 +321,11 @@ export const generateHttpEvent = async (prevData, newData) => {
   }
 };
 
-export const generateHttpWarningEvents = async (newData, prevData, expireDate) => {
+export const generateHttpWarningEvents = async (
+  newData,
+  prevData,
+  expireDate
+) => {
   const events = [];
 
   let reason = `Ssl certificate expires ${new Date(expireDate)}  `;
@@ -426,9 +429,6 @@ export const createMonitorDataset = (data) => {
 export const checkStatus = async (hostData) => {
   // const {URL, monitor_type, key_word, enable_auth, login, password} = hostData;
   // const basicAuth = 'Basic ' + Buffer.from(`${hostData.login}:${hostData.password}`).toString('base64');
-  
-  
-  
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
@@ -445,23 +445,25 @@ export const checkStatus = async (hostData) => {
       method: "GET",
       headers: reqHeaders,
       signal: controller.signal,
-      cache: 'no-cache' 
+      cache: "no-cache",
     });
-  } catch (e) {
-    
-  }
+  } catch (e) {}
 
   let respText = null;
   if (response !== null) {
     try {
       respText = await response.text();
     } catch (e) {
-      console.log("Http response reading error", new Date(), "response errno:", response.errno, "response status:", response.status);
+      console.log(
+        "Http response reading error",
+        new Date(),
+        "response errno:",
+        response.errno,
+        "response status:",
+        response.status
+      );
     }
   }
- 
-
-  
 
   clearTimeout(timeout);
 
@@ -485,8 +487,7 @@ export const checkStatus = async (hostData) => {
     }
     if (response.errno === wrongHostNameError) {
       hostData.SslError = wrongHostNameError;
-    }
-    else {
+    } else {
       hostData.errno = response.errno;
     }
     return {
@@ -505,7 +506,7 @@ export const checkStatus = async (hostData) => {
       };
     case "keyword_exist": {
       if (respText === null) {
-        return { response: false }
+        return { response: false };
       }
       const kwExists = respText.includes(hostData.key_word);
       if (!kwExists) {
@@ -517,7 +518,7 @@ export const checkStatus = async (hostData) => {
     }
     case "keyword_not_exist": {
       if (respText === null) {
-        return { response: false }
+        return { response: false };
       }
 
       const kwNotExists = !respText.includes(hostData.key_word);
@@ -532,7 +533,6 @@ export const checkStatus = async (hostData) => {
 };
 
 export const startScheduler = () => {
-
   database.data.httpMonitoringData.forEach((data) => {
     createScheduleJob(data.id, data.monitor_interval);
   });
@@ -545,93 +545,92 @@ export const cleanResponseError = (host) => {
 };
 
 export const createScheduleJob = async (httpHostId, targetInterval) => {
-  
   schedulerIsRunningForHost[httpHostId] = true;
   let intervalCorrection = 0;
 
-
- 
- 
   while (schedulerIsRunningForHost[httpHostId]) {
-    
-
     let waitTime = (targetInterval - intervalCorrection) * 1000;
     if (waitTime > 0) {
-      await (new Promise((resolve) => setTimeout(resolve,waitTime)));
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
 
     const iterationStartMs = +new Date();
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
-    
-    let cert = null;
-    if (!dbData.URL.includes("localhost:")) {
-      try {cert = await sslChecker(getHostName(dbData.URL));}
-      catch(e) { console.log( `sslChecker error for ${dbData.URL}`, new Date(),e) }
-      
-    }
-    const now = new Date().getTime();
-    const nullTime = new Date(0).getTime();
-    const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
-    const res = await checkStatus(dbData);
-    if (res.response !== dbData.okStatus) {
-      if (!dbData.numberOfFalseWarnings) {
-        dbData.numberOfFalseWarnings = 0;
-      }
-      if (!dbData.firstFalseConfirmationTime) {
-        dbData.firstFalseConfirmationTime = new Date().getTime();
-      }
-      dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
+    if (dbData) {
+      const now = new Date().getTime();
+      const nullTime = new Date(0).getTime();
+      const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
+      const res = await checkStatus(dbData);
+      if (res.response !== dbData.okStatus) {
+        if (!dbData.numberOfFalseWarnings) {
+          dbData.numberOfFalseWarnings = 0;
+        }
+        if (!dbData.firstFalseConfirmationTime) {
+          dbData.firstFalseConfirmationTime = new Date().getTime();
+        }
+        dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
 
-      if (dbData.numberOfFalseWarnings >= +(HTTP_ISSUE_CONFIRMATION || 0) + 1) {
-        await generateHttpEvent(dbData, {
-          ...dbData,
-          okStatus: !!res.response,
-          status: res.status,
-          event_created: dbData.firstFalseConfirmationTime,
-        });
+        if (
+          dbData.numberOfFalseWarnings >=
+          +(HTTP_ISSUE_CONFIRMATION || 0) + 1
+        ) {
+          await generateHttpEvent(dbData, {
+            ...dbData,
+            okStatus: !!res.response,
+            status: res.status,
+            event_created: dbData.firstFalseConfirmationTime,
+          });
 
-        dbData.okStatus = res.response;
-        dbData.event_created = dbData.firstFalseConfirmationTime;
+          dbData.okStatus = res.response;
+          dbData.event_created = dbData.firstFalseConfirmationTime;
+          dbData.numberOfFalseWarnings = 0;
+          dbData.firstFalseConfirmationTime = 0;
+
+          cleanResponseError(dbData);
+          if (res.response) {
+            dbData.errno = "";
+          }
+        }
+      } else {
         dbData.numberOfFalseWarnings = 0;
         dbData.firstFalseConfirmationTime = 0;
-
-        cleanResponseError(dbData);
-        if (res.response) {
-          dbData.errno = "";
-        }
       }
-    } else {
-      dbData.numberOfFalseWarnings = 0;
-      dbData.firstFalseConfirmationTime = 0;
+
+      if (!dbData.lastSslCheckingTime) {
+        dbData.lastSslCheckingTime = nullTime;
+      }
+      const checkingSSLintervalHours = 24;
+
+      if (
+        dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
+        now
+      ) {
+        dbData.lastSslCheckingTime = now;
+        //add cert information to DB
+        let cert = null;
+        if (!dbData.URL.includes("localhost:")) {
+          try {
+            cert = await sslChecker(getHostName(dbData.URL));
+          } catch (e) {
+            console.log(`sslChecker error for ${dbData.URL}`, new Date(), e);
+          }
+        }
+        dbData.cert = cert;
+        await checkSslCert(cert, dbData);
+      }
+
+      await database.write();
+      const iterationEndMs = +new Date();
+      intervalCorrection = (iterationEndMs - iterationStartMs) / 1000;
     }
-
-    if (!dbData.lastSslCheckingTime) {
-      dbData.lastSslCheckingTime = nullTime;
-    }
-    const checkingSSLintervalHours = 24;
-
-    if (
-      dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
-      now
-    ) {
-      dbData.lastSslCheckingTime = now;
-      //add cert information to DB
-      dbData.cert = cert;
-      await checkSslCert( cert, dbData);
-    }
-
-    await database.write();
-    const iterationEndMs = +new Date();
-    intervalCorrection = (iterationEndMs - iterationStartMs) / 1000;
-
   }
 };
 
 const DEFAULT_DAYS_FOR_SSL_EXPIRED = 14;
 
-export const checkSslCert = async ( cert, dbData) => {
+export const checkSslCert = async (cert, dbData) => {
   if (cert === null) {
     dbData.sslWarning = false;
     return;
@@ -639,12 +638,14 @@ export const checkSslCert = async ( cert, dbData) => {
 
   const { DAYS_FOR_SSL_EXPIRED } = database.data.settings;
   if (
-    cert.daysRemaining < (DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) && cert.valid
+    cert.daysRemaining <
+      (DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) &&
+    cert.valid
   ) {
     await generateHttpWarningEvents(
-      { 
+      {
         ...dbData,
-        sslWarning: true
+        sslWarning: true,
       },
       dbData,
       cert.validTo
@@ -657,7 +658,9 @@ export const checkSslCert = async ( cert, dbData) => {
 };
 
 export const stopScheduleJob = (httpHostId) => {
+  console.log("before stop", schedulerIsRunningForHost);
   schedulerIsRunningForHost[httpHostId] = false;
+  console.log("after stop", schedulerIsRunningForHost);
 };
 
 export const roundToNearestMinute = (date) => {
@@ -678,8 +681,6 @@ export const dbClearScheduler = async () => {
     await dbIndex.clear({ lt: time.toString() }).catch((e) => console.log(e));
   });
 };
-
-
 
 export const getHostName = (url) => {
   return new URL(url).host;
