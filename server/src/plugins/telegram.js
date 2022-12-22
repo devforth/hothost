@@ -100,6 +100,7 @@ Chat in which you send message will be used to publish notifications.
 
     async sendMessage(settings, text) {
       const botToken = settings.params.botToken;
+     
     if(!text) {
         text = '🔥 This is a test notification from HotHost';
       }
@@ -107,8 +108,10 @@ Chat in which you send message will be used to publish notifications.
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
       }).then(r => r.json());
-      console.log('TG First resp', firstResp);
-      const chatId = firstResp?.result?.find(e => e.channel_post)?.channel_post?.chat?.id;
+      
+      const chatId = firstResp?.result?.find(e => e?.message?.chat?.id).message.chat.id
+      
+
      
       const secondResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`, {
           method: 'GET',
