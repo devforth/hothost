@@ -742,6 +742,72 @@ router.post(
 );
 
 router.post(
+  "/get_plugins_for_http-monitor/",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const host = database.data.httpMonitoringData.find(
+      (host) => host.id === id
+    );
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+
+    if (!host.enabledPlugins) {
+      host.enabledPlugins = {
+        ALL_PLUGINS: {
+          value: true,
+        },
+        ONLY_TELEGRAM: {
+          value: true,
+        },
+        ONLY_SLACK: {
+          value: true,
+        },
+        ONLY_EMAIL: {
+          value: true,
+        },
+      };
+    }
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: host.enabledPlugins,
+    });
+  })
+);
+
+router.post(
+  "/set_plugins_for_http-monitor/",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const plugins = req.body.plugins;
+    const host = database.data.httpMonitoringData.find(
+      (host) => host.id === id
+    );
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+    if (plugins) {
+      host.enabledPlugins = plugins;
+    }
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+    });
+  })
+);
+
+router.post(
   "/save_host_settings/",
   mustBeAuthorizedView(async (req, res) => {
     const id = req.body.id;

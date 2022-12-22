@@ -241,6 +241,7 @@ export const calculateAsyncEvents = async () => {
       await PluginManager().handleEvents(
         events.filter((e) => e),
         {
+          enabledPlugins:data.enabledPlugins,
           enabledNotifList: data.enabledNotifList,
           HOST_NAME: data.HOST_NAME,
           HOST_LABEL:
@@ -316,6 +317,7 @@ export const generateHttpEvent = async (prevData, newData) => {
           DATE_HUMANIZER_CONFIG
         ),
         EVENT_REASON: reason,
+        enabledPlugins:newData.enabledPlugins,
       }
     );
   }
@@ -345,6 +347,7 @@ export const generateHttpWarningEvents = async (
           newData.label && newData.label !== "" ? `\`${newData.label}\`` : "",
         CERT_VALID_UNTIL: new Date(expireDate),
         EVENT_REASON: reason,
+        enabledPlugins:data.enabledPlugins,
       }
     );
   }

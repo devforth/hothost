@@ -36,6 +36,8 @@ Chat in which you send message will be used to publish notifications.
         'host_is_online',
         'ram_is_almost_full',
         'ram_usage_recovered',
+        'http_host_down',
+        'http_host_up',
         'ssl_is_almost_expire'
     ],
 
@@ -90,6 +92,20 @@ Chat in which you send message will be used to publish notifications.
           
       },
       {
+        id: "http_host_down_message",
+        name: "What message will be shown when you get http_host_down alert",
+        default_value: "⚠️ HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} down. Reason: {{ EVENT_REASON }}",
+        required: false,
+        type: "text",
+    },
+    {
+        id: "http_host_up_message",
+        name: "What message will be shown when you get http_host_up alert",
+        default_value: "👌🏼 HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} back online. Reason: {{ EVENT_REASON }}. Downtime: {{ EVENT_DURATION }}",
+        required: false,
+        type: "text",
+    },
+      {
           id: "ssl_is_almost_expire_message",
           name: "What message will be shown when you get ssl_expire warning",
           default_value: "⚠️ SSL certificate of HTTP host {{ HOST_NAME }} {{ HOST_LABEL }} will expire soon. Certificate is valid until: {{CERT_VALID_UNTIL}} ",
@@ -130,6 +146,7 @@ Chat in which you send message will be used to publish notifications.
 
       try {
          this.sendMessage(settings, text);
+         
       }
       catch(e){console.log(e)}
 

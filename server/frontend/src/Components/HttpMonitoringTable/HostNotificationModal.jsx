@@ -1,24 +1,26 @@
 import { useEffect, useState } from "react";
+import { apiFetch } from "../../../FetchApi";
 
-const HostNotificationModal = ({ chosenHost, monitor, setModalIsVisible }) => {
+const HostNotificationModal = ({ monitor, setModalIsVisible }) => {
   async function getHostSettings(id) {
-    //   const data = await apiFetch(id, "get_host_settings");
-    //   if (data.data) {
-    //     setModalInputs(data.data);
-    //   }
+    const data = await apiFetch(id, "get_plugins_for_http-monitor");
+    if (data.data) {
+      setModalInputs(data.data);
+    }
   }
   async function saveHostSettings(id) {
-    // const data = await apiFetch(
-    //   { settings: modalInputs, id },
-    //   "save_host_settings"
-    // );
-    // if (data.status === "success") {
-    //   setModalIsVisible(false);
-    // }
+    const data = await apiFetch(
+      { plugins: modalInputs, id },
+      "set_plugins_for_http-monitor"
+    );
+    if (data.status === "success") {
+      setModalIsVisible(false);
+    }
   }
 
   useEffect(() => {
-    getHostSettings({ id: chosenHost });
+    
+    getHostSettings({ id: monitor.id });
   }, []);
 
   const [modalInputs, setModalInputs] = useState({
@@ -27,15 +29,12 @@ const HostNotificationModal = ({ chosenHost, monitor, setModalIsVisible }) => {
     },
     ONLY_TELEGRAM: {
       value: true,
-      visible: true,
     },
     ONLY_SLACK: {
       value: true,
-      visible: true,
     },
     ONLY_EMAIL: {
       value: true,
-      visible: true,
     },
   });
 
@@ -102,7 +101,7 @@ const HostNotificationModal = ({ chosenHost, monitor, setModalIsVisible }) => {
           <div className="flex justify-between">
             <button
               onClick={() => {
-                saveHostSettings(chosenHost);
+                saveHostSettings(monitor.id);
               }}
               type="button"
               class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2 disabled:hover:bg-gray-500 disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500"
