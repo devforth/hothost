@@ -1,10 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { getData } from "../../../FetchApi";
+
 import HttpTableRow from "./HttpTableRow";
 import ModalDelete from "./ModalDelete";
 import ModalAddLabel from "./ModalAddLabel";
-import HttpMonitor from "../HttpMonitor/HttpMonitor";
+import HostNotificationModal from "./HostNotificationModal";
 
 const httpMonitoringTable = (props) => {
   const httpMOnitors = props.monitoringHttpData;
@@ -15,6 +15,8 @@ const httpMonitoringTable = (props) => {
   const [labelModalIsVisible, setLabelModalIsVisible] = useState(false);
   const [settingsViewIsVisible, setSettingsViewIsVisible] = useState(true);
   const [chosenId, setChosenId] = useState("");
+  const [hostNotificationIsVisible, setHostNotificationVisible] =
+    useState(false);
 
   return (
     <>
@@ -43,6 +45,10 @@ const httpMonitoringTable = (props) => {
                 }}
                 checkSslWarn={checkSslWarn}
                 changeMonitorSetting={changeMonitorSetting}
+                getNOtificationOfMonitor={(e) => {
+                  setChosenId(e);
+                  setHostNotificationVisible(true);
+                }}
               ></HttpTableRow>
             );
           })}
@@ -76,7 +82,17 @@ const httpMonitoringTable = (props) => {
           setLabelModalIsVisible={setLabelModalIsVisible}
         ></ModalAddLabel>
       ) : null}
-      {/* {settingsViewIsVisible ? <HttpMonitor></HttpMonitor> : null} */}
+      {hostNotificationIsVisible ? (
+        <HostNotificationModal
+          setModalIsVisible={setHostNotificationVisible}
+          monitor={
+            chosenId &&
+            httpMOnitors.filter((m) => {
+              return m.id === chosenId;
+            })[0]
+          }
+        ></HostNotificationModal>
+      ) : null}
     </>
   );
 };

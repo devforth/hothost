@@ -61,7 +61,7 @@ const HttpMonitor = () => {
     setLastCHangedMonitorId(id);
     const findingHost = monitoringHttpData.filter((el) => el.id === id)[0];
     if (findingHost) {
-      console.log(findingHost);
+      
       setMonitorUrlInp(findingHost.url);
       setMonitorIntervalRng(findingHost.interval);
       if (findingHost.login) {
