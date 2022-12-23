@@ -27,13 +27,13 @@ const HostNotificationModal = ({ monitor, setModalIsVisible }) => {
     ALL_PLUGINS: {
       value: true,
     },
-    ONLY_TELEGRAM: {
+    TELEGRAM: {
       value: true,
     },
-    ONLY_SLACK: {
+    SLACK: {
       value: true,
     },
-    ONLY_EMAIL: {
+    EMAIL: {
       value: true,
     },
   });
