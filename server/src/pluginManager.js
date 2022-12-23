@@ -10,6 +10,8 @@ const fsReaddirAsync = promisify(fs.readdir);
 class PluginManager {
     constructor() {
         this.plugins = [];
+        this.rssQueue = [];
+        this.rssSendInterval = setInterval(() => this.processRssQueue(), 1000);
     }
 
     async loadPlugins() {
@@ -75,6 +77,28 @@ class PluginManager {
        
                 
         }
+    }
+
+    async processRssQueue() {
+        if (this.rssQueue.length) {
+            const rssFotmedMessage = this.rssQueue.unshift();
+            // plugins var is only enabled plugin for this event 
+            await Promise.all(
+                plugins.map( 
+                    async (p) => {
+                        try {
+                            await p.plugin.sendMessage(p.settings, rssFotmedMessage);
+                        } catch (e) {
+                            console.error('Error in plugin', p.id, e, 'stack:', e.stack)
+                        }
+                    }
+                )
+            );
+        }
+    }
+
+    async handleRssEvent(text) {
+        this.rssQueue.push(text)
     }
 }
 let _instance;
