@@ -81,8 +81,8 @@ class PluginManager {
 
     async processRssQueue() {
         if (this.rssQueue.length) {
-            const rssFotmedMessage = this.rssQueue.unshift();
-            // plugins var is only enabled plugin for this event 
+            const { rssFotmedMessage, enabledPlugins } = this.rssQueue.unshift();
+            // plugins var is only enabled plugin for this event based on enabledPlugins
             await Promise.all(
                 plugins.map( 
                     async (p) => {
@@ -97,8 +97,8 @@ class PluginManager {
         }
     }
 
-    async handleRssEvent(text) {
-        this.rssQueue.push(text)
+    async handleRssEvent({ rssFotmedMessage, enabledPlugins }) {
+        this.rssQueue.push({ rssFotmedMessage, enabledPlugins })
     }
 }
 let _instance;
