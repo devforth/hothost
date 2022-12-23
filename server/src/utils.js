@@ -351,6 +351,16 @@ export const generateHttpWarningEvents = async (
         enabledPlugins:data.enabledPlugins,
       }
     );
+    await PluginManager().handleEvents(
+      events.filter((e) => e),
+      {
+        HOST_NAME: newData.URL,
+        HOST_LABEL:
+          newData.label && newData.label !== "" ? `\`${newData.label}\`` : "",
+        CERT_VALID_UNTIL: new Date(expireDate),
+        EVENT_REASON: reason,
+      }
+    );
   }
 };
 
