@@ -526,6 +526,8 @@ const getHttpMonitor = () => {
     login: data.login,
     password: data.password,
     keyWord: data.key_word,
+    enabledPlugins:data.enabledPlugins
+
   }));
 };
 
@@ -761,13 +763,13 @@ router.post(
         ALL_PLUGINS: {
           value: true,
         },
-        ONLY_TELEGRAM: {
+        TELEGRAM: {
           value: true,
         },
-        ONLY_SLACK: {
+        SLACK: {
           value: true,
         },
-        ONLY_EMAIL: {
+        EMAIL: {
           value: true,
         },
       };

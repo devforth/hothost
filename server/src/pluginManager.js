@@ -63,13 +63,13 @@ class PluginManager {
         ALL_PLUGINS: {
           value: true,
         },
-        ONLY_TELEGRAM: {
+        TELEGRAM: {
           value: true,
         },
-        ONLY_SLACK: {
+        SLACK: {
           value: true,
         },
-        ONLY_EMAIL: {
+        EMAIL: {
           value: true,
         },
       };
@@ -77,10 +77,10 @@ class PluginManager {
       hostPlugins = newData.enabledPlugins;
     }
     const pluginsForHost = [
-      ["telegram-notifications", "ONLY_TELEGRAM"],
-      ["slack-notifications", "ONLY_SLACK"],
-      ["gmail-notifications", "ONLY_EMAIL"],
-      ["email-notifications", "ONLY_EMAIL"],
+      ["telegram-notifications", "TELEGRAM"],
+      ["slack-notifications", "SLACK"],
+      ["gmail-notifications", "EMAIL"],
+      ["email-notifications", "EMAIL"],
     ];
     function getEnabledPluginsForHost() {
         
