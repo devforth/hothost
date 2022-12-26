@@ -305,6 +305,7 @@ router.post(
     if (monitorIndex !== -1) {
       database.data.httpMonitoringData[monitorIndex] = {
         ...database.data.httpMonitoringData[monitorIndex],
+        last_rss_feed_time: new Date().getTime(),
         ...newSettings,
       };
       await database.write();
@@ -526,8 +527,7 @@ const getHttpMonitor = () => {
     login: data.login,
     password: data.password,
     keyWord: data.key_word,
-    enabledPlugins:data.enabledPlugins
-
+    enabledPlugins: data.enabledPlugins,
   }));
 };
 

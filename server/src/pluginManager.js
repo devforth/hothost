@@ -8,11 +8,12 @@ import database from "./database.js";
 const fsReaddirAsync = promisify(fs.readdir);
 
 class PluginManager {
-    constructor() {
-        this.plugins = [];
-        this.rssQueue = [];
-        this.rssSendInterval = setInterval(() => this.processRssQueue(), 1000);
-    }
+  constructor(isRss) {
+    this.plugins = [];
+    this.rssQueue = [];
+
+    this.rssSendInterval = setInterval(() => this.processRssQueue(), 2000);
+  }
 
   async loadPlugins() {
     const internalPluginFiles = await fsReaddirAsync("src/plugins");
@@ -48,69 +49,100 @@ class PluginManager {
     );
   }
 
-    async handleEvents(events, newData) {
-        let hostEvents = []
-      
-        if (newData.enabledNotifList) { 
-            const eventsList = Object.values(newData.enabledNotifList).filter(e=>!e.value).map(e=>e.events).flat()
-            hostEvents=[...eventsList]
-        }
-       
-        for ( let eventType of events) {
-            const plugins = this.plugins
-                .map(p => {
-                    const settings = database.data.pluginSettings.find(ps => ps.id === p.id) || {};
-                    return {
-                        plugin: p,
-                        settings,
-                    }
-                })
-            
-                .filter(p => p.settings.enabled && p.settings.enabledEvents.includes(eventType) 
-                && !hostEvents.includes(eventType));
-                
-            
-            // handle event by all plugins in parallel
-            await Promise.all(
-                plugins.map( 
-                    async (p) => {
-                        try {
-                            await p.plugin.handleEvent({ eventType, data: newData, settings: p.settings });
-                        } catch (e) {
-                            console.error('Error in plugin', p.id, e, 'stack:', e.stack)
-                        }
-                    }
-                )
-            );
-       
-                
-        }
+  async handleEvents(events, newData) {
+    let hostEvents = [];
+
+    if (newData.enabledNotifList) {
+      const eventsList = Object.values(newData.enabledNotifList)
+        .filter((e) => !e.value)
+        .map((e) => e.events)
+        .flat();
+      hostEvents = [...eventsList];
     }
 
+    for (let eventType of events) {
+      const plugins = this.plugins
+        .map((p) => {
+          const settings =
+            database.data.pluginSettings.find((ps) => ps.id === p.id) || {};
+          return {
+            plugin: p,
+            settings,
+          };
+        })
 
-    async processRssQueue() {
-      if (this.rssQueue.length) {
-          const { rssFotmedMessage, enabledPlugins } = this.rssQueue.unshift();
-          // plugins var is only enabled plugin for this event based on enabledPlugins
-          await Promise.all(
-              plugins.map( 
-                  async (p) => {
-                      try {
-                          await p.plugin.sendMessage(p.settings, rssFotmedMessage);
-                      } catch (e) {
-                          console.error('Error in plugin', p.id, e, 'stack:', e.stack)
-                      }
-                  }
-              )
-          );
+        .filter(
+          (p) =>
+            p.settings.enabled &&
+            p.settings.enabledEvents.includes(eventType) &&
+            !hostEvents.includes(eventType)
+        );
+
+      // handle event by all plugins in parallel
+      await Promise.all(
+        plugins.map(async (p) => {
+          try {
+            await p.plugin.handleEvent({
+              eventType,
+              data: newData,
+              settings: p.settings,
+            });
+          } catch (e) {
+            console.error("Error in plugin", p.id, e, "stack:", e.stack);
+          }
+        })
+      );
+    }
+  }
+
+  async processRssQueue() {
+    if (this.rssQueue.length) {
+      const { rssFormatedMessage, enabledPlugins } = this.rssQueue.shift();
+
+      // plugins var is only enabled plugin for this event based on enabledPlugins
+      const plugins = this.plugins
+        .map((p) => {
+          const settings =
+            database.data.pluginSettings.find((ps) => ps.id === p.id) || {};
+          return {
+            plugin: p,
+            settings,
+          };
+        })
+
+        .filter((p) => p.settings.enabled);
+      await Promise.all(
+        plugins.map(async (p) => {
+          try {
+            await p.plugin.sendMessage(p.settings, rssFormatedMessage);
+          } catch (e) {
+            console.error("Error in plugin", p.id, e, "stack:", e.stack);
+          }
+        })
+      );
+    }
+  }
+
+  async handleRssEvent({ rssFormatedMessage, enabledPlugins }) {
+    let messageString = "";
+    let excludedFields = [
+      "content:encoded",
+      "content:encodedSnippet",
+      "contentSnippet",
+      "isoDate",
+    ];
+    Object.entries(rssFormatedMessage).forEach((e) => {
+      if (!excludedFields.includes(e[0])) {
+        messageString = `${messageString}\n:large_purple_circle:${e[0]
+          .charAt(0)
+          .toUpperCase()}${e[0].slice(1)}:${e[1]})`;
       }
-  }
+    });
 
-  async handleRssEvent({ rssFotmedMessage, enabledPlugins }) {
-      this.rssQueue.push({ rssFotmedMessage, enabledPlugins })
+    this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
   }
-
 }
+
 let _instance;
 const PluginManagerSingleton = () => {
   if (!_instance) {

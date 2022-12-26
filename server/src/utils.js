@@ -8,8 +8,7 @@ import env from "./env.js";
 import database from "./database.js";
 import PluginManager from "./pluginManager.js";
 import levelDb from "./levelDB.js";
-
-
+import { rssParser } from "./rssParser.js";
 
 export const DATE_HUMANIZER_CONFIG = {
   round: true,
@@ -242,7 +241,7 @@ export const calculateAsyncEvents = async () => {
       await PluginManager().handleEvents(
         events.filter((e) => e),
         {
-          enabledPlugins:data.enabledPlugins,
+          enabledPlugins: data.enabledPlugins,
           enabledNotifList: data.enabledNotifList,
           HOST_NAME: data.HOST_NAME,
           HOST_LABEL:
@@ -318,7 +317,7 @@ export const generateHttpEvent = async (prevData, newData) => {
           DATE_HUMANIZER_CONFIG
         ),
         EVENT_REASON: reason,
-        enabledPlugins:newData.enabledPlugins,
+        enabledPlugins: newData.enabledPlugins,
       }
     );
   }
@@ -348,17 +347,7 @@ export const generateHttpWarningEvents = async (
           newData.label && newData.label !== "" ? `\`${newData.label}\`` : "",
         CERT_VALID_UNTIL: new Date(expireDate),
         EVENT_REASON: reason,
-        enabledPlugins:data.enabledPlugins,
-      }
-    );
-    await PluginManager().handleEvents(
-      events.filter((e) => e),
-      {
-        HOST_NAME: newData.URL,
-        HOST_LABEL:
-          newData.label && newData.label !== "" ? `\`${newData.label}\`` : "",
-        CERT_VALID_UNTIL: new Date(expireDate),
-        EVENT_REASON: reason,
+        enabledPlugins: data.enabledPlugins,
       }
     );
   }
@@ -398,7 +387,7 @@ export const eventDuration = (data, events) => {
     case "host_is_online":
       duration = now - data.ONLINE_EVENT_TS;
       //use when show host uptime
-      data.ONLINE_EVENT_TS = now
+      data.ONLINE_EVENT_TS = now;
       break;
     case "ram_usage_recovered":
       duration = now - data.RAM_EVENT_TS;
@@ -433,6 +422,7 @@ export const createMonitorDataset = (data) => {
   const monitor = {
     id: uuidv4(),
     event_created: now,
+    last_rss_feed_time: now,
   };
   for (const key in data) {
     if (data[key] !== "" && typeof data[key] !== "boolean") {
@@ -545,6 +535,11 @@ export const checkStatus = async (hostData) => {
         response: kwNotExists,
       };
     }
+    case "rss_parser": {
+      return {
+        response: true,
+      };
+    }
   }
 };
 
@@ -558,6 +553,14 @@ export const schedulerIsRunningForHost = {};
 
 export const cleanResponseError = (host) => {
   host.SslError = "";
+};
+
+export const generateRssEvent = async (e) => {
+  console.log("generated rss item");
+  await PluginManager(true).handleRssEvent({
+    rssFormatedMessage: e,
+    enabledPlugins: "test",
+  });
 };
 
 export const createScheduleJob = async (httpHostId, targetInterval) => {
@@ -576,72 +579,94 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
     );
 
     if (dbData) {
-      const now = new Date().getTime();
-      const nullTime = new Date(0).getTime();
-      const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
-      const res = await checkStatus(dbData);
-      if (res.response !== dbData.okStatus) {
-        if (!dbData.numberOfFalseWarnings) {
-          dbData.numberOfFalseWarnings = 0;
-        }
-        if (!dbData.firstFalseConfirmationTime) {
-          dbData.firstFalseConfirmationTime = new Date().getTime();
-        }
-        dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
+      // rss parser
+      if (dbData.monitor_type === "rss_parser") {
+        const rssObject = await rssParser(
+          dbData.URL,
+          dbData.last_rss_feed_time || new Date().getTime()
+        );
 
-        if (
-          dbData.numberOfFalseWarnings >=
-          +(HTTP_ISSUE_CONFIRMATION || 0) + 1
-        ) {
-          await generateHttpEvent(dbData, {
-            ...dbData,
-            okStatus: !!res.response,
-            status: res.status,
-            event_created: dbData.firstFalseConfirmationTime,
+        if (rssObject && rssObject.items && rssObject.items.at(0)) {
+          rssObject.items.forEach((e) => {
+            generateRssEvent(e);
           });
 
-          dbData.okStatus = res.response;
-          dbData.event_created = dbData.firstFalseConfirmationTime;
+          // rssObjectsArr.map((e) => {
+          // if (e && e.lastFeedItemTime) {
+          dbData.last_rss_feed_time = rssObject.lastFeedItemTime;
+          await database.write();
+          // console.log(rssObject.items);} }) } ) {
+        }
+      }
+      // rss parser
+      else {
+        const now = new Date().getTime();
+        const nullTime = new Date(0).getTime();
+        const { HTTP_ISSUE_CONFIRMATION } = database.data.settings;
+        const res = await checkStatus(dbData);
+        if (res.response !== dbData.okStatus) {
+          if (!dbData.numberOfFalseWarnings) {
+            dbData.numberOfFalseWarnings = 0;
+          }
+          if (!dbData.firstFalseConfirmationTime) {
+            dbData.firstFalseConfirmationTime = new Date().getTime();
+          }
+          dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
+
+          if (
+            dbData.numberOfFalseWarnings >=
+            +(HTTP_ISSUE_CONFIRMATION || 0) + 1
+          ) {
+            await generateHttpEvent(dbData, {
+              ...dbData,
+              okStatus: !!res.response,
+              status: res.status,
+              event_created: dbData.firstFalseConfirmationTime,
+            });
+
+            dbData.okStatus = res.response;
+            dbData.event_created = dbData.firstFalseConfirmationTime;
+            dbData.numberOfFalseWarnings = 0;
+            dbData.firstFalseConfirmationTime = 0;
+
+            cleanResponseError(dbData);
+            if (res.response) {
+              dbData.errno = "";
+            }
+          }
+        } else {
           dbData.numberOfFalseWarnings = 0;
           dbData.firstFalseConfirmationTime = 0;
-
-          cleanResponseError(dbData);
-          if (res.response) {
-            dbData.errno = "";
-          }
         }
-      } else {
-        dbData.numberOfFalseWarnings = 0;
-        dbData.firstFalseConfirmationTime = 0;
-      }
-      //
-      if (!dbData.lastSslCheckingTime) {
-        dbData.lastSslCheckingTime = nullTime;
-      }
-      const checkingSSLintervalHours = 24;
-
-      if (
-        dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
-        now
-      ) {
-        dbData.lastSslCheckingTime = now;
-        //add cert information to DB
-        let cert = null;
-        //get sslCert information
-        if (!dbData.URL.includes("localhost:")) {
-          try {
-            cert = await sslChecker(getHostName(dbData.URL));
-          } catch (e) {
-            console.log(`sslChecker error for ${dbData.URL}`, new Date(), e);
-          }
+        //
+        if (!dbData.lastSslCheckingTime) {
+          dbData.lastSslCheckingTime = nullTime;
         }
-        dbData.cert = cert;
-        await checkSslCert(cert, dbData);
-      }
+        const checkingSSLintervalHours = 24;
 
-      await database.write();
-      const iterationEndMs = +new Date();
-      intervalCorrection = (iterationEndMs - iterationStartMs) / 1000;
+        if (
+          dbData.lastSslCheckingTime + checkingSSLintervalHours * 3600 * 1000 <=
+          now
+        ) {
+          dbData.lastSslCheckingTime = now;
+          //add cert information to DB
+          let cert = null;
+          //get sslCert information
+          if (!dbData.URL.includes("localhost:")) {
+            try {
+              cert = await sslChecker(getHostName(dbData.URL));
+            } catch (e) {
+              console.log(`sslChecker error for ${dbData.URL}`, new Date(), e);
+            }
+          }
+          dbData.cert = cert;
+          await checkSslCert(cert, dbData);
+        }
+
+        await database.write();
+        const iterationEndMs = +new Date();
+        intervalCorrection = (iterationEndMs - iterationStartMs) / 1000;
+      }
     }
   }
 };
@@ -717,7 +742,3 @@ export const anyNotificationDisabled = function (obj) {
   }, {});
   return newProp;
 };
-
-
-
-
