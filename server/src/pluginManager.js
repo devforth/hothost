@@ -51,6 +51,7 @@ class PluginManager {
 
   async handleEvents(events, newData) {
     let hostEvents = [];
+    let hostPlugins = {};
 
     if (newData.enabledNotifList) {
       const eventsList = Object.values(newData.enabledNotifList)
@@ -59,6 +60,48 @@ class PluginManager {
         .flat();
       hostEvents = [...eventsList];
     }
+
+    if (!newData.enabledPlugins) {
+      hostPlugins = {
+        ALL_PLUGINS: {
+          value: true,
+        },
+        TELEGRAM: {
+          value: true,
+        },
+        SLACK: {
+          value: true,
+        },
+        EMAIL: {
+          value: true,
+        },
+      };
+    } else {
+      hostPlugins = newData.enabledPlugins;
+    }
+    const pluginsForHost = [
+      ["telegram-notifications", "TELEGRAM"],
+      ["slack-notifications", "SLACK"],
+      ["gmail-notifications", "EMAIL"],
+      ["email-notifications", "EMAIL"],
+    ];
+    function getEnabledPluginsForHost() {
+      if (hostPlugins.ALL_PLUGINS.value) {
+        return pluginsForHost.map((p) => {
+          return p[0];
+        });
+      } else {
+        let newArr = [];
+        pluginsForHost.forEach((p) => {
+          if (hostPlugins[p[1]].value) {
+            newArr.push(p[0]);
+          }
+        });
+        return newArr;
+      }
+    }
+
+    const enabledPlugins = getEnabledPluginsForHost();
 
     for (let eventType of events) {
       const plugins = this.plugins
@@ -71,12 +114,14 @@ class PluginManager {
           };
         })
 
-        .filter(
-          (p) =>
+        .filter((p) => {
+          return (
             p.settings.enabled &&
             p.settings.enabledEvents.includes(eventType) &&
-            !hostEvents.includes(eventType)
-        );
+            !hostEvents.includes(eventType) &&
+            enabledPlugins.includes(p.plugin.id)
+          );
+        });
 
       // handle event by all plugins in parallel
       await Promise.all(
@@ -97,7 +142,7 @@ class PluginManager {
 
   async processRssQueue() {
     if (this.rssQueue.length) {
-      const { rssFormatedMessage, enabledPlugins } = this.rssQueue.shift();
+      const { rssFormatedMessage } = this.rssQueue.shift();
 
       // plugins var is only enabled plugin for this event based on enabledPlugins
       const plugins = this.plugins
@@ -110,7 +155,9 @@ class PluginManager {
           };
         })
 
-        .filter((p) => p.settings.enabled);
+        .filter((p) => {
+          return p.settings.enabled && enabledPlugins.includes(p.plugin.id);
+        });
       await Promise.all(
         plugins.map(async (p) => {
           try {
