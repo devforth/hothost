@@ -19,31 +19,53 @@ const HttpTableRow = (props) => {
 
   return (
     <tr className="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
-      <td className="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
-        {monitor.status ? (
-          <span>🟢OK</span>
-        ) : (
-          <Tooltip
-            content={`Host error: ${monitor.sslError || monitor.errno}`}
-            placement="bottom"
-          >
-            <span
-              data-tooltip-placement="bottom"
-              data-tooltip-target="tooltip_online_alert-{{@index}}"
+      {monitor.monitor_type === "rss_parser" ? (
+        <td className="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+          <span className="flex justify-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
             >
-              🔴 Error
-            </span>
-          </Tooltip>
-        )}
-      </td>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12.75 19.5v-.75a7.5 7.5 0 00-7.5-7.5H4.5m0-6.75h.75c7.87 0 14.25 6.38 14.25 14.25v.75M6 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              />
+            </svg>
+            RSS
+          </span>
+        </td>
+      ) : (
+        <td className="pr-4 flex-1 items-center text-base font-semibold text-gray-900 dark:text-white">
+          {monitor.status ? (
+            <span>🟢OK</span>
+          ) : (
+            <Tooltip
+              content={`Host error: ${monitor.sslError || monitor.errno}`}
+              placement="bottom"
+            >
+              <span
+                data-tooltip-placement="bottom"
+                data-tooltip-target="tooltip_online_alert-{{@index}}"
+              >
+                🔴 Error
+              </span>
+            </Tooltip>
+          )}
+        </td>
+      )}
       <td className="pr-4 row-start-2 col-start-1   flex-1 text-gray-900 dark:text-white   ">
         <Tooltip
           content={`Monitor type : ${monitor.monitor_type}`}
           placement="bottom"
         >
-          <p className="overflow-hidden max-w-[400px] truncate">
+          <p className="overflow-hidden max-w-[400px]  mobile:max-w-[250px] truncate  ">
             <span className="whitespace-">
-              <a href={monitor.url} target="_blank">
+              <a href={monitor.url} target="_blank" className="">
                 {monitor.url}
               </a>
             </span>
@@ -95,13 +117,13 @@ const HttpTableRow = (props) => {
         <SSLinfo certInfo={monitor.certInfo}></SSLinfo>
       </td>
 
-      <td className="pr-4 flex-1 text-gray-900 dark:text-white min-w-max">
+      <td className="pr-4 flex-1 text-gray-900 dark:text-white min-w-max row-start-3 col-start-1 ">
         <p className="text-sm text-gray-500 truncate dark:text-gray-400">
           Up\down time
         </p>
         <p>{monitor.monitorLastEventsTs}</p>
       </td>
-      <td>
+      <td className="row-start-3 col-start-3 ">
         {" "}
         {!monitor?.enabledPlugins?.ALL_PLUGINS.value &&
         monitor?.enabledPlugins &&
@@ -115,14 +137,14 @@ const HttpTableRow = (props) => {
               content={`Disabled plugin${
                 Object.entries(monitor?.enabledPlugins)
                   .filter((e) => {
-                    return e[1].value === false;
+                    return e[1].value === false && e[0] !== "ALL_PLUGINS";
                   })
                   .at(1)
                   ? "s"
                   : ""
               }: ${Object.entries(monitor?.enabledPlugins)
                 .filter((e) => {
-                  return e[1].value !== false;
+                  return e[1].value === false && e[0] !== "ALL_PLUGINS";
                 })
                 .map((e) => {
                   return e[0];
