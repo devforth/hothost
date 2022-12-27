@@ -121,6 +121,21 @@ const HttpMonitor = () => {
         monitor_interval: monitorIntervalRng,
 
         monitor_type: monitorTypeSlt,
+
+        enabledPlugins: {
+          ALL_PLUGINS: {
+            value: true,
+          },
+          TELEGRAM: {
+            value: true,
+          },
+          SLACK: {
+            value: true,
+          },
+          EMAIL: {
+            value: true,
+          },
+        },
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
