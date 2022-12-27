@@ -637,7 +637,7 @@ router.post(
       const newPluginSetting = {
         id: plugin.id,
         params: input.params,
-        enabledEvents: Object.keys(input.events),
+        enabledEvents: input.events ? Object.keys(input.events) : [],
         enabled: true,
       };
 
