@@ -19,7 +19,6 @@ const HostNotificationModal = ({ monitor, setModalIsVisible }) => {
   }
 
   useEffect(() => {
-    
     getHostSettings({ id: monitor.id });
   }, []);
 
@@ -40,10 +39,10 @@ const HostNotificationModal = ({ monitor, setModalIsVisible }) => {
 
   return (
     <>
-      <div class=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 w-full max-w-md h-full md:h-auto z-10">
+      <div class=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 w-full max-w-md  z-10">
         <div class=" p-4 w-full max-w-md h-full md:h-auto  bg-white rounded-lg shadow dark:bg-gray-700">
           <h2 className="mb-6 mt-4 text-lg flex justify-center font-bold text-gray-500 dark:text-gray-400 whitespace-normal">
-            Notify settings of {monitor.url}{" "}
+            <span className="truncate"> Notify settings of {monitor.url} </span>
           </h2>
           {Object.keys(modalInputs).map((plugin, i) => {
             return (
@@ -96,7 +95,7 @@ const HostNotificationModal = ({ monitor, setModalIsVisible }) => {
             );
           })}
           <p className="mb-6 mt-4 text-base flex justify-center font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
-            Do you want to save http Monitor?
+            Do you want to save settings?
           </p>
           <div className="flex justify-between">
             <button

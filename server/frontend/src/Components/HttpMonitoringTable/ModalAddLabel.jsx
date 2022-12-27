@@ -52,7 +52,7 @@ const ModalAddLabel = (props) => {
               </svg>
             </button>
             <div class="p-6 text-center  ">
-              <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal">
+              <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 whitespace-normal truncate">
                 Enter label name for <br />
                 <b>{hostUrl}</b> host
               </h3>
