@@ -560,7 +560,6 @@ export const cleanResponseError = (host) => {
 };
 
 export const generateRssEvent = async (e, enabledPlugins) => {
-  console.log("generated rss item");
   await PluginManager(true).handleRssEvent({
     rssFormatedMessage: e,
     enabledPlugins,

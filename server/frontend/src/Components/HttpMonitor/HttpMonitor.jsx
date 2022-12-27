@@ -420,7 +420,7 @@ const HttpMonitor = () => {
             <option value="status_code">Status code is 200</option>
             <option value="keyword_exist">Keyword exists</option>
             <option value="keyword_not_exist">Keyword not exists</option>
-            <option value="rss_parser">Rss parser </option>
+            <option value="rss_parser">RSS parser </option>
           </select>
         </div>
         {monitorTypeSlt !== "status_code" && monitorTypeSlt !== "rss_parser" ? (
