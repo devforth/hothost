@@ -285,6 +285,7 @@ router.post(
     await database.write();
 
     createScheduleJob(monitor.id, monitor.monitor_interval);
+    PluginManagerSingleton().startInterval();
 
     const statusRes = await checkStatus(monitor);
     monitor.event_created = new Date().getTime();
