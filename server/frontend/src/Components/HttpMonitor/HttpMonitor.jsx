@@ -19,11 +19,18 @@ const HttpMonitor = () => {
 
     const data = await getData("http-monitor");
     if (data.data) {
-      setMonitoringHttpData(data.data);
+      const rssMonitors = data.data.filter(
+        (m) => m.monitor_type === "rss_parser"
+      );
+      const httpMonitors = data.data.filter(
+        (m) => m.monitor_type !== "rss_parser"
+      );
+
+      setMonitoringHttpData([...httpMonitors, ...rssMonitors]);
     }
     setStatus("fullfield");
   };
-  const [editError,setEditError] = useState(false)
+  const [editError, setEditError] = useState(false);
   const [lastCHangedMonitorId, setLastCHangedMonitorId] = useState("");
   const [edditingMonitor, setEdditingMonitor] = useState(false);
   const [monitorIsVisible, setMonitorIsVisible] = useState(false);
@@ -61,7 +68,6 @@ const HttpMonitor = () => {
     setLastCHangedMonitorId(id);
     const findingHost = monitoringHttpData.filter((el) => el.id === id)[0];
     if (findingHost) {
-      
       setMonitorUrlInp(findingHost.url);
       setMonitorIntervalRng(findingHost.interval);
       if (findingHost.login) {
@@ -107,27 +113,26 @@ const HttpMonitor = () => {
         validationIsOk = false;
       }
     } else return;
-// add Rss Parser
-    if(monitorTypeSlt === "rss_parser" ){
+    // add Rss Parser
+    if (monitorTypeSlt === "rss_parser") {
       body = {
         URL: monitorUrlInp,
-       
+
         monitor_interval: monitorIntervalRng,
-       
+
         monitor_type: monitorTypeSlt,
+      };
+      if (validationIsOk) {
+        const data = await apiFetch(body, "add_http_monitor");
+        if (data) {
+          resetFieds();
+          setMonitoringHttpData(data.data);
+        }
       }
-        if (validationIsOk) {
-          const data = await apiFetch(body, "add_http_monitor");
-          if (data) {
-            resetFieds();
-            setMonitoringHttpData(data.data);
-          }
-       
-      }
-    return }
+      return;
+    }
     // add Rss Parser
 
-    
     if (basicAuthChk) {
       if (checkInputs(loginInp, loginInpEl, setLoginError)) {
         validationIsOk = true;
@@ -196,9 +201,12 @@ const HttpMonitor = () => {
     const data = await apiFetch(body, "edit_http_monitor");
     if (!data.error) {
       setEdditingMonitor(false);
+    } else {
+      setEditError(true);
+      setTimeout(() => {
+        setEditError(false);
+      }, 5000);
     }
-    else { setEditError(true);
-    setTimeout(()=>{setEditError(false)},5000)}
   };
   return (
     <div>
@@ -311,29 +319,31 @@ const HttpMonitor = () => {
             <span id="interval">{monitorIntervalRng}</span> sec.
           </div>
         </div>
-        { monitorTypeSlt !== "rss_parser"?<div>
-        <label
-          htmlFor="enable_auth"
-          className="relative inline-flex items-center mb-4 cursor-pointer"
-        >
-          <input
-            ref={basicAuthChkEl}
-            name="enable_auth"
-            id="enable_auth"
-            onClick={() => {
-              setBasicAuthChk(!basicAuthChk);
-            }}
-            type="checkbox"
-            value={basicAuthChk}
-            className="sr-only peer"
-          />
-          
-          <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-          <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-            Enable basic auth
-          </span>
-        </label>
-        </div>:null}
+        {monitorTypeSlt !== "rss_parser" ? (
+          <div>
+            <label
+              htmlFor="enable_auth"
+              className="relative inline-flex items-center mb-4 cursor-pointer"
+            >
+              <input
+                ref={basicAuthChkEl}
+                name="enable_auth"
+                id="enable_auth"
+                onClick={() => {
+                  setBasicAuthChk(!basicAuthChk);
+                }}
+                type="checkbox"
+                value={basicAuthChk}
+                className="sr-only peer"
+              />
+
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                Enable basic auth
+              </span>
+            </label>
+          </div>
+        ) : null}
         <div id="baseAuth" className={`${basicAuthChk ? "" : "hidden"}`}>
           <label
             htmlFor="login"
@@ -395,10 +405,10 @@ const HttpMonitor = () => {
             <option value="status_code">Status code is 200</option>
             <option value="keyword_exist">Keyword exists</option>
             <option value="keyword_not_exist">Keyword not exists</option>
-            <option value = "rss_parser">Rss parser </option>
+            <option value="rss_parser">Rss parser </option>
           </select>
         </div>
-        {monitorTypeSlt !== "status_code" && monitorTypeSlt !=="rss_parser" ? (
+        {monitorTypeSlt !== "status_code" && monitorTypeSlt !== "rss_parser" ? (
           <div id="keyWordPlace">
             <label
               htmlFor="key_word"
@@ -465,8 +475,9 @@ const HttpMonitor = () => {
           ></HttpMonitoringTable>
         </div>
       )}
-      { editError?<div className="absolute bottom-0 right-0" >
-       <Toast
+      {editError ? (
+        <div className="absolute bottom-0 right-0">
+          <Toast
             className={
               " bg-red-100 text--500 dark:bg-red-800 dark:text-red-200"
             }
@@ -474,7 +485,6 @@ const HttpMonitor = () => {
             <div
               className={`inline-flex h-8 w-8 shrink-0 shadow-lg items-center justify-center rounded-lg bg-red-100 text--500 dark:bg-red-800 dark:text-red-200 z-50`}
             >
-             
               <svg
                 class="w-5 h-5"
                 fill="none"
@@ -490,11 +500,12 @@ const HttpMonitor = () => {
                 ></path>
               </svg>
             </div>
-           <p className="ml-1"> Can`t edit monitor</p> 
+            <p className="ml-1"> Can`t edit monitor</p>
             <div className="ml-3 text-sm font-normal"></div>
             <Toast.Toggle />
           </Toast>
-    </div>:null}
+        </div>
+      ) : null}
     </div>
   );
 };
