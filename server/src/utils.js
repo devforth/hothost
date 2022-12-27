@@ -426,7 +426,11 @@ export const createMonitorDataset = (data) => {
   };
   for (const key in data) {
     if (data[key] !== "" && typeof data[key] !== "boolean") {
-      monitor[key] = data[key].trim();
+      if (typeof data[key] === "string") {
+        monitor[key] = data[key].trim();
+      } else {
+        monitor[key] = data[key];
+      }
     }
   }
   return monitor;
@@ -555,11 +559,11 @@ export const cleanResponseError = (host) => {
   host.SslError = "";
 };
 
-export const generateRssEvent = async (e) => {
+export const generateRssEvent = async (e, enabledPlugins) => {
   console.log("generated rss item");
   await PluginManager(true).handleRssEvent({
     rssFormatedMessage: e,
-    enabledPlugins: "test",
+    enabledPlugins,
   });
 };
 
@@ -587,8 +591,9 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
         );
 
         if (rssObject && rssObject.items && rssObject.items.at(0)) {
+          const enabledPlugins = dbData.enabledPlugins;
           rssObject.items.forEach((e) => {
-            generateRssEvent(e);
+            generateRssEvent(e, enabledPlugins);
           });
 
           // rssObjectsArr.map((e) => {
