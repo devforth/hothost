@@ -11,8 +11,12 @@ class PluginManager {
   constructor(isRss) {
     this.plugins = [];
     this.rssQueue = [];
-
-    this.rssSendInterval = setInterval(() => this.processRssQueue(), 2000);
+    this.rssSendInterval = setInterval(() => this.processRssQueue(), 4000);
+  }
+  startInterval() {
+    if (!this.rssSendInterval) {
+      this.rssSendInterval = setInterval(() => this.processRssQueue(), 4000);
+    }
   }
 
   async loadPlugins() {
@@ -142,7 +146,43 @@ class PluginManager {
 
   async processRssQueue() {
     if (this.rssQueue.length) {
-      const { rssFormatedMessage } = this.rssQueue.shift();
+      const { rssFormatedMessage, enabledPlugins } = this.rssQueue.shift();
+      const hostPlugins = enabledPlugins || {
+        ALL_PLUGINS: {
+          value: true,
+        },
+        TELEGRAM: {
+          value: true,
+        },
+        SLACK: {
+          value: true,
+        },
+        EMAIL: {
+          value: true,
+        },
+      };
+      const pluginsForHost = [
+        ["telegram-notifications", "TELEGRAM"],
+        ["slack-notifications", "SLACK"],
+        ["gmail-notifications", "EMAIL"],
+        ["email-notifications", "EMAIL"],
+      ];
+      function getEnabledPluginsForHost() {
+        if (hostPlugins.ALL_PLUGINS.value) {
+          return pluginsForHost.map((p) => {
+            return p[0];
+          });
+        } else {
+          let newArr = [];
+          pluginsForHost.forEach((p) => {
+            if (hostPlugins[p[1]].value) {
+              newArr.push(p[0]);
+            }
+          });
+          return newArr;
+        }
+      }
+      const enabledPluginsArr = getEnabledPluginsForHost();
 
       // plugins var is only enabled plugin for this event based on enabledPlugins
       const plugins = this.plugins
@@ -156,7 +196,7 @@ class PluginManager {
         })
 
         .filter((p) => {
-          return p.settings.enabled && enabledPlugins.includes(p.plugin.id);
+          return p.settings.enabled && enabledPluginsArr.includes(p.plugin.id);
         });
       await Promise.all(
         plugins.map(async (p) => {
@@ -168,6 +208,12 @@ class PluginManager {
         })
       );
     }
+    const rssMonitor = database.data.httpMonitoringData.find(
+      (p) => p.monitor_type === "rss_parser"
+    );
+    if (!rssMonitor) {
+      this.stopProcessRssQueue();
+    }
   }
 
   async handleRssEvent({ rssFormatedMessage, enabledPlugins }) {
@@ -178,15 +224,36 @@ class PluginManager {
       "contentSnippet",
       "isoDate",
     ];
-    Object.entries(rssFormatedMessage).forEach((e) => {
-      if (!excludedFields.includes(e[0])) {
-        messageString = `${messageString}\n:large_purple_circle:${e[0]
-          .charAt(0)
-          .toUpperCase()}${e[0].slice(1)}:${e[1]})`;
-      }
-    });
-
+    const prepareMessage = (cutField) => {
+      const CHARACTERS_LIMIT = 500;
+      Object.entries(rssFormatedMessage).forEach((e) => {
+        if (!excludedFields.includes(e[0])) {
+          if (!cutField) {
+            messageString = `${messageString}\n✅-${e[0]
+              .charAt(0)
+              .toUpperCase()}${e[0].slice(1)}:${e[1]})`;
+          } else {
+            messageString = `${messageString}\n⚠️-${e[0]
+              .charAt(0)
+              .toUpperCase()}${e[0].slice(1)}:${e[1].slice(
+              0,
+              CHARACTERS_LIMIT
+            )}(short message...)`;
+          }
+        }
+      });
+    };
+    prepareMessage();
+    if (messageString.length > 4096) {
+      messageString = "";
+      prepareMessage(true);
+    }
     this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
+  }
+
+  stopProcessRssQueue() {
+    clearInterval(this.rssSendInterval);
+    this.rssSendInterval = null;
   }
 }
 
