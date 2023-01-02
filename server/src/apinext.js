@@ -634,6 +634,16 @@ router.post(
       const psIndex = database.data.pluginSettings.findIndex(
         (ps) => ps.id === plugin.id
       );
+
+      //check last telegramChannelId
+      let oldBotToken = database.data.pluginSettings[psIndex]?.params?.botToken;
+
+      if (oldBotToken && oldBotToken !== input.params.botToken) {
+        database.data.telegramLastChannelId = null;
+        console.log("lastTelegramChatId Was cleaned");
+      }
+      //check last telegramChannelId
+
       const newPluginSetting = {
         id: plugin.id,
         params: input.params,
@@ -676,7 +686,11 @@ router.post(
     const plugin = PluginManagerSingleton().plugins.find(
       (p) => p.id === req.body.id
     );
-
+    //clean last telegramChannel
+    if (req.body.id === "telegram-notifications") {
+      database.data.telegramLastChannelId = null;
+    }
+    //
     if (!plugin) {
       return res.status(401).json({
         status: "rejected",

@@ -1,5 +1,6 @@
 import hbs from "handlebars";
 // import fetch from 'node-fetch';
+import database from "../database.js";
 
 export default {
   id: "telegram-notifications",
@@ -124,6 +125,7 @@ Chat in which you send message will be used to publish notifications.
 
   async sendMessage(settings, text) {
     const botToken = settings.params.botToken;
+    let chatId = database.data.telegramLastChannelId?.[0] || null;
 
     if (!text) {
       text = "🔥 This is a test notification from HotHost";
@@ -135,9 +137,16 @@ Chat in which you send message will be used to publish notifications.
         headers: { "Content-Type": "application/json" },
       }
     ).then((r) => r.json());
-
-    const chatId = firstResp?.result?.find((e) => e?.message?.chat?.id)?.message
-      ?.chat.id;
+    // save chat id to DB
+    if (!chatId) {
+      chatId = firstResp?.result?.find((e) => e?.channel_post?.chat?.id)
+        ?.channel_post?.chat?.id;
+      console.log(chatId, "chatId");
+      if (chatId) {
+        database.data.telegramLastChannelId = [chatId];
+        await database.write();
+      }
+    }
 
     const secondResp = await fetch(
       `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
@@ -149,7 +158,9 @@ Chat in which you send message will be used to publish notifications.
       }
     ).then((r) => r.json());
 
-    console.log(secondResp);
+    if (!chatId) {
+      console.log("incorrect chat id");
+    }
   },
 
   async onPluginEnabled() {
