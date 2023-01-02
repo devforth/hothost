@@ -148,6 +148,8 @@ Chat in which you send message will be used to publish notifications.
         headers: { "Content-Type": "application/json" },
       }
     ).then((r) => r.json());
+
+    console.log(secondResp);
   },
 
   async onPluginEnabled() {
