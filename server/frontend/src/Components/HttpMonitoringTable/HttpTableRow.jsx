@@ -237,7 +237,7 @@ const HttpTableRow = (props) => {
                 setDotsIsvisible(false);
               }}
               data-modal-toggle="modal_delete-{{@index}}"
-              className="mx-3 my-2 flex text-left hover:underline"
+              className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -268,7 +268,7 @@ const HttpTableRow = (props) => {
                 setDotsIsvisible(false);
               }}
               data-modal-toggle="modal_delete-{{@index}}"
-              className="mx-3 my-2 flex text-left hover:underline"
+              className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
