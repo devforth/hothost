@@ -347,7 +347,7 @@ export const generateHttpWarningEvents = async (
           newData.label && newData.label !== "" ? `\`${newData.label}\`` : "",
         CERT_VALID_UNTIL: new Date(expireDate),
         EVENT_REASON: reason,
-        enabledPlugins: data.enabledPlugins,
+        enabledPlugins: newData.enabledPlugins,
       }
     );
   }
