@@ -593,7 +593,6 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
         if (rssObject && rssObject.items && rssObject.items.at(0)) {
           const enabledPlugins = dbData.enabledPlugins;
           rssObject.items.forEach((e) => {
-            console.log(e);
             generateRssEvent(e, enabledPlugins, dbData);
           });
 
