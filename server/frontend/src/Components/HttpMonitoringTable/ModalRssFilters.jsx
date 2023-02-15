@@ -90,7 +90,7 @@ const ModalRssFilter = (props) => {
     <>
       <div
         id={id}
-        class=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 w-full max-w-xl h-full md:h-auto z-10  mb-5  text-gray-500 dark:text-gray-400 whitespace-normal truncate dark:bg-gray-700 bg-white"
+        class=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 w-full max-w-xl h-full md:h-auto z-10  mb-5  text-gray-600 dark:text-gray-400 whitespace-normal truncate dark:bg-gray-700 bg-gray-200"
       >
         <div class=" p-4 w-full max-w-xl h-full md:h-auto">
           <button

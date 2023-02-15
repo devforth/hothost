@@ -81,13 +81,20 @@
   gap: 8px;
 }
 
-.choices__input {
+.dark .choices__input {
   outline: none;
   border: none !important;
 
   padding: 0 !important;
   background-color: rgb(75 85 99) !important;
 }
+.choices__input {
+  outline: none;
+  border: none !important;
+
+  padding: 0 !important;
+}
+
 .is-focused {
   border: none !important;
   outline: none !important;
@@ -123,12 +130,20 @@
   box-shadow: none !important;
 }
 
-.choices__input.choices__input--cloned {
+.dark .choices__input.choices__input--cloned {
   color: white;
   padding-left: 4px;
   padding-right: 4px;
   font-size: 14px;
 }
+
+.choices__input.choices__input--cloned {
+  color: black;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-size: 14px;
+}
+
 input[type="search" i]::-webkit-search-cancel-button {
   display: none !important;
 }
