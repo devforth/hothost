@@ -118,12 +118,10 @@ const ModalRssFilter = (props) => {
             Filters
           </h3>
           <p className="text-sm text-grey dark:text-white text-left mb-4  break-words ">
-            1.Add some keywords if you want filter RSS feeds. Be carefull,
-            because you may lose some neccessary feeds, filter finds keywords in
-            RSS message, and will not send it even if the message contains at
-            least one of the keywords.{" "}
+            If at least one of this keywords will exist in feed (case-insensitive), feed will not be delivered to plugin. 
+            Be careful - you will not know about excluded feeds.{" "}
           </p>
-          <p className="mb-1 text-xs">Excluding items</p>
+          <p className="mb-1 text-xs">Excluding keywords</p>
           <div className="h-fit  badges overflow-hidden mr-auto bg-gray-50 border z-50  border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white mb-4">
             {" "}
             <input
@@ -135,14 +133,11 @@ const ModalRssFilter = (props) => {
             ></input>
           </div>
           <p className="text-sm text-grey dark:text-white text-left mb-4  break-words ">
-            2.Add some keywords to prioritize feeds. Don`t want lost something
-            really meaningful ? Just add highlighting filters , and you always
-            notice more neccessary messages. If the feed contains one of the
-            selected items, it will add a special character 🔥🔥🔥 to message
-            wich will draw your attention. Anyway you can use both filters at
-            the same time , or only one of them.{" "}
+            Optionally, add some keywords to prioritize feeds. If the feed contains one of the
+            selected keywords, Hothost will prepend 🔥🔥🔥 in message to draw your attention.
+            {" "}
           </p>
-          <p className="mb-1 text-xs">Highlighting items</p>
+          <p className="mb-1 text-xs">Highlighting keywords</p>
           <div className="h-fit  highlighter  overflow-hidden mr-auto bg-gray-50 border z-50  border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
             {" "}
             <input defaultValue="" id="highlighted" type="text"></input>
