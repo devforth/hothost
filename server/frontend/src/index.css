@@ -15,9 +15,12 @@
   height: 8px;
 }
 
-#proc  input[type="range" ]::-webkit-slider-runnable-track {margin-left: -10px; margin-right: -10px;}
+#proc input[type="range"]::-webkit-slider-runnable-track {
+  margin-left: -10px;
+  margin-right: -10px;
+}
 
-#proc input[type=range] {
+#proc input[type="range"] {
   -webkit-appearance: none;
   background: #c7c7c7;
   border-radius: 8px;
@@ -26,7 +29,7 @@
   outline: none;
 }
 
-#proc input[type=range]::-webkit-slider-thumb {
+#proc input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
 
@@ -41,7 +44,7 @@
   transform: translateY(-50px);
 }
 
-#proc input[type=range]::-moz-range-thumb {
+#proc input[type="range"]::-moz-range-thumb {
   background-color: transparent;
   border: 1px solid #c7c7c7;
   height: 30px;
@@ -49,10 +52,10 @@
   border-top-right-radius: 30%;
   border-bottom-left-radius: 50%;
   border-bottom-right-radius: 50%;
-  transform: translateY(-50px); 
+  transform: translateY(-50px);
 }
 
-#proc input[type=range]::-moz-range-progress{
+#proc input[type="range"]::-moz-range-progress {
   background: transparent;
 }
 
@@ -63,4 +66,82 @@
 .scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.choices__inner {
+  display: flex;
+  color: black;
+  flex-wrap: wrap;
+}
+
+.choices__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.choices__input {
+  outline: none;
+  border: none !important;
+
+  padding: 0 !important;
+  background-color: rgb(75 85 99) !important;
+}
+.is-focused {
+  border: none !important;
+  outline: none !important;
+}
+/* 
+.choices__button {
+  width: 1px;
+  position: absolute;
+  left: 999999px;
+} */
+
+.choices__item--choice {
+  width: 1px;
+  position: absolute;
+  left: 999999px;
+}
+.choices__item {
+  padding: 4px;
+  border-radius: 6px;
+  background-color: rgb(49 196 141);
+
+  display: flex;
+}
+
+* {
+  outline: none !important;
+  border: none !important;
+}
+
+.choices__input.choices__input--cloned:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.choices__input.choices__input--cloned {
+  color: white;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-size: 14px;
+}
+input[type="search" i]::-webkit-search-cancel-button {
+  display: none !important;
+}
+
+.choices__item.is-highlighted {
+  background-color: red;
+  color: white;
+}
+.choices__button {
+  background-image: url("../src/assets/Close.svg") !important;
+  background-origin: padding-box;
+  background-repeat: no-repeat;
+  font-size: 0px !important;
+  height: 100%;
+  width: 16px;
 }

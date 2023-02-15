@@ -216,7 +216,10 @@ class PluginManager {
     }
   }
 
-  async handleRssEvent({ rssFormatedMessage, enabledPlugins }) {
+  async handleRssEvent({ rssFormatedMessage, enabledPlugins, data }) {
+    let needExceptMessage = false;
+    let needBeHighlighted = false;
+    let fullMessageString = "";
     let messageString = "";
     let excludedFields = [
       "content:encoded",
@@ -224,6 +227,34 @@ class PluginManager {
       "contentSnippet",
       "isoDate",
     ];
+    let exceptionsList =
+      data &&
+      data.rssFilters.filter((e) => {
+        return e.name === "Exclude";
+      })[0].data;
+
+    let highlightedList =
+      data &&
+      data.rssFilters.filter((e) => {
+        return e.name === "Highlighted";
+      })[0].data;
+
+    Object.entries(rssFormatedMessage).forEach((e) => {
+      fullMessageString = `${fullMessageString}${e[0]}${e[1]}`;
+    });
+
+    exceptionsList.forEach((ex) => {
+      if (fullMessageString.toLowerCase().includes(ex.toLowerCase())) {
+        needExceptMessage = true;
+      }
+    });
+
+    highlightedList.forEach((hig) => {
+      if (fullMessageString.toLowerCase().includes(hig.toLowerCase())) {
+        needBeHighlighted = true;
+      }
+    });
+
     const prepareMessage = (cutField) => {
       const CHARACTERS_LIMIT = 500;
       Object.entries(rssFormatedMessage).forEach((e) => {
@@ -244,11 +275,16 @@ class PluginManager {
       });
     };
     prepareMessage();
-    if (messageString.length > 4096) {
+    if (messageString.length > 4000) {
       messageString = "";
       prepareMessage(true);
     }
-    this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
+    if (!needExceptMessage) {
+      if (needBeHighlighted) {
+        messageString = `🔥🔥🔥🔥🔥🔥\n${messageString}\n🔥🔥🔥🔥🔥🔥}`;
+      }
+      this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
+    }
   }
 
   stopProcessRssQueue() {

@@ -559,10 +559,11 @@ export const cleanResponseError = (host) => {
   host.SslError = "";
 };
 
-export const generateRssEvent = async (e, enabledPlugins) => {
+export const generateRssEvent = async (e, enabledPlugins, data) => {
   await PluginManager(true).handleRssEvent({
     rssFormatedMessage: e,
     enabledPlugins,
+    data,
   });
 };
 
@@ -592,7 +593,8 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
         if (rssObject && rssObject.items && rssObject.items.at(0)) {
           const enabledPlugins = dbData.enabledPlugins;
           rssObject.items.forEach((e) => {
-            generateRssEvent(e, enabledPlugins);
+            console.log(e);
+            generateRssEvent(e, enabledPlugins, dbData);
           });
 
           // rssObjectsArr.map((e) => {

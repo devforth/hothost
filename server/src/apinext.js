@@ -799,6 +799,66 @@ router.post(
 );
 
 router.post(
+  "/get_filters_for_RSS/",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const host = database.data.httpMonitoringData.find(
+      (host) => host.id === id
+    );
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+
+    if (!host.rssFilters) {
+      host.rssFilters = [
+        {
+          name: "Exclude",
+          data: [],
+        },
+        { name: "Highlighted", data: [] },
+      ];
+    }
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: host.rssFilters,
+    });
+  })
+);
+
+router.post(
+  "/set_filters_for_RSS/",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const filters = req.body.filters;
+    const host = database.data.httpMonitoringData.find(
+      (host) => host.id === id
+    );
+    if (!host || host.monitor_type !== "rss_parser") {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+
+    if (filters) {
+      host.rssFilters = filters;
+    }
+    await database.write();
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+    });
+  })
+);
+
+router.post(
   "/set_plugins_for_http-monitor/",
   mustBeAuthorizedView(async (req, res) => {
     const id = req.body.id;

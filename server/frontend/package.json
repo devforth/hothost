@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "choices.js": "^10.2.0",
     "flowbite": "^1.5.3",
     "flowbite-react": "^0.1.11",
     "react": "^18.2.0",

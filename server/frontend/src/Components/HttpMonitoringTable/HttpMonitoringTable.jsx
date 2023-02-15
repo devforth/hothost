@@ -5,6 +5,7 @@ import HttpTableRow from "./HttpTableRow";
 import ModalDelete from "./ModalDelete";
 import ModalAddLabel from "./ModalAddLabel";
 import HostNotificationModal from "./HostNotificationModal";
+import ModalRssFilters from "./ModalRssFilters";
 
 const httpMonitoringTable = (props) => {
   const httpMOnitors = props.monitoringHttpData;
@@ -17,6 +18,7 @@ const httpMonitoringTable = (props) => {
   const [chosenId, setChosenId] = useState("");
   const [hostNotificationIsVisible, setHostNotificationVisible] =
     useState(false);
+  const [rssFilterIsVisible, setRssFilterIsVisible] = useState(false);
 
   return (
     <>
@@ -48,6 +50,10 @@ const httpMonitoringTable = (props) => {
                 getNOtificationOfMonitor={(e) => {
                   setChosenId(e);
                   setHostNotificationVisible(true);
+                }}
+                getRssFilters={(e) => {
+                  setChosenId(e);
+                  setRssFilterIsVisible(true);
                 }}
               ></HttpTableRow>
             );
@@ -93,6 +99,18 @@ const httpMonitoringTable = (props) => {
           }
         ></HostNotificationModal>
       ) : null}
+      {rssFilterIsVisible ? (
+        <ModalRssFilters
+          setModalIsVisible={setRssFilterIsVisible}
+          monitor={
+            chosenId &&
+            httpMOnitors.filter((m) => {
+              return m.id === chosenId;
+            })[0]
+          }
+        ></ModalRssFilters>
+      ) : null}
+      {}
     </>
   );
 };
