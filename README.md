@@ -54,9 +54,9 @@ First you need to run HotHost Web Server. Web-server itself, when will be starte
 
 You can use any host with public IP. You are responsible for setting up HTTPS.
 
-You can use one of next options:
+For HTTPS you can use anything, most simple options:
 - Nginx or Traefik with connected external certificate or free Let's Encrypt certificate
-- Free Cloudflare CDN which terminates SSL and gives additional layer of cecurity.
+- Free Cloudflare CDN which terminates SSL and gives additional layer of security.
 
 We recommend you to check guide how to [setup HotHost with free Cloudflare plan and EC2 Nano](https://devforth.io/blog/critical-server-alerts-with-hothost-open-source-quick-to-setup-disk-ram-notifier/)
 
@@ -126,7 +126,7 @@ server {
 
 ### Pure Docker
 
-In case if you want to use pure docker:
+If you are not using Compose, rhen just install Docker to your host with public IP and run folowwing command:
 
 ```
 mkdir -p /www/hothostdata
@@ -148,15 +148,6 @@ docker pull devforth/hothost-web:latest
 ```
 
 then recreate a contaner
-
-# Optional Environment variables
-
-If you want to create a public page with Basic Auth access, then provide next two environment variables to web:
-
-* HOTHOST_WEB_BASIC_PUBLIC_USERNAME
-* HOTHOST_WEB_BASIC_PUBLIC_PASSWORD
-
-Then use https://subdomain.yourdomain.com/public/ with basic auth credentials. You can add this to setup e.g. UptimeRobot monitor and watch for `ALERT` keyword to prevent disk space issues
 
 # Plugin development
 
