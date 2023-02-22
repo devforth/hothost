@@ -516,15 +516,14 @@ do
     \"MONITOR_INTERVAL\":\"${HOTHOST_MONITOR_INTERVAL}\"
   }"
   
-  echo ${JSON_DATA}
-  echo curl -sS \
+  curl -sS \
    -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$JSON_DATA" \
    -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36' \
     2>&1 | ts | while read line; do echo ${line} ℹ️ HostInfo; done \
 
-   echo curl -sS \
+   curl -sS \
    -X POST $HOTHOST_SERVER_BASE/api/process/$HOTHOST_AGENT_SECRET \
    -H 'Content-Type: application/json' \
    -d "$PROC_DATA" \
