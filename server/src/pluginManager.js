@@ -7,6 +7,13 @@ import database from "./database.js";
 
 const fsReaddirAsync = promisify(fs.readdir);
 
+String.prototype.replaceAll = function(strReplace, strWith) {
+    // See http://stackoverflow.com/a/3561711/556609
+    var esc = strReplace.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    var reg = new RegExp(esc, 'ig');
+    return this.replace(reg, strWith);
+};
+
 class PluginManager {
   constructor(isRss) {
     this.plugins = [];
@@ -216,6 +223,7 @@ class PluginManager {
     }
   }
 
+
   async handleRssEvent({ rssFormatedMessage, enabledPlugins, data }) {
     let needExceptMessage = false;
     let needBeHighlighted = false;
@@ -252,6 +260,7 @@ class PluginManager {
     highlightedList.forEach((hig) => {
       if (fullMessageString.toLowerCase().includes(hig.toLowerCase())) {
         needBeHighlighted = true;
+        messageString = messageString.replaceAll(hig.toLowerCase(), `🔥${hig}`);
       }
     });
 
@@ -281,7 +290,7 @@ class PluginManager {
     }
     if (!needExceptMessage) {
       if (needBeHighlighted) {
-        messageString = `🔥🔥🔥🔥🔥🔥\n${messageString}\n🔥🔥🔥🔥🔥🔥}`;
+        messageString = `🔥🔥🔥 [PRIO] \n${messageString}\n🔥🔥🔥}`;
       }
       this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
     }
