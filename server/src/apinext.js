@@ -819,7 +819,14 @@ router.post(
           name: "Exclude",
           data: [],
         },
-        { name: "Highlighted", data: [] },
+        { 
+          name: "Highlighted", 
+          data: []
+        },
+        { 
+          name: "OnlyPrio", 
+          data: false
+        },
       ];
     }
     await database.write();

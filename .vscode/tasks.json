@@ -1,10 +1,21 @@
 {
   "version": "2.0.0",
   "tasks": [
+    // {
+    //   "label": "Tilewind",
+    //   "type": "shell",
+    //   "command": "cd server &&  npm run watch-tailwindcss",
+    //   "presentation": {
+    //     "reveal": "always",
+    //     "panel": "new",
+    //     "group": "develop",
+    //   },
+    //   "runOptions": { "runOn": "folderOpen" }
+    // },
     {
-      "label": "Tilewind",
+      "label": "Server",
       "type": "shell",
-      "command": "cd server &&  npm run watch-tailwindcss",
+      "command": "cd server ; npx kill-port 8007 ; npm run start",
       "presentation": {
         "reveal": "always",
         "panel": "new",
@@ -13,9 +24,9 @@
       "runOptions": { "runOn": "folderOpen" }
     },
     {
-      "label": "Server",
+      "label": "Frontend",
       "type": "shell",
-      "command": "cd server && lsof -i :8007 -t | xargs kill ; npm run start",
+      "command": "cd server/frontend ; npx kill-port 5173 ; xdg-open http://localhost:5173/ ; npm run dev ; ",
       "presentation": {
         "reveal": "always",
         "panel": "new",
@@ -23,5 +34,8 @@
       },
       "runOptions": { "runOn": "folderOpen" }
     }
+
+
+    
   ]
 }

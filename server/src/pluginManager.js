@@ -235,16 +235,22 @@ class PluginManager {
       "contentSnippet",
       "isoDate",
     ];
-    let exceptionsList =
+    const exceptionsList =
       data &&
       data.rssFilters.filter((e) => {
         return e.name === "Exclude";
       })[0].data;
 
-    let highlightedList =
+    const highlightedList =
       data &&
       data.rssFilters.filter((e) => {
         return e.name === "Highlighted";
+      })[0].data;
+
+    const onlyPrio =
+      data &&
+      data.rssFilters.filter((e) => {
+        return e.name === "OnlyPrio";
       })[0].data;
 
     Object.entries(rssFormatedMessage).forEach((e) => {
@@ -292,7 +298,9 @@ class PluginManager {
       if (needBeHighlighted) {
         messageString = `🔥🔥🔥 [PRIO] \n${messageString}\n🔥🔥🔥}`;
       }
-      this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
+      if (!onlyPrio || needBeHighlighted) {
+        this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
+      }
     }
   }
 

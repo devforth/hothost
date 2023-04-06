@@ -164,6 +164,20 @@ If you want to bundle some dedicated node modules then you need to bundle them u
 Default local credentials:
 - admin:123456
 
-How to run:
-- Apply migrations using: `npm run migrate`
-- Run the server using: `npm start`
+
+First, start back:
+
+```
+cd server
+npm ci
+npm start
+```
+
+Then start front:
+
+```
+cd frontend 
+npm ci
+npm run dev
+```
+
