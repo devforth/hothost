@@ -40,9 +40,13 @@ const getIconName = (osName) => {
   const icons = {
     "arch linux": "arch",
     ubuntu: "ubuntu",
+    centos: "centos",
+    deepin: "deepin",
+    openwrt: "openwrt",
+    immortalwrt: "openwrt",
   };
 
-  return icons[osName?.toLowerCase()] ?? "unknown";
+  return icons[osName?.toLowerCase().split(" ")[0]] ?? "unknown";
 };
 
 const ifUnknown = (value, trueValue, falseValue) => {
@@ -819,12 +823,12 @@ router.post(
           name: "Exclude",
           data: [],
         },
-        { 
-          name: "Highlighted", 
+        {
+          name: "Highlighted",
           data: []
         },
-        { 
-          name: "OnlyPrio", 
+        {
+          name: "OnlyPrio",
           data: false
         },
       ];
