@@ -425,12 +425,10 @@ export const createMonitorDataset = (data) => {
     last_rss_feed_time: now,
   };
   for (const key in data) {
-    if (data[key] !== "" && typeof data[key] !== "boolean") {
-      if (typeof data[key] === "string") {
-        monitor[key] = data[key].trim();
-      } else {
-        monitor[key] = data[key];
-      }
+    if (typeof data[key] === "string") {
+      monitor[key] = data[key].trim();
+    } else {
+      monitor[key] = data[key];
     }
   }
   return monitor;
