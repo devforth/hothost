@@ -516,9 +516,16 @@ export const checkStatus = async (hostData) => {
       if (respText === null) {
         return { response: false };
       }
-      const kwExists = respText.includes(hostData.key_word);
+
+      let kwExists = false;
+      if (!hostData.caseInsensitive) {
+        kwExists = respText.includes(hostData.key_word)
+      } else {
+        kwExists = respText.toLowerCase().includes(hostData.key_word.toLowerCase());
+      }
+
       if (!kwExists) {
-        hostData.errno = "Keyword doesn't exist.";
+        hostData.errno = "Keyword doesn't exist in response.";
       }
       return {
         response: kwExists,
@@ -529,12 +536,18 @@ export const checkStatus = async (hostData) => {
         return { response: false };
       }
 
-      const kwNotExists = !respText.includes(hostData.key_word);
-      if (!kwNotExists) {
-        hostData.errno = "Keyword exist.";
+      let kwExists = false;
+      if (!hostData.caseInsensitive) {
+        kwExists = respText.includes(hostData.key_word)
+      } else {
+        kwExists = respText.toLowerCase().includes(hostData.key_word.toLowerCase());
+      }
+
+      if (kwExists) {
+        hostData.errno = "Keyword exist in response.";
       }
       return {
-        response: kwNotExists,
+        response: !kwExists,
       };
     }
     case "rss_parser": {
