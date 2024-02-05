@@ -7,6 +7,10 @@ import validator from "validator";
 import { Toast } from "flowbite-react";
 
 const HttpMonitor = () => {
+
+  const MIN_INTERVAL_HTTP_MONITORING = 1;
+  const MAX_INTERVAL_HTTP_MONITORING = 600;
+
   const checkInputs = (inp, inpEl, setInpErr) => {
     if (!inp) {
       inpEl.current.focus();
@@ -56,6 +60,14 @@ const HttpMonitor = () => {
 
   const basicAuthChkEl = useRef(null);
 
+  const updateInterval = value => {
+    if (isNaN(value)) {
+      return;
+    }
+
+    setMonitorIntervalRng(Math.max(MIN_INTERVAL_HTTP_MONITORING, Math.min(MAX_INTERVAL_HTTP_MONITORING, value)));
+  }
+
   useEffect(() => {
     const intervalId = setInterval(fetchData, 10000);
     fetchData();
@@ -69,7 +81,7 @@ const HttpMonitor = () => {
     const findingHost = monitoringHttpData.filter((el) => el.id === id)[0];
     if (findingHost) {
       setMonitorUrlInp(findingHost.url);
-      setMonitorIntervalRng(findingHost.interval);
+      updateInterval(findingHost.interval);
       if (findingHost.login) {
         setBasicAuthChk(!basicAuthChk);
         basicAuthChkEl.current.checked = true;
@@ -317,21 +329,36 @@ const HttpMonitor = () => {
         >
           Monitor interval (sec)
         </label>
-        <div className="flex justify-between items-center mb-5">
+        <div className="flex items-center mb-5 gap-4">
           <input
             name="monitor_interval"
             id="monitorInterval"
             onChange={(e) => {
-              setMonitorIntervalRng(e.target.value);
+              updateInterval(e.target.value);
             }}
             type="range"
-            min="1"
-            max="120"
+            min={MIN_INTERVAL_HTTP_MONITORING}
+            max={MAX_INTERVAL_HTTP_MONITORING}
             value={monitorIntervalRng}
-            className="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            className="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 flex-1"
           />
-          <div className="text-gray-900 dark:text-gray-200">
-            <span id="interval">{monitorIntervalRng}</span> sec.
+          <div className={'flex items-center gap-4'}>
+            <input
+                    className="w-16 text-center p-2 rounded border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    onChange={(e) => updateInterval(e.target.value)}
+                    value={monitorIntervalRng}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        updateInterval( +monitorIntervalRng + 1);
+                      }
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        updateInterval( +monitorIntervalRng - 1);
+                      }
+                    }}
+            />
+            <span className="text-gray-900 dark:text-gray-200">sec</span>
           </div>
         </div>
         {monitorTypeSlt !== "rss_parser" ? (
@@ -418,9 +445,9 @@ const HttpMonitor = () => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="status_code">Status code is 200</option>
-            <option value="keyword_exist">Keyword exists</option>
-            <option value="keyword_not_exist">Keyword not exists</option>
-            <option value="rss_parser">RSS parser </option>
+            <option value="keyword_exist">Keyword must exist in response</option>
+            <option value="keyword_not_exist">Keyword must not exist in response</option>
+            <option value="rss_parser">RSS parser</option>
           </select>
         </div>
         {monitorTypeSlt !== "status_code" && monitorTypeSlt !== "rss_parser" ? (
