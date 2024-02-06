@@ -21,11 +21,13 @@ const HttpTableRow = (props) => {
   const humanMonitorType = () => {
     return {
       status_code: 'Status code is 200',
-      keyword_exist: `Keyword "${ monitor.keyWord }" must exist`,
-      keyword_not_exist: `Keyword "${ monitor.keyWord }" must not exist`,
+      keyword_exist: `Keyword "${ monitor.keyWord }" must exist ${!monitor.caseInsensitive ? '(case sensitive)' : ''}`,
+      keyword_not_exist: `Keyword "${ monitor.keyWord }" must not exist ${!monitor.caseInsensitive ? '(case sensitive)' : ''}`,
       rss_parser: 'RSS parser',
     }[monitor.monitor_type]
   }
+
+  console.log(monitor);
 
   return (
           <tr className="py-4 mobile:grid mobile:gap-4 mobile:grid-cols-2 border-b last:border-b-0 border-gray-200 dark:border-gray-700 ">
