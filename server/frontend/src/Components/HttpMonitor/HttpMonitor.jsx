@@ -5,8 +5,13 @@ import { useRef, useEffect } from "react";
 import HttpMonitoringTable from "../HttpMonitoringTable/HttpMonitoringTable";
 import validator from "validator";
 import { Toast } from "flowbite-react";
+import ToggleButton from "../ToggleButton/ToggleButton.jsx";
 
 const HttpMonitor = () => {
+
+  const MIN_INTERVAL_HTTP_MONITORING = 1;
+  const MAX_INTERVAL_HTTP_MONITORING = 600;
+
   const checkInputs = (inp, inpEl, setInpErr) => {
     if (!inp) {
       inpEl.current.focus();
@@ -41,6 +46,7 @@ const HttpMonitor = () => {
   const [passwordInp, setPasswordInp] = useState("");
   const [monitorTypeSlt, setMonitorTypeSlt] = useState("status_code");
   const [keyWordInp, setKeyWordInp] = useState("");
+  const [caseSensitiveChk, setCaseSensitiveChk] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [urlError, setUrlError] = useState(false);
@@ -54,7 +60,13 @@ const HttpMonitor = () => {
     setKeyWordInp("");
   };
 
-  const basicAuthChkEl = useRef(null);
+  const updateInterval = value => {
+    if (isNaN(value)) {
+      return;
+    }
+
+    setMonitorIntervalRng(Math.max(MIN_INTERVAL_HTTP_MONITORING, Math.min(MAX_INTERVAL_HTTP_MONITORING, value)));
+  }
 
   useEffect(() => {
     const intervalId = setInterval(fetchData, 10000);
@@ -69,10 +81,9 @@ const HttpMonitor = () => {
     const findingHost = monitoringHttpData.filter((el) => el.id === id)[0];
     if (findingHost) {
       setMonitorUrlInp(findingHost.url);
-      setMonitorIntervalRng(findingHost.interval);
+      updateInterval(findingHost.interval);
       if (findingHost.login) {
         setBasicAuthChk(!basicAuthChk);
-        basicAuthChkEl.current.checked = true;
         setLoginInp(findingHost.login);
         setPasswordInp(findingHost.password);
       }
@@ -169,6 +180,7 @@ const HttpMonitor = () => {
         password: passwordInp,
         monitor_type: monitorTypeSlt,
         key_word: keyWordInp,
+        caseInsensitive: !caseSensitiveChk,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -191,6 +203,7 @@ const HttpMonitor = () => {
         password: "",
         monitor_type: monitorTypeSlt,
         key_word: keyWordInp,
+        caseInsensitive: !caseSensitiveChk,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -210,6 +223,7 @@ const HttpMonitor = () => {
       password: basicAuthChk ? passwordInp : "",
       monitor_type: monitorTypeSlt,
       key_word: keyWordInp,
+      caseInsensitive: !caseSensitiveChk,
       id,
     };
 
@@ -317,47 +331,44 @@ const HttpMonitor = () => {
         >
           Monitor interval (sec)
         </label>
-        <div className="flex justify-between items-center mb-5">
+        <div className="flex items-center mb-5 gap-4">
           <input
             name="monitor_interval"
             id="monitorInterval"
             onChange={(e) => {
-              setMonitorIntervalRng(e.target.value);
+              updateInterval(e.target.value);
             }}
             type="range"
-            min="1"
-            max="120"
+            min={MIN_INTERVAL_HTTP_MONITORING}
+            max={MAX_INTERVAL_HTTP_MONITORING}
             value={monitorIntervalRng}
-            className="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            className="w-4/5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 flex-1"
           />
-          <div className="text-gray-900 dark:text-gray-200">
-            <span id="interval">{monitorIntervalRng}</span> sec.
+          <div className={'flex items-center gap-4'}>
+            <input
+                    className="w-16 text-center p-2 rounded border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    onChange={(e) => updateInterval(e.target.value)}
+                    value={monitorIntervalRng}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        updateInterval( +monitorIntervalRng + 1);
+                      }
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        updateInterval( +monitorIntervalRng - 1);
+                      }
+                    }}
+            />
+            <span className="text-gray-900 dark:text-gray-200">sec</span>
           </div>
         </div>
         {monitorTypeSlt !== "rss_parser" ? (
-          <div>
-            <label
-              htmlFor="enable_auth"
-              className="relative inline-flex items-center mb-4 cursor-pointer"
-            >
-              <input
-                ref={basicAuthChkEl}
-                name="enable_auth"
-                id="enable_auth"
-                onClick={() => {
-                  setBasicAuthChk(!basicAuthChk);
-                }}
-                type="checkbox"
-                value={basicAuthChk}
-                className="sr-only peer"
-              />
-
-              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Enable basic auth
-              </span>
-            </label>
-          </div>
+          <ToggleButton
+                  text={"Enable basic auth"}
+                  value={basicAuthChk}
+                  toggle={() => setBasicAuthChk(!basicAuthChk)}
+          />
         ) : null}
         <div id="baseAuth" className={`${basicAuthChk ? "" : "hidden"}`}>
           <label
@@ -418,9 +429,9 @@ const HttpMonitor = () => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="status_code">Status code is 200</option>
-            <option value="keyword_exist">Keyword exists</option>
-            <option value="keyword_not_exist">Keyword not exists</option>
-            <option value="rss_parser">RSS parser </option>
+            <option value="keyword_exist">Keyword must exist in response</option>
+            <option value="keyword_not_exist">Keyword must not exist in response</option>
+            <option value="rss_parser">RSS parser</option>
           </select>
         </div>
         {monitorTypeSlt !== "status_code" && monitorTypeSlt !== "rss_parser" ? (
@@ -447,6 +458,11 @@ const HttpMonitor = () => {
               type="text"
               placeholder="Keyword"
               className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            />
+            <ToggleButton
+                    text={"Case sensitive"}
+                    value={caseSensitiveChk}
+                    toggle={() => setCaseSensitiveChk(!caseSensitiveChk)}
             />
           </div>
         ) : null}
