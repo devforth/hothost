@@ -489,6 +489,15 @@ export const checkStatus = async (hostData) => {
       response: false,
     };
   }
+
+  if (response.status === 401 && hostData.enable_auth) {
+    hostData.errno = "Unauthorized";
+    return {
+      error: hostData.errno,
+      response: false,
+    };
+  }
+
   if (response.errno) {
     if (response.errno === expiredError) {
       hostData.SslError = expiredError;
