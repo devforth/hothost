@@ -46,7 +46,7 @@ const HttpMonitor = () => {
   const [passwordInp, setPasswordInp] = useState("");
   const [monitorTypeSlt, setMonitorTypeSlt] = useState("status_code");
   const [keyWordInp, setKeyWordInp] = useState("");
-  const [caseSensitiveChk, setCaseSensitiveChk] = useState(false);
+  const [caseSensitiveChk, setCaseSensitiveChk] = useState(true);
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [urlError, setUrlError] = useState(false);
