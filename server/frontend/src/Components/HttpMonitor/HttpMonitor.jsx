@@ -5,6 +5,7 @@ import { useRef, useEffect } from "react";
 import HttpMonitoringTable from "../HttpMonitoringTable/HttpMonitoringTable";
 import validator from "validator";
 import { Toast } from "flowbite-react";
+import ToggleButton from "../ToggleButton/ToggleButton.jsx";
 
 const HttpMonitor = () => {
 
@@ -45,6 +46,7 @@ const HttpMonitor = () => {
   const [passwordInp, setPasswordInp] = useState("");
   const [monitorTypeSlt, setMonitorTypeSlt] = useState("status_code");
   const [keyWordInp, setKeyWordInp] = useState("");
+  const [caseSensitiveChk, setCaseSensitiveChk] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [urlError, setUrlError] = useState(false);
@@ -57,8 +59,6 @@ const HttpMonitor = () => {
     setPasswordInp("");
     setKeyWordInp("");
   };
-
-  const basicAuthChkEl = useRef(null);
 
   const updateInterval = value => {
     if (isNaN(value)) {
@@ -84,7 +84,6 @@ const HttpMonitor = () => {
       updateInterval(findingHost.interval);
       if (findingHost.login) {
         setBasicAuthChk(!basicAuthChk);
-        basicAuthChkEl.current.checked = true;
         setLoginInp(findingHost.login);
         setPasswordInp(findingHost.password);
       }
@@ -181,6 +180,7 @@ const HttpMonitor = () => {
         password: passwordInp,
         monitor_type: monitorTypeSlt,
         key_word: keyWordInp,
+        caseInsensitive: !caseSensitiveChk,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -203,6 +203,7 @@ const HttpMonitor = () => {
         password: "",
         monitor_type: monitorTypeSlt,
         key_word: keyWordInp,
+        caseInsensitive: !caseSensitiveChk,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -222,6 +223,7 @@ const HttpMonitor = () => {
       password: basicAuthChk ? passwordInp : "",
       monitor_type: monitorTypeSlt,
       key_word: keyWordInp,
+      caseInsensitive: !caseSensitiveChk,
       id,
     };
 
@@ -362,29 +364,11 @@ const HttpMonitor = () => {
           </div>
         </div>
         {monitorTypeSlt !== "rss_parser" ? (
-          <div>
-            <label
-              htmlFor="enable_auth"
-              className="relative inline-flex items-center mb-4 cursor-pointer"
-            >
-              <input
-                ref={basicAuthChkEl}
-                name="enable_auth"
-                id="enable_auth"
-                onClick={() => {
-                  setBasicAuthChk(!basicAuthChk);
-                }}
-                type="checkbox"
-                value={basicAuthChk}
-                className="sr-only peer"
-              />
-
-              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Enable basic auth
-              </span>
-            </label>
-          </div>
+          <ToggleButton
+                  text={"Enable basic auth"}
+                  value={basicAuthChk}
+                  toggle={() => setBasicAuthChk(!basicAuthChk)}
+          />
         ) : null}
         <div id="baseAuth" className={`${basicAuthChk ? "" : "hidden"}`}>
           <label
@@ -474,6 +458,11 @@ const HttpMonitor = () => {
               type="text"
               placeholder="Keyword"
               className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            />
+            <ToggleButton
+                    text={"Case sensitive"}
+                    value={caseSensitiveChk}
+                    toggle={() => setCaseSensitiveChk(!caseSensitiveChk)}
             />
           </div>
         ) : null}
