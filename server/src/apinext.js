@@ -533,6 +533,7 @@ const getHttpMonitor = () => {
     password: data.password,
     keyWord: data.key_word,
     enabledPlugins: data.enabledPlugins,
+    caseInsensitive: data.caseInsensitive,
   }));
 };
 
