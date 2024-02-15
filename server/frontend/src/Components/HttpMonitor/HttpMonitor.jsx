@@ -10,7 +10,7 @@ import ToggleButton from "../ToggleButton/ToggleButton.jsx";
 const HttpMonitor = () => {
 
   const MIN_INTERVAL_HTTP_MONITORING = 1;
-  const MAX_INTERVAL_HTTP_MONITORING = 600;
+  const MAX_INTERVAL_HTTP_MONITORING = 1 * 60 * 60;
 
   const checkInputs = (inp, inpEl, setInpErr) => {
     if (!inp) {
