@@ -24,6 +24,7 @@ import {
   checkSslCert,
   anyNotificationDisabled,
   calculateDataEvent,
+  notAuthorizedView
 } from "./utils.js";
 import {
   getCountryName,
@@ -54,6 +55,7 @@ const ifUnknown = (value, trueValue, falseValue) => {
 };
 
 const getMonitoringData = async (req) => {
+  const { user } = req
   const { RAM_THRESHOLD, DISK_THRESHOLD } = database.data.settings;
   const initialHostSettings = {
     disk_is_almost_full: {
@@ -78,93 +80,93 @@ const getMonitoringData = async (req) => {
   return monitoringData.map((data) =>
     data.createdAt === data.updatedAt
       ? {
-          id: data.id,
-          no_data: true,
-          secret: req.user && data.secret,
-          isLocal: env.ENV === "local" ? true : false,
-        }
+        id: data.id,
+        no_data: true,
+        secret: req.user && data.secret,
+        isLocal: env.ENV === "local" ? true : false,
+      }
       : {
-          id: data.id,
-          // secret: req.user && data.secret,
-          isLocal: env.ENV === "local" ? true : false,
-          icon_name: getIconName(data.HOST_OS_NAME),
-          online:
-            data.updatedAt + +data.MONITOR_INTERVAL * 1000 * 1.3 >=
-            new Date().getTime(),
-          online_event_ts: data.ONLINE_EVENT_TS,
-          ram_event_ts: data.RAM_EVENT_TS,
-          disk_event_ts: data.DISK_EVENT_TS,
-          hostname: data.HOST_NAME,
-          label: data.HOST_LABEL,
-          public_ip: data.HOST_PUBLIC_IP,
-          country: data.HOST_PUBLIC_IP_COUNTRY,
-          os_name: data.HOST_OS_NAME,
-          os_version: ifUnknown(
-            data.HOST_OS_VERSION,
-            data.SYSTEM_KERNEL_VERSION,
-            data.HOST_OS_VERSION
-          ),
-          cpu_name: `${data.SYSTEM_CPU_MODEL}`,
-          cpu_count: data.SYSTEM_CPU_LOGICAL_CPU_COUNT,
-          ram_total: ifUnknown(
-            data.SYSTEM_TOTAL_RAM,
-            "unknown",
-            sizeFormat(data.SYSTEM_TOTAL_RAM)
-          ),
-          ram_used_percentage: (
-            ((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) /
-              +data.SYSTEM_TOTAL_RAM) *
-              100 || 0
-          ).toFixed(0),
-          ram_used: sizeFormat(
-            +(+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) || 0
-          ),
-          ram_warning:
-            (+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100 <
-            100 - RAM_THRESHOLD,
-          isSwap: !!data.SYSTEM_TOTAL_SWAP && data.SYSTEM_TOTAL_SWAP !== "0",
-          swap_total: ifUnknown(
-            data.SYSTEM_TOTAL_SWAP,
-            "unknown",
-            sizeFormat(data.SYSTEM_TOTAL_SWAP)
-          ),
-          swap_used: (
-            ((+data.SYSTEM_TOTAL_SWAP - +data.SYSTEM_FREE_SWAP) /
-              +data.SYSTEM_TOTAL_SWAP) *
-              100 || 0
-          ).toFixed(0),
-          disk_total: sizeFormat(+data.DISK_AVAIL + +data.DISK_USED),
-          disk_used: (
-            (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) *
-            100
-          ).toFixed(0),
-          disk_warning:
-            (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 >
-            DISK_THRESHOLD,
-          humanizeDurationOnlineEvent: getDuration(data.ONLINE_EVENT_TS),
-          countryFlag: getFlag(data.HOST_PUBLIC_IP_COUNTRY),
-          countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
-          humanizeDurationRamEvent: getDuration(data.RAM_EVENT_TS),
-          humanizeDurationDiskEvent: getDuration(data.DISK_EVENT_TS),
-          enabledNotifList:
-            data?.enabledNotifList?.events || initialHostSettings,
-          isNotificationDisabled: anyNotificationDisabled(
-            data.enabledNotifList || initialHostSettings
-          ),
-        }
+        id: data.id,
+        // secret: req.user && data.secret,
+        isLocal: env.ENV === "local" ? true : false,
+        icon_name: getIconName(data.HOST_OS_NAME),
+        online:
+          data.updatedAt + +data.MONITOR_INTERVAL * 1000 * 1.3 >=
+          new Date().getTime(),
+        online_event_ts: data.ONLINE_EVENT_TS,
+        ram_event_ts: data.RAM_EVENT_TS,
+        disk_event_ts: data.DISK_EVENT_TS,
+        hostname: data.HOST_NAME,
+        label: data.HOST_LABEL,
+        public_ip: user ? data.HOST_PUBLIC_IP : '*********',
+        country: data.HOST_PUBLIC_IP_COUNTRY,
+        os_name: data.HOST_OS_NAME,
+        os_version: ifUnknown(
+          data.HOST_OS_VERSION,
+          data.SYSTEM_KERNEL_VERSION,
+          data.HOST_OS_VERSION
+        ),
+        cpu_name: `${data.SYSTEM_CPU_MODEL}`,
+        cpu_count: data.SYSTEM_CPU_LOGICAL_CPU_COUNT,
+        ram_total: ifUnknown(
+          data.SYSTEM_TOTAL_RAM,
+          "unknown",
+          sizeFormat(data.SYSTEM_TOTAL_RAM)
+        ),
+        ram_used_percentage: (
+          ((+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) /
+            +data.SYSTEM_TOTAL_RAM) *
+          100 || 0
+        ).toFixed(0),
+        ram_used: sizeFormat(
+          +(+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) || 0
+        ),
+        ram_warning:
+          (+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100 <
+          100 - RAM_THRESHOLD,
+        isSwap: !!data.SYSTEM_TOTAL_SWAP && data.SYSTEM_TOTAL_SWAP !== "0",
+        swap_total: ifUnknown(
+          data.SYSTEM_TOTAL_SWAP,
+          "unknown",
+          sizeFormat(data.SYSTEM_TOTAL_SWAP)
+        ),
+        swap_used: (
+          ((+data.SYSTEM_TOTAL_SWAP - +data.SYSTEM_FREE_SWAP) /
+            +data.SYSTEM_TOTAL_SWAP) *
+          100 || 0
+        ).toFixed(0),
+        disk_total: sizeFormat(+data.DISK_AVAIL + +data.DISK_USED),
+        disk_used: (
+          (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) *
+          100
+        ).toFixed(0),
+        disk_warning:
+          (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 >
+          DISK_THRESHOLD,
+        humanizeDurationOnlineEvent: getDuration(data.ONLINE_EVENT_TS),
+        countryFlag: getFlag(data.HOST_PUBLIC_IP_COUNTRY),
+        countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
+        humanizeDurationRamEvent: getDuration(data.RAM_EVENT_TS),
+        humanizeDurationDiskEvent: getDuration(data.DISK_EVENT_TS),
+        enabledNotifList:
+          data?.enabledNotifList?.events || initialHostSettings,
+        isNotificationDisabled: anyNotificationDisabled(
+          data.enabledNotifList || initialHostSettings
+        ),
+      }
   );
 };
 
 router.get(
   "/getMonitoringData",
-  mustBeAuthorizedView(async (req, res) => {
+  notAuthorizedView(async (req, res) => {
     res.status(200).json(await getMonitoringData(req));
   })
 );
 
 router.get(
   "/http-monitor",
-  mustBeAuthorizedView((req, res) => {
+  notAuthorizedView((req, res) => {
     res
       .status(200)
       .json({ status: "success", code: 200, data: getHttpMonitor() });

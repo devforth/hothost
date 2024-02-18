@@ -6,8 +6,9 @@ import HttpMonitoringTable from "../HttpMonitoringTable/HttpMonitoringTable";
 import validator from "validator";
 import { Toast } from "flowbite-react";
 import ToggleButton from "../ToggleButton/ToggleButton.jsx";
+import AddHostBtn from "../../Components/AddHostBtn/AddHostBtn";
 
-const HttpMonitor = () => {
+const HttpMonitor = ({ cookieExist }) => {
 
   const MIN_INTERVAL_HTTP_MONITORING = 1;
   const MAX_INTERVAL_HTTP_MONITORING = 1 * 60 * 60;
@@ -53,6 +54,7 @@ const HttpMonitor = () => {
   const [keyWordError, setKeyWordError] = useState(false);
   const [status, setStatus] = useState("fullfield");
   const [monitoringHttpData, setMonitoringHttpData] = useState([]);
+
   const resetFieds = function () {
     setMonitorUrlInp("");
     setLoginInp("");
@@ -71,6 +73,7 @@ const HttpMonitor = () => {
   useEffect(() => {
     const intervalId = setInterval(fetchData, 10000);
     fetchData();
+
     return () => {
       clearInterval(intervalId);
     };
@@ -108,6 +111,10 @@ const HttpMonitor = () => {
   const passwordInpEl = useRef(null);
   const urlInpEl = useRef(null);
   const keywordInpEl = useRef(null);
+
+  const setVisable = () => {
+    setMonitorIsVisible(!monitorIsVisible);
+  }
 
   const addHttpMonitor = async function () {
     let body = {};
@@ -253,61 +260,39 @@ const HttpMonitor = () => {
                 setEdditingMonitor(!edditingMonitor);
                 setMonitorIsVisible(!monitorIsVisible);
               }}
-              class=" text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+              className=" text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
               data-modal-toggle="modal_label-{{@index}}"
             >
               <svg
-                class="w-5 h-5"
+                className="w-5 h-5"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
             </button>
           ) : (
-            <button
-              onClick={() => {
-                setMonitorIsVisible(!monitorIsVisible);
-              }}
-              className="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none mobile:w-max focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2.5 text-center ml-2 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex mobile:inline items-center "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Add new host
-            </button>
+            cookieExist ? <AddHostBtn handleAdd={setVisable} /> : null
           )}
         </div>
       </div>
       <div id="monitor_form" className={monitorIsVisible ? "" : "hidden"}>
         <label
           htmlFor="URL"
-          className={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${
-            urlError ? "text-red-700 " : ""
-          }`}
+          className={`block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ${urlError ? "text-red-700 " : ""
+            }`}
           style={{ color: urlError ? "red" : "" }}
         >
           {urlError && urlError === "Field value must be url"
             ? "Field value must be url"
             : urlError
-            ? "Monitor url is required"
-            : "Monitor url"}
+              ? "Monitor url is required"
+              : "Monitor url"}
         </label>
 
         <input
@@ -346,28 +331,28 @@ const HttpMonitor = () => {
           />
           <div className={'flex items-center gap-4'}>
             <input
-                    className="w-16 text-center p-2 rounded border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    onChange={(e) => updateInterval(e.target.value)}
-                    value={monitorIntervalRng}
-                    onKeyDown={(e) => {
-                      if (e.key === "ArrowUp") {
-                        e.preventDefault();
-                        updateInterval( +monitorIntervalRng + 1);
-                      }
-                      if (e.key === "ArrowDown") {
-                        e.preventDefault();
-                        updateInterval( +monitorIntervalRng - 1);
-                      }
-                    }}
+              className="w-16 text-center p-2 rounded border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              onChange={(e) => updateInterval(e.target.value)}
+              value={monitorIntervalRng}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  updateInterval(+monitorIntervalRng + 1);
+                }
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  updateInterval(+monitorIntervalRng - 1);
+                }
+              }}
             />
             <span className="text-gray-900 dark:text-gray-200">sec</span>
           </div>
         </div>
         {monitorTypeSlt !== "rss_parser" ? (
           <ToggleButton
-                  text={"Enable basic auth"}
-                  value={basicAuthChk}
-                  toggle={() => setBasicAuthChk(!basicAuthChk)}
+            text={"Enable basic auth"}
+            value={basicAuthChk}
+            toggle={() => setBasicAuthChk(!basicAuthChk)}
           />
         ) : null}
         <div id="baseAuth" className={`${basicAuthChk ? "" : "hidden"}`}>
@@ -460,9 +445,9 @@ const HttpMonitor = () => {
               className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
             />
             <ToggleButton
-                    text={"Case sensitive"}
-                    value={caseSensitiveChk}
-                    toggle={() => setCaseSensitiveChk(!caseSensitiveChk)}
+              text={"Case sensitive"}
+              value={caseSensitiveChk}
+              toggle={() => setCaseSensitiveChk(!caseSensitiveChk)}
             />
           </div>
         ) : null}
@@ -476,11 +461,10 @@ const HttpMonitor = () => {
             }
           }}
           disabled={passwordError || urlError || keyWordError || loginError}
-          className={` ${
-            passwordError || urlError || keyWordError || loginError
-              ? "disabled"
-              : null
-          } mr-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:hover:bg-gray-500 disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500`}
+          className={` ${passwordError || urlError || keyWordError || loginError
+            ? "disabled"
+            : null
+            } mr-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:hover:bg-gray-500 disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500`}
         >
           {edditingMonitor ? "Edit" : "Submit"}
         </button>
@@ -503,6 +487,7 @@ const HttpMonitor = () => {
             setMonitoringHttpData={setMonitoringHttpData}
             checkSslWarn={checkSslWarn}
             changeMonitorSetting={changeMonitorSetting}
+            cookieExist={cookieExist}
           ></HttpMonitoringTable>
         </div>
       )}

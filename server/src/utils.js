@@ -75,6 +75,11 @@ export const mustBeAuthorizedView = (callback) => {
     }
   };
 };
+export const notAuthorizedView = (callback) => {
+  return (req, res) => {
+    callback(req, res);
+  };
+};
 export const sizeFormat = (a) => {
   let value = parseInt(a);
   for (let unit of ["B", "KiB", "MiB", "GiB", "TiB"]) {
