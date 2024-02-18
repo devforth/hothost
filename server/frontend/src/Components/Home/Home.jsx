@@ -31,7 +31,7 @@ const Home = ({ cookieExist }) => {
   };
 
   useEffect(() => {
-    // fetchData({ withLoader: true });
+    fetchData({ withLoader: true });
     const intervalId = setInterval(() => {
       fetchData();
     }, 10000);
