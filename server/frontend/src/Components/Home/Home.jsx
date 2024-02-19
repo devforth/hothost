@@ -97,14 +97,12 @@ const Home = ({ cookieExist }) => {
                     ></AddHostDlg>
                   ) : null;
                 })}
-
-              {/* {{/if}}
-    {{/each}} */}
               <div className="flow-root overflow-auto mobile:truncate">
                 {monitoringData && status === "fullfield" && (
                   <MonitoringTable
                     monitoringData={monitoringData}
                     refreshData={fetchData}
+                    cookieExist={cookieExist}
                   ></MonitoringTable>
                 )}
                 {status === "pending" && (

@@ -72,8 +72,10 @@ const MyHostsTableSceleton = ({ quantity = 5 }) => {
       role="list"
       className="divide-y divide-gray-200 dark:divide-gray-700 w-full"
     >
-      {arr.map((e) => {
-        return monitorRow;
+      {arr.map((e, index) => {
+        <React.Fragment key={index}>
+          {monitorRow}
+        </React.Fragment>
       })}
     </table>
   );
