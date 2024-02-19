@@ -30,15 +30,18 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    const ck = getCookie('__hhjwt')
-    if (!ck || ck == undefined) {
-      setCookieExist(false)
-    }
-    if (ck && ck.length > 0) {
-      setCookieExist(true)
-    }
+    const timer = setInterval(() => {
+      const ck = getCookie('__hhjwt')
+      if (!ck || ck == undefined) {
+        setCookieExist(false)
+      }
+      if (ck && ck.length > 0) {
+        setCookieExist(true)
+      }
+    }, 1000)
 
-  }, [])
+    return () => clearInterval(timer)
+  }, [cookieExist])
 
   return (
     <div className="App">
