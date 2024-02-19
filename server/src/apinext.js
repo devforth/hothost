@@ -161,6 +161,10 @@ const getMonitoringData = async (req) => {
 router.get(
   "/getMonitoringData",
   notAuthorizedView(async (req, res) => {
+    if (!env.WEB_PUBLIC_VIEW_ENABLED && !req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     res.status(200).json(await getMonitoringData(req));
   })
 );
@@ -168,6 +172,10 @@ router.get(
 router.get(
   "/http-monitor",
   notAuthorizedView((req, res) => {
+    if (!env.WEB_PUBLIC_VIEW_ENABLED && !req.user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     res
       .status(200)
       .json({ status: "success", code: 200, data: getHttpMonitor() });

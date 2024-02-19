@@ -10,6 +10,7 @@ const env = {
     WEB_BASIC_PUBLIC_PASSWORD: process.env.HOTHOST_WEB_BASIC_PUBLIC_PASSWORD,
     WEB_PORT: +process.env.HOTHOST_WEB_PORT,
     WEB_JWT_SECRET: process.env.HOTHOST_WEB_JWT_SECRET,
+    WEB_PUBLIC_VIEW_ENABLED: process.env.HOTHOST_WEB_PUBLIC_VIEW_ENABLED === 'true',
 };
 
 env.DATA_PATH = env.ENV === 'local' ? './data/' : '/var/lib/hothost/data/';

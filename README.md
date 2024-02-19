@@ -80,6 +80,7 @@ services:
       - HOTHOST_WEB_ADMIN_USERNAME=admin
       - HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
       - HOTHOST_WEB_PORT=8007
+      - HOTHOST_WEB_PUBLIC_VIEW_ENABLED=false
     ports:
       - 8007:8007
     volumes:
@@ -137,6 +138,7 @@ docker run -d --name=hothost-web \
   -v /www/hothostdata:/var/lib/hothost/data/  \
   --env HOTHOST_WEB_ADMIN_USERNAME=admin  \
   --env HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!  \
+  --env HOTHOST_WEB_PUBLIC_VIEW_ENABLED=false  \
   --restart=always  \
   --env HOTHOST_WEB_PORT=8007  \
   -p 8007:8007  \
