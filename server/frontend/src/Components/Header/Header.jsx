@@ -52,7 +52,7 @@ const Header = ({ theme, setTheme, cookieExist }) => {
           <ThemeButton theme={theme} setTheme={setTheme}></ThemeButton>
 
           <div className="flex md:order-2">
-            {location.pathname === "/login" ? (
+            {!cookieExist ? (
               <a
                 onClick={() => {
                   clickAndNavigate("login");
