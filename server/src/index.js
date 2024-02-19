@@ -42,7 +42,7 @@ async function main() {
 
   app.use(
     cors({
-      origin: "http://localhost:56558",
+      origin: "http://localhost:5173",
       credentials: true,
     })
   );
