@@ -45,6 +45,7 @@ const getIconName = (osName) => {
     deepin: "deepin",
     openwrt: "openwrt",
     immortalwrt: "openwrt",
+    debian: "debian"
   };
 
   return icons[osName?.toLowerCase().split(" ")[0]] ?? "unknown";
