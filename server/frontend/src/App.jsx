@@ -9,12 +9,15 @@ import Users from "./Components/Users/Users.jsx";
 import HttpMonitor from "./Components/HttpMonitor/HttpMonitor";
 import Plugins from "./Components/Plugins/Plugins";
 import Plugin from "./Components/Plugin/Plugin";
+import { getCookie } from "./Components/Utils/Hooks/getCookie.js";
 
 function App() {
   //get data from server
   const [isAuthorize, setIsAuthorize] = useState("");
   const [monitoringData, setMonitoringData] = useState([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [cookieExist, setCookieExist] = useState(false)
+
 
   useEffect(() => {
     if (theme === "dark") {
@@ -26,24 +29,38 @@ function App() {
     }
   }, [theme]);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const ck = getCookie('__hhjwt')
+      if (!ck || ck == undefined) {
+        setCookieExist(false)
+      }
+      if (ck && ck.length > 0) {
+        setCookieExist(true)
+      }
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [cookieExist])
+
   return (
     <div className="App">
-      <Header setTheme={setTheme} theme={theme} />
-      
-        <Routes>
-          <Route path="/" element={<Navigate replace to="/home" />} />
-          <Route path="/home" element={<Home />}>
-            <Route path="http-monitor" element={<HttpMonitor />} />
-          </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/plugins" element={<Plugins />} />
-          <Route path="/plugin" element={<Plugin />}>
-            <Route path=":pluginName" element={<Plugin />}></Route>
-          </Route>
-        </Routes>
-      
+      <Header setTheme={setTheme} theme={theme} cookieExist={cookieExist} />
+
+      <Routes>
+        <Route path="/" element={<Navigate replace to="/home" />} />
+        <Route path="/home" element={<Home cookieExist={cookieExist} />}>
+          <Route path="http-monitor" element={<HttpMonitor />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/plugins" element={<Plugins />} />
+        <Route path="/plugin" element={<Plugin />}>
+          <Route path=":pluginName" element={<Plugin />}></Route>
+        </Route>
+      </Routes>
+
     </div>
   );
 }

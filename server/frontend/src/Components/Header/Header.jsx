@@ -9,7 +9,7 @@ import { useLocation } from "react-router-dom";
 import OutsideHider from "../OutsideAlert/OutsideAlert";
 import Settings from "./Settings";
 
-const Header = ({ theme, setTheme }) => {
+const Header = ({ theme, setTheme, cookieExist }) => {
   const userMenuBtn = useRef(null);
   const logoutMenuBtn = useRef(null);
   const location = useLocation();
@@ -64,7 +64,7 @@ const Header = ({ theme, setTheme }) => {
             ) : (
               <>
                 {" "}
-                <OutsideHider
+                {(cookieExist && setSettingsIsVisible) ? (<OutsideHider
                   state={setingsIsVisible}
                   setstate={setSettingsIsVisible}
                 >
@@ -103,65 +103,67 @@ const Header = ({ theme, setTheme }) => {
                       setingsIsVisible={setingsIsVisible}
                     ></Settings>
                   ) : null}
-                </OutsideHider>
-                <OutsideHider
-                  state={usertManageIsVisible}
-                  setstate={setUsertManageIsVisible}
-                >
-                  <div
-                    ref={logoutMenuBtn}
-                    className="px-2"
-                    onClick={() => {
-                      setUsertManageIsVisible(!usertManageIsVisible);
-                    }}
+                </OutsideHider>) : null}
+                {cookieExist ? (
+                  <OutsideHider
+                    state={usertManageIsVisible}
+                    setstate={setUsertManageIsVisible}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      id="userManage"
-                      className="text-gray-700 dark:text-gray-300 h-10 w-10 cursor-pointer hover:text-gray-600 "
-                      data-dropdown-toggle="userManageDropdown"
-                      data-dropdown-placement="bottom-end"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-
-                  {usertManageIsVisible ? (
                     <div
-                      id="userManageDropdown"
-                      className="absolute inset: 0px 0px auto auto bottom-[-64px]  translate-x-[-50%]  bg-white divide-y divide-gray-100 rounded shadow w-32 dark:bg-gray-700 dark:divide-gray-600  block`"
+                      ref={logoutMenuBtn}
+                      className="px-2"
+                      onClick={() => {
+                        setUsertManageIsVisible(!usertManageIsVisible);
+                      }}
                     >
-                      <div className="py-3">
-                        <button
-                          onClick={logout}
-                          className="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 mr-3"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                            />
-                          </svg>
-                          Logout
-                        </button>
-                      </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        id="userManage"
+                        className="text-gray-700 dark:text-gray-300 h-10 w-10 cursor-pointer hover:text-gray-600 "
+                        data-dropdown-toggle="userManageDropdown"
+                        data-dropdown-placement="bottom-end"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </div>
-                  ) : null}
-                </OutsideHider>
+
+                    {usertManageIsVisible ? (
+                      <div
+                        id="userManageDropdown"
+                        className="absolute inset: 0px 0px auto auto bottom-[-64px]  translate-x-[-50%]  bg-white divide-y divide-gray-100 rounded shadow w-32 dark:bg-gray-700 dark:divide-gray-600  block`"
+                      >
+                        <div className="py-3">
+                          <button
+                            onClick={logout}
+                            className="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-6 w-6 mr-3"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                              />
+                            </svg>
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </OutsideHider>
+                ) : null}
               </>
             )}
           </div>

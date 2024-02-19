@@ -8,6 +8,7 @@ import HostNotificationModal from "./HostNotificationModal";
 import ModalRssFilters from "./ModalRssFilters";
 
 const httpMonitoringTable = (props) => {
+  const cookieExist = props.cookieExist
   const httpMOnitors = props.monitoringHttpData;
   const setMonitoringHttpData = props.setMonitoringHttpData;
   const checkSslWarn = props.checkSslWarn;
@@ -33,6 +34,7 @@ const httpMonitoringTable = (props) => {
             return (
               <HttpTableRow
                 monitor={monitor}
+                cookieExist={cookieExist}
                 getDeleteId={(e) => {
                   setChosenId(e);
                   setDeleteModalIsVisible(true);

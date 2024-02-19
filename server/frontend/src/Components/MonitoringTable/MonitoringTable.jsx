@@ -11,6 +11,7 @@ import NotificationModal from "./MonitoringModal/NotificationModal";
 const MonitoringTable = (props) => {
   const monitoringData = props.monitoringData;
   const refreshData = props.refreshData;
+  const cookieExist = props.cookieExist
 
   const [labelModalIsVisible, setlabelModalIsVisible] = useState(false);
   const [notifyModalIsVisible, setNotifyModalIsVisible] = useState(false);
@@ -80,6 +81,7 @@ const MonitoringTable = (props) => {
                 setlabelModalIsVisible={setlabelModalIsVisible}
                 setDonutModalIsVisible={setDonutModalIsVisible}
                 setNotifyModalIsVisible={setNotifyModalIsVisible}
+                cookieExist={cookieExist}
               />
             ))}
 
