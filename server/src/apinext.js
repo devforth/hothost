@@ -996,7 +996,7 @@ router.get(
       .catch((err) => []);
 
     res.json({
-      restartTime: restartTime,
+      restartTime: Array.isArray(restartTime) ? restartTime : [restartTime],
       process: processByTime,
       totalRamUsage: sizeFormat(ramUsage),
     });
