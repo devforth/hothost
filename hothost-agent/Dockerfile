@@ -16,4 +16,5 @@ COPY --from=psbuilder /procps/ps/pscommand /pscommand
 RUN apt-get update -y && apt-get -y install curl && apt-get -y install moreutils
 ADD getinfo.sh .
 
-CMD [ "bash", "getinfo.sh" ]
+# run getinfo.sh with nice 19
+CMD ["nice", "-n", "15", "bash", "./getinfo.sh"]
