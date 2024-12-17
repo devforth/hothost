@@ -3,17 +3,18 @@
 <a href="https://devforth.io"><img src="https://raw.githubusercontent.com/devforth/OnLogs/e97944fffc24fec0ce2347b205c9bda3be8de5c5/.assets/df_powered_by.svg" style="height:36px"/></a>
 
 
-Lightweight and minimalistic free and opensource Servers and HTTP monitor. 
+Lightweight and minimalistic monitoring tool for Servers and HTTP web pages. 
 
-* 💾 Shows used disk space percentage and ALERT badge if it exceeds configurable threshold (90% by default)
-* 🧠 Shows used RAM percentage and ALERT badge if it exceeds configurable threshold (90% by default)
+* 🆓 Free and Open-Source forever
+* 💾 Shows used disk space percentage and ALERT badge if it exceeds a configurable threshold (90% by default)
+* 🧠 Shows used RAM percentage and ALERT badge if it exceeds a configurable threshold (90% by default)
 * ☎️ Built-in plugins to setup free Email/Slack/Telegram notifications
 * 🪧 Agents installed using **simple code snippets**. Options: Docker/Compose/Bash+curl+crontab.
 * 🏙 Allows to monitor as many hosts as needed
 * ⏰️ Configurable monitoring interval
 * 📈 View top 10 processes consuming RAM, historically over last 2 days.
-* 🌐 HTTP / HTTPS Monitor, status code check, webpage keywords existence, basic auth, notifications
-* 🔒 HTTPS SSL check with expiration reminder (default is 14 days prior to expire, configurable)
+* 🌐 HTTP / HTTPS Monitor, status code check (e.g. 200), webpage keywords existence, basic auth, notifications
+* 🔒 HTTPS SSL check with expiration reminder (default is 14 days prior to expiration, configurable)
 
 For each host it allows to see:
 
