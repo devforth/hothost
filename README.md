@@ -10,6 +10,7 @@ Lightweight and minimalistic monitoring tool for Servers and HTTP web pages.
 * 🧠 Shows used RAM percentage and ALERT badge if it exceeds a configurable threshold (90% by default)
 * ☎️ Built-in plugins to setup free Email/Slack/Telegram notifications
 * 🪧 Agents installed using **simple code snippets**. Options: Docker/Compose/Bash+curl+crontab.
+* 🐬 Docker ready - you can run the agent with plain docker command or add to your compose
 * 🏙 Allows to monitor as many hosts as needed
 * ⏰️ Configurable monitoring interval
 * 📈 View top 10 processes consuming RAM, historically over last 2 days.
