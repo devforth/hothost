@@ -464,6 +464,10 @@ do
       i=$(($i+1))
       RAM=$(echo $line | awk '{print $1;}')
       process=$(echo $line | sed "s/^[^ ]* //")
+
+      # process line migth have \u characters, remove them because they crash express body-parser
+      process=$(echo $process | sed 's/\\u//g')
+
       JSON_PROCESS+="\"$RAM\":\"$process\","  
 
   done <<< "$process_output"
