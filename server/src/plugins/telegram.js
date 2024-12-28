@@ -25,7 +25,9 @@ export default {
 
 Paste in setting called "Telegram Token created by BotFather" located below.
 
-4\\. Invite bot to some group and **type any message there**, or just **type message in Direct Messages** with bot.
+4\\. [Get chat id where you want messages to be sent](https://gist.github.com/nafiesl/4ad622f344cd1dc3bb1ecbe468ff9f8a)
+
+Paste in setting called "Telegram Chat ID" located below.
 
 Chat in which you send message will be used to publish notifications.
 
@@ -47,6 +49,12 @@ Chat in which you send message will be used to publish notifications.
     {
       id: "botToken",
       name: "Telegram Token created by BotFather",
+      required: true,
+      type: "str",
+    },
+    {
+      id: "telegramChatId",
+      name: "Telegram Chat ID",
       required: true,
       type: "str",
     },
@@ -125,27 +133,20 @@ Chat in which you send message will be used to publish notifications.
 
   async sendMessage(settings, text) {
     const botToken = settings.params.botToken;
-    let chatId = database.data.telegramLastChannelId?.[0] || null;
+
+    const lastChatId = database.data.telegramLastChannelId?.[0] || null;
+    if (lastChatId) {
+      settings.params.telegramChatId = lastChatId;
+    }
 
     if (!text) {
       text = "🔥 This is a test notification from HotHost";
     }
-    const firstResp = await fetch(
-      `https://api.telegram.org/bot${botToken}/getUpdates`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    ).then((r) => r.json());
-    // save chat id to DB
+
+    const chatId = settings.params.telegramChatId;
     if (!chatId) {
-      chatId = firstResp?.result?.find((e) => e?.channel_post?.chat?.id)
-        ?.channel_post?.chat?.id;
-      console.log(chatId, "chatId");
-      if (chatId) {
-        database.data.telegramLastChannelId = [chatId];
-        await database.write();
-      }
+      console.log("incorrect chat id");
+      return;
     }
 
     const secondResp = await fetch(
@@ -157,10 +158,6 @@ Chat in which you send message will be used to publish notifications.
         headers: { "Content-Type": "application/json" },
       }
     ).then((r) => r.json());
-
-    if (!chatId) {
-      console.log("incorrect chat id");
-    }
   },
 
   async onPluginEnabled() {
