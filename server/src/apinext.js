@@ -943,6 +943,9 @@ const generateProcessData = (data) => {
     "#E2CF56",
     "#AEE256",
     "#56E289",
+    "#56E2CF",
+    "#56AEE2",
+    "#568AE2",
   ];
   let processEntries = [];
   let id = 0;
@@ -953,7 +956,7 @@ const generateProcessData = (data) => {
         data: value,
         total_usage: key,
         ram_usage: sizeFormat(key * 1024),
-        color: colors[id],
+        color: colors[id % colors.length],
       });
       id++;
     }

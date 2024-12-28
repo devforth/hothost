@@ -447,9 +447,16 @@ do
     TOTAL_SWAP="$((TOTAL_SWAP * 1024))"
     FREE_SWAP="$((FREE_SWAP * 1024))"
   fi
+  SYSTEM_TOTAL_PROCESSES=`$pscommand -eo pid | wc -l`
 
   # Detect process RSS information  
-  process_output=`$pscommand -eo rss,command --sort -rss | head -n 11 | sed '1d'`
+  # if free ram is less then 80% of total ram, send 10 processes, otherwise send 100 processes
+  if [ $FREE_RAM -lt $((TOTAL_RAM * 80 / 100)) ]; then
+    process_output=`$pscommand -eo rss,command --sort -rss | head -n 11 | sed '1d'`
+  else
+    # more debug might be needed 
+    process_output=`$pscommand -eo rss,command --sort -rss | head -n 101 | sed '1d'`
+  fi 
   JSON_PROCESS=""
 
   i=0
@@ -468,6 +475,7 @@ do
     \"IS_RESTART\":\"${IS_RESTART}\",
     \"SYSTEM_FREE_RAM\":\"${FREE_RAM}\",
     \"SYSTEM_TOTAL_RAM\":\"${TOTAL_RAM}\",
+    \"SYSTEM_TOTAL_PROCESSES\":\"${SYSTEM_TOTAL_PROCESSES}\",
     \"PROCESS\":"{$JSON_PROCESS}"
   }"
   JSON_DATA="{
