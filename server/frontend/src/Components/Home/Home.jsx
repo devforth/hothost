@@ -72,7 +72,7 @@ const Home = ({ cookieExist }) => {
               : ""
               }`}
           >
-            Http/Https monitoring
+            HTTP/HTTPs monitoring
           </div>
         </div>
 
