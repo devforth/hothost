@@ -319,12 +319,21 @@ router.post(
       (m) => m.id === id
     );
     if (monitorIndex !== -1) {
+      const prev = database.data.httpMonitoringData[monitorIndex];
+      const prevInterval = prev.monitor_interval;
       database.data.httpMonitoringData[monitorIndex] = {
         ...database.data.httpMonitoringData[monitorIndex],
         last_rss_feed_time: new Date().getTime(),
         ...newSettings,
       };
       await database.write();
+      if (
+        typeof newSettings.monitor_interval !== "undefined" &&
+        +newSettings.monitor_interval !== +prevInterval
+      ) {
+        stopScheduleJob(id);
+        createScheduleJob(id, +newSettings.monitor_interval);
+      }
       res.status(200).json({ status: "successful", code: 200 });
     } else {
       res.status(400).json({ error: "invalid data" });
