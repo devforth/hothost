@@ -593,21 +593,24 @@ export const generateRssEvent = async (e, enabledPlugins, data) => {
 };
 
 export const createScheduleJob = async (httpHostId, targetInterval) => {
-  schedulerIsRunningForHost[httpHostId] = true;
+  const jobToken = uuidv4();
+  schedulerIsRunningForHost[httpHostId] = jobToken;
   let intervalCorrection = 0;
 
-  while (schedulerIsRunningForHost[httpHostId]) {
+  while (schedulerIsRunningForHost[httpHostId] === jobToken) {
     let waitTime = (targetInterval - intervalCorrection) * 1000;
+    if (schedulerIsRunningForHost[httpHostId] !== jobToken) {
+      break;
+    }
     if (waitTime > 0) {
       await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
-
     const iterationStartMs = +new Date();
     const dbData = database.data.httpMonitoringData.find(
       (host) => host.id == httpHostId
     );
 
-    if (dbData) {
+    if (dbData && schedulerIsRunningForHost[httpHostId] === jobToken) {
       // rss parser
       if (dbData.monitor_type === "rss_parser") {
         const rssObject = await rssParser(
