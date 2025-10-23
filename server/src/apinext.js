@@ -496,20 +496,72 @@ router.post(
       hours_for_next_alert,
     } = req.body;
 
-    database.data.settings = {
-      RAM_THRESHOLD: +ram_threshold,
-      RAM_STABILIZATION_LEVEL: +ram_stabilization_lvl,
-      DISK_THRESHOLD: +disk_threshold,
-      DISK_STABILIZATION_LEVEL: +disk_stabilization_lvl,
-      HOST_IS_DOWN_CONFIRMATIONS: +host_is_down_confirmations,
-      HTTP_ISSUE_CONFIRMATION: +http_issue_confirmations,
-      DAYS_FOR_SSL_EXPIRED: +days_for_ssl_expire,
-      HOURS_FOR_NEXT_ALERT: +hours_for_next_alert,
+    const required = {
+      disk_threshold,
+      disk_stabilization_lvl,
+      ram_threshold,
+      ram_stabilization_lvl,
+      host_is_down_confirmations,
+      http_issue_confirmations,
+      days_for_ssl_expire,
+      hours_for_next_alert,
     };
-    res.status(200).json({
-      status: "sucessful",
-      code: 200,
+
+    // Ensure all required fields present
+    for (const [k, v] of Object.entries(required)) {
+      if (typeof v === "undefined") {
+        return res
+          .status(400)
+          .json({ status: "rejected", code: 400, error: `missing field ${k}` });
+      }
+    }
+
+    // Coerce and validate
+    const toNum = (v) => Number(v);
+    const values = {
+      RAM_THRESHOLD: toNum(ram_threshold),
+      RAM_STABILIZATION_LEVEL: toNum(ram_stabilization_lvl),
+      DISK_THRESHOLD: toNum(disk_threshold),
+      DISK_STABILIZATION_LEVEL: toNum(disk_stabilization_lvl),
+      HOST_IS_DOWN_CONFIRMATIONS: toNum(host_is_down_confirmations),
+      HTTP_ISSUE_CONFIRMATION: toNum(http_issue_confirmations),
+      DAYS_FOR_SSL_EXPIRED: toNum(days_for_ssl_expire),
+      HOURS_FOR_NEXT_ALERT: toNum(hours_for_next_alert),
+    };
+
+    // Reject non-finite numbers
+    for (const [k, v] of Object.entries(values)) {
+      if (!Number.isFinite(v)) {
+        return res
+          .status(400)
+          .json({ status: "rejected", code: 400, error: `invalid value for ${k}` });
+      }
+    }
+
+    // Clamp percent-based fields to [0, 100]
+    const percentKeys = [
+      "RAM_THRESHOLD",
+      "RAM_STABILIZATION_LEVEL",
+      "DISK_THRESHOLD",
+      "DISK_STABILIZATION_LEVEL",
+    ];
+    percentKeys.forEach((k) => {
+      if (values[k] < 0) values[k] = 0;
+      if (values[k] > 100) values[k] = 100;
     });
+
+    // Non-negative for counters/periods
+    [
+      "HOST_IS_DOWN_CONFIRMATIONS",
+      "HTTP_ISSUE_CONFIRMATION",
+      "DAYS_FOR_SSL_EXPIRED",
+      "HOURS_FOR_NEXT_ALERT",
+    ].forEach((k) => {
+      if (values[k] < 0) values[k] = 0;
+    });
+
+    database.data.settings = values;
+    res.status(200).json({ status: "sucessful", code: 200 });
   })
 );
 

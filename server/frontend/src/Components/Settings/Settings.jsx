@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Toast } from "flowbite-react";
 import InputExplanation from "./InputExplanation.jsx";
+import { clampPercentString } from "../../utils";
 
 const Settings = () => {
   const [defaultSettings, setDefaultSettings] = useState("");
@@ -98,8 +99,7 @@ const Settings = () => {
     return finalArr;
   };
   const confirmationFieldValidation = function (value) {
-    if (+value > 10) return 10;
-    else if (+value < 0) return 0;
+    if (+value < 0) return 0;
     else {
       if (isNaN(+value)) {
         return 1;
@@ -132,24 +132,21 @@ const Settings = () => {
       daysForSslExpireNotify.value,
       hoursForNextAlert.value,
     ];
+    const validated = isArrNumber(inptValues);
 
-    if (
-      isArrNumber(inptValues)[0] &&
-      isArrNumber(inptValues)[0] !== "err" &&
-      !inpError
-    ) {
+    if (validated[0] !== "err" && !inpError) {
       const body = {
-        disk_threshold: isArrNumber(inptValues)[0],
-        disk_stabilization_lvl: isArrNumber(inptValues)[1],
-        ram_threshold: isArrNumber(inptValues)[2],
-        ram_stabilization_lvl: isArrNumber(inptValues)[3],
-        host_is_down_confirmations: isArrNumber(inptValues)[4],
-        http_issue_confirmations: isArrNumber(inptValues)[5],
-        days_for_ssl_expire: isArrNumber(inptValues)[6],
-        hours_for_next_alert: isArrNumber(inptValues)[7],
+        disk_threshold: validated[0],
+        disk_stabilization_lvl: validated[1],
+        ram_threshold: validated[2],
+        ram_stabilization_lvl: validated[3],
+        host_is_down_confirmations: validated[4],
+        http_issue_confirmations: validated[5],
+        days_for_ssl_expire: validated[6],
+        hours_for_next_alert: validated[7],
       };
       const data = await apiFetch(body, "edit_settings");
-      if ((data.code = 200)) {
+      if (data.code === 200) {
         // setDefaultSettings()
         // setInpError;
         // setDiskUsage;
@@ -159,10 +156,10 @@ const Settings = () => {
           setToastState({ isVisible: false });
         }, 3000);
 
-        setDiskUsage(isArrNumber(inptValues)[0]);
-        setdiskStabilization(isArrNumber(inptValues)[1]);
-        setRAMstabilization(isArrNumber(inptValues)[3]);
-        setRAMusage(isArrNumber(inptValues)[2]);
+        setDiskUsage(validated[0]);
+        setdiskStabilization(validated[1]);
+        setRAMstabilization(validated[3]);
+        setRAMusage(validated[2]);
       }
     } else {
       setInpError(true);
@@ -174,7 +171,7 @@ const Settings = () => {
       <div className="container mx-auto flex justify-center">
         <div className=" p-4 my-5 mx-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
           <div className="flex justify-between items-center mb-5">
-            <div onClick={goToHome}>
+            <div onClick={goToHome} className="cursor-pointer">
               <p
                 className="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
             focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
@@ -212,9 +209,12 @@ const Settings = () => {
               </label>
               <input
                 name="disk_threshold"
-                value={diskUsage || ""}
+                value={diskUsage ?? ""}
+                type="number"
+                min={0}
+                max={100}
                 onChange={(e) => {
-                  setDiskUsage(e.currentTarget.value);
+                  setDiskUsage(clampPercentString(e.currentTarget.value, 0, 100));
                   setInpError(false);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -233,9 +233,12 @@ const Settings = () => {
               </label>
               <input
                 name="disk_stabilization_lvl"
-                value={diskStabilization || ""}
+                value={diskStabilization ?? ""}
+                type="number"
+                min={0}
+                max={100}
                 onChange={(e) => {
-                  setdiskStabilization(e.currentTarget.value);
+                  setdiskStabilization(clampPercentString(e.currentTarget.value, 0, 100));
                   setInpError(false);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -250,9 +253,12 @@ const Settings = () => {
               </label>
               <input
                 name="ram_threshold"
-                value={RAMusage || ""}
+                value={RAMusage ?? ""}
+                type="number"
+                min={0}
+                max={100}
                 onChange={(e) => {
-                  setRAMusage(e.currentTarget.value);
+                  setRAMusage(clampPercentString(e.currentTarget.value, 0, 100));
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
@@ -270,9 +276,12 @@ const Settings = () => {
               </label>
               <input
                 name="ram_stabilization_lvl"
-                value={RAMstabilization || ""}
+                value={RAMstabilization ?? ""}
+                type="number"
+                min={0}
+                max={100}
                 onChange={(e) => {
-                  setRAMstabilization(e.currentTarget.value);
+                  setRAMstabilization(clampPercentString(e.currentTarget.value, 0, 100));
                   setInpError(false);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -292,10 +301,12 @@ const Settings = () => {
                     ? ""
                     : HOSTDOWNnotificationDelay.value
                 }
+                type="number"
+                min={0}
                 onChange={(e) => {
                   setHOSTDOWNnotificationDelay({
                     ...HOSTDOWNnotificationDelay,
-                    value: e.currentTarget.value,
+                    value: clampPercentString(e.currentTarget.value, 0),
                   });
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -322,10 +333,12 @@ const Settings = () => {
                     ? ""
                     : HTTPIssueNotificationDelay.value
                 }
+                type="number"
+                min={0}
                 onChange={(e) => {
                   setHTTPIssueNotification({
                     ...HTTPIssueNotificationDelay,
-                    value: e.currentTarget.value,
+                    value: clampPercentString(e.currentTarget.value, 0),
                   });
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -348,8 +361,10 @@ const Settings = () => {
               <input
                 name="ssl_notification period"
                 value={daysForSslExpireNotify.value || ""}
+                type="number"
+                min={0}
                 onChange={(e) => {
-                  setDaysForSslExpireNotify({ value: e.currentTarget.value });
+                  setDaysForSslExpireNotify({ value: clampPercentString(e.currentTarget.value, 0) });
                   setInpError(false);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -370,8 +385,10 @@ const Settings = () => {
               <input
                 name="diskAlert repeat period"
                 value={hoursForNextAlert.value || ""}
+                type="number"
+                min={0}
                 onChange={(e) => {
-                  setHoursForNextAlert({ value: e.currentTarget.value });
+                  setHoursForNextAlert({ value: clampPercentString(e.currentTarget.value, 0) });
                   setInpError(false);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -391,12 +408,12 @@ const Settings = () => {
                 onClick={saveSettings}
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800  disabled:hover:bg-gray-500 disabled:hover:dark:bg-gray-500 disabled:dark:bg-gray-500 disabled:bg-gray-500"
                 disabled={
-                  !diskUsage ||
-                  !diskStabilization ||
-                  !RAMusage ||
-                  !RAMstabilization ||
-                  !daysForSslExpireNotify ||
-                  !hoursForNextAlert ||
+                  diskUsage === "" ||
+                  diskStabilization === "" ||
+                  RAMusage === "" ||
+                  RAMstabilization === "" ||
+                  daysForSslExpireNotify.value === "" ||
+                  hoursForNextAlert.value === "" ||
                   inpError
                 }
               >

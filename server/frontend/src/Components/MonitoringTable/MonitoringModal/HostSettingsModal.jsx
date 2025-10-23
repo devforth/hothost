@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../../../FetchApi";
+import { clampPercentString } from "../../../utils";
 
 const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
   const [inputs, setInputs] = useState({
@@ -124,7 +125,7 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
           max={100}
           placeholder={placeholders.disk_threshold}
           type="number"
-          onChange={(e) => setField("disk_threshold", e.currentTarget.value)}
+          onChange={(e) => setField("disk_threshold", clampPercentString(e.currentTarget.value, 0, 100))}
           className="placeholder-gray-400 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
       </div>
@@ -141,7 +142,7 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
           placeholder={placeholders.disk_stabilization_lvl}
           type="number"
           onChange={(e) =>
-            setField("disk_stabilization_lvl", e.currentTarget.value)
+            setField("disk_stabilization_lvl", clampPercentString(e.currentTarget.value, 0, 100))
           }
           className="placeholder-gray-400 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
@@ -158,7 +159,7 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
           max={100}
           placeholder={placeholders.ram_threshold}
           type="number"
-          onChange={(e) => setField("ram_threshold", e.currentTarget.value)}
+          onChange={(e) => setField("ram_threshold", clampPercentString(e.currentTarget.value, 0, 100))}
           className="placeholder-gray-400 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
       </div>
@@ -175,7 +176,7 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
           placeholder={placeholders.ram_stabilization_lvl}
           type="number"
           onChange={(e) =>
-            setField("ram_stabilization_lvl", e.currentTarget.value)
+            setField("ram_stabilization_lvl", clampPercentString(e.currentTarget.value, 0, 100))
           }
           className="placeholder-gray-400 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
@@ -192,7 +193,7 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
           type="number"
           placeholder={placeholders.host_is_down_confirmations}
           onChange={(e) =>
-            setField("host_is_down_confirmations", e.currentTarget.value)
+            setField("host_is_down_confirmations", clampPercentString(e.currentTarget.value, 0))
           }
           className="placeholder-gray-400 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
@@ -208,7 +209,7 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
           min={0}
           type="number"
           placeholder={placeholders.hours_for_next_alert}
-          onChange={(e) => setField("hours_for_next_alert", e.currentTarget.value)}
+          onChange={(e) => setField("hours_for_next_alert", clampPercentString(e.currentTarget.value, 0))}
           className="placeholder-gray-400 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
         />
       </div>
