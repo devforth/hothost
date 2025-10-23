@@ -19,11 +19,10 @@ import {
   createScheduleJob,
   readableRandomStringMaker,
   createMonitorDataset,
-  eventDuration,
   getHostName,
   checkSslCert,
   anyNotificationDisabled,
-  calculateDataEvent,
+  getEffectiveSettingsForHost,
   notAuthorizedView
 } from "./utils.js";
 import {
@@ -57,7 +56,7 @@ const ifUnknown = (value, trueValue, falseValue) => {
 
 const getMonitoringData = async (req) => {
   const { user } = req
-  const { RAM_THRESHOLD, DISK_THRESHOLD } = database.data.settings;
+  // thresholds may be overridden per-host; use effective settings per host where needed
   const initialHostSettings = {
     disk_is_almost_full: {
       value: true,
@@ -122,9 +121,13 @@ const getMonitoringData = async (req) => {
         ram_used: sizeFormat(
           +(+data.SYSTEM_TOTAL_RAM - +data.SYSTEM_FREE_RAM) || 0
         ),
-        ram_warning:
-          (+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100 <
-          100 - RAM_THRESHOLD,
+        ram_warning: (() => {
+          const { RAM_THRESHOLD } = getEffectiveSettingsForHost(data);
+          return (
+            (+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100 <
+            100 - RAM_THRESHOLD
+          );
+        })(),
         isSwap: !!data.SYSTEM_TOTAL_SWAP && data.SYSTEM_TOTAL_SWAP !== "0",
         swap_total: ifUnknown(
           data.SYSTEM_TOTAL_SWAP,
@@ -141,9 +144,13 @@ const getMonitoringData = async (req) => {
           (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) *
           100
         ).toFixed(0),
-        disk_warning:
-          (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 >
-          DISK_THRESHOLD,
+        disk_warning: (() => {
+          const { DISK_THRESHOLD } = getEffectiveSettingsForHost(data);
+          return (
+            (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100 >
+            DISK_THRESHOLD
+          );
+        })(),
         humanizeDurationOnlineEvent: getDuration(data.ONLINE_EVENT_TS),
         countryFlag: getFlag(data.HOST_PUBLIC_IP_COUNTRY),
         countryName: getCountryName(data.HOST_PUBLIC_IP_COUNTRY),
@@ -937,6 +944,114 @@ router.post(
       status: "success",
       code: 200,
     });
+  })
+);
+
+router.post(
+  "/get_host_overrides",
+  mustBeAuthorizedView(async (req, res) => {
+    const id = req.body.id;
+    const host = database.data.monitoringData.find((host) => host.id === id);
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+
+    const gs = database.data.settings || {};
+    const ovr = host?.settingsOverrides || {}
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        global: {
+          ram_threshold: gs.RAM_THRESHOLD,
+          ram_stabilization_lvl: gs.RAM_STABILIZATION_LEVEL,
+          disk_threshold: gs.DISK_THRESHOLD,
+          disk_stabilization_lvl: gs.DISK_STABILIZATION_LEVEL,
+          host_is_down_confirmations: gs.HOST_IS_DOWN_CONFIRMATIONS,
+          hours_for_next_alert: gs.HOURS_FOR_NEXT_ALERT,
+        },
+        host: {
+          ram_threshold: ovr.RAM_THRESHOLD,
+          ram_stabilization_lvl: ovr.RAM_STABILIZATION_LEVEL,
+          disk_threshold: ovr.DISK_THRESHOLD,
+          disk_stabilization_lvl: ovr.DISK_STABILIZATION_LEVEL,
+          host_is_down_confirmations: ovr.HOST_IS_DOWN_CONFIRMATIONS,
+          hours_for_next_alert: ovr.HOURS_FOR_NEXT_ALERT,
+        },
+      },
+    });
+  })
+);
+
+router.post(
+  "/save_host_overrides",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id, settings } = req.body;
+    const host = database.data.monitoringData.find((host) => host.id === id);
+    if (!host) {
+      return res.status(401).json({
+        status: "rejected",
+        code: 401,
+        error: "invalid data",
+      });
+    }
+    const overrides = host.settingsOverrides || {};
+    if (settings) {
+      const map = {
+        ram_threshold: "RAM_THRESHOLD",
+        ram_stabilization_lvl: "RAM_STABILIZATION_LEVEL",
+        disk_threshold: "DISK_THRESHOLD",
+        disk_stabilization_lvl: "DISK_STABILIZATION_LEVEL",
+        host_is_down_confirmations: "HOST_IS_DOWN_CONFIRMATIONS",
+        hours_for_next_alert: "HOURS_FOR_NEXT_ALERT",
+      };
+      let invalidKey = null;
+      for (const k of Object.keys(map)) {
+        if (k in settings) {
+          const targetKey = map[k];
+          const val = settings[k];
+          if (val === null || val === "") {
+            delete overrides[targetKey];
+          } else {
+            const numVal = Number(val);
+            if (!Number.isFinite(numVal)) {
+              invalidKey = k;
+              break;
+            }
+            let coerced = numVal;
+            if (coerced < 0) {
+              coerced = 0;
+            }
+            // clamp percentage fields to [0, 100]
+            if (
+              [
+                "ram_threshold",
+                "ram_stabilization_lvl",
+                "disk_threshold",
+                "disk_stabilization_lvl",
+              ].includes(k)
+            ) {
+              if (coerced > 100) coerced = 100;
+            }
+            overrides[targetKey] = coerced;
+          }
+        }
+      }
+      if (invalidKey) {
+        return res.status(400).json({
+          status: "rejected",
+          code: 400,
+          error: `invalid value for ${invalidKey}`,
+        });
+      }
+      host.settingsOverrides = overrides;
+    }
+    await database.write();
+    return res.status(200).json({ status: "success", code: 200 });
   })
 );
 
