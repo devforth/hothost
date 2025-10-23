@@ -235,5 +235,3 @@ const HostSettingsModal = ({ chosenHost, hostname, setModalIsVisible }) => {
 };
 
 export default HostSettingsModal;
-
-

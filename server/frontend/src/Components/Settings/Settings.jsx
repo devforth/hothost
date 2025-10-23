@@ -217,7 +217,7 @@ const Settings = () => {
                   setDiskUsage(clampPercentString(e.currentTarget.value, 0, 100));
                   setInpError(false);
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
               <p className="text-xs text-gray-400 dark:text-gray-300">
                 If disk usage exceeds this value then disk_is_almost_full alert
@@ -241,7 +241,7 @@ const Settings = () => {
                   setdiskStabilization(clampPercentString(e.currentTarget.value, 0, 100));
                   setInpError(false);
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
             </div>
             <div className="mb-5">
@@ -260,7 +260,7 @@ const Settings = () => {
                 onChange={(e) => {
                   setRAMusage(clampPercentString(e.currentTarget.value, 0, 100));
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
               <p className="text-xs text-gray-400 dark:text-gray-300">
                 If RAM usage exceeds this value then ram_is_almost_full alert is
@@ -284,7 +284,7 @@ const Settings = () => {
                   setRAMstabilization(clampPercentString(e.currentTarget.value, 0, 100));
                   setInpError(false);
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
             </div>
             <div className="mb-5">
@@ -309,7 +309,7 @@ const Settings = () => {
                     value: clampPercentString(e.currentTarget.value, 0),
                   });
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
               <InputExplanation
                 text={[
@@ -341,7 +341,7 @@ const Settings = () => {
                     value: clampPercentString(e.currentTarget.value, 0),
                   });
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
               <InputExplanation
                 text={[
@@ -367,7 +367,7 @@ const Settings = () => {
                   setDaysForSslExpireNotify({ value: clampPercentString(e.currentTarget.value, 0) });
                   setInpError(false);
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
               <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
                 {" "}
@@ -391,7 +391,7 @@ const Settings = () => {
                   setHoursForNextAlert({ value: clampPercentString(e.currentTarget.value, 0) });
                   setInpError(false);
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-500 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
               />
               <InputExplanation
                 text={[
