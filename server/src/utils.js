@@ -142,8 +142,7 @@ export const calculateDataEvent = (prevData, newData) => {
     RAM_STABILIZATION_LEVEL,
     DISK_THRESHOLD,
     DISK_STABILIZATION_LEVEL,
-  } = database.data.settings;
-
+  } = getEffectiveSettingsForHost(newData);
   const calculateDiskWarning = (data) => {
     const diskUsage =
       (+data.DISK_USED / (+data.DISK_USED + +data.DISK_AVAIL)) * 100;
@@ -187,7 +186,9 @@ export const calculateDataEvent = (prevData, newData) => {
   }
 
   const checkRepeatDiskNotif = (data) => {
-    const { HOURS_FOR_NEXT_ALERT } = database.data.settings;
+    const { HOURS_FOR_NEXT_ALERT, DISK_THRESHOLD } = getEffectiveSettingsForHost(
+      data
+    );
     if (!data.lastDiskNotifTime) {
       data.lastDiskNotifTime = new Date().getTime();
     }
@@ -223,12 +224,11 @@ export const calculateDataEvent = (prevData, newData) => {
 };
 
 export const calculateAsyncEvents = async () => {
-  const { HOST_IS_DOWN_CONFIRMATIONS } = database.data.settings;
-
   await Promise.all(
     database.data.monitoringData.map(async (data) => {
       const safePeriod = 0.1 * 1000;
       const events = [];
+      const { HOST_IS_DOWN_CONFIRMATIONS } = getEffectiveSettingsForHost(data);
 
       const online =
         data.updatedAt +
@@ -406,7 +406,7 @@ export const eventDuration = (data, events) => {
 };
 
 export const setWarning = (data, prevData) => {
-  const { RAM_THRESHOLD, DISK_THRESHOLD } = database.data.settings;
+  const { RAM_THRESHOLD, DISK_THRESHOLD } = getEffectiveSettingsForHost(data);
   const isRamWarning =
     (+data.SYSTEM_FREE_RAM / +data.SYSTEM_TOTAL_RAM) * 100 <
     100 - RAM_THRESHOLD;
@@ -774,4 +774,25 @@ export const anyNotificationDisabled = function (obj) {
     return newProp;
   }, {});
   return newProp;
+};
+
+export const getEffectiveSettingsForHost = (host) => {
+  const gs = database.data.settings || {};
+  const ovr = host?.settingsOverrides || {};
+  return {
+    RAM_THRESHOLD: +(ovr.RAM_THRESHOLD ?? gs.RAM_THRESHOLD ?? 90),
+    RAM_STABILIZATION_LEVEL: +(
+      ovr.RAM_STABILIZATION_LEVEL ?? gs.RAM_STABILIZATION_LEVEL ?? 3
+    ),
+    DISK_THRESHOLD: +(ovr.DISK_THRESHOLD ?? gs.DISK_THRESHOLD ?? 90),
+    DISK_STABILIZATION_LEVEL: +(
+      ovr.DISK_STABILIZATION_LEVEL ?? gs.DISK_STABILIZATION_LEVEL ?? 1
+    ),
+    HOST_IS_DOWN_CONFIRMATIONS: +(
+      ovr.HOST_IS_DOWN_CONFIRMATIONS ?? gs.HOST_IS_DOWN_CONFIRMATIONS ?? 1
+    ),
+    HOURS_FOR_NEXT_ALERT: +(
+      ovr.HOURS_FOR_NEXT_ALERT ?? gs.HOURS_FOR_NEXT_ALERT ?? 12
+    ),
+  };
 };

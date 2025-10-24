@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import NotificationModal from "./NotificationModal";
+import HostSettingsModal from "./HostSettingsModal";
 
 const MonitoringModal = ({
   setModalIsVisible,
@@ -12,6 +13,7 @@ const MonitoringModal = ({
   confrimButtonName = "OK",
   alertIcoVisible = true,
   notifySettings = false,
+  hostSettings = false,
   label="",
 }) => {
   
@@ -48,6 +50,12 @@ const MonitoringModal = ({
 
           {notifySettings ? (
             <NotificationModal
+              chosenHost={chosenHost}
+              hostname={hostname}
+              setModalIsVisible={setModalIsVisible}
+            />
+          ) : hostSettings ? (
+            <HostSettingsModal
               chosenHost={chosenHost}
               hostname={hostname}
               setModalIsVisible={setModalIsVisible}

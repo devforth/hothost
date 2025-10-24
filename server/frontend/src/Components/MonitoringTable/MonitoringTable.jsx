@@ -15,6 +15,7 @@ const MonitoringTable = (props) => {
 
   const [labelModalIsVisible, setlabelModalIsVisible] = useState(false);
   const [notifyModalIsVisible, setNotifyModalIsVisible] = useState(false);
+  const [hostSettingsModalIsVisible, setHostSettingsModalIsVisible] = useState(false);
   const [deleteModalIsVisible, setDeleteModalIsVisible] = useState(false);
   const [donutModalIsVisible, setDonutModalIsVisible] = useState(false);
 
@@ -81,6 +82,7 @@ const MonitoringTable = (props) => {
                 setlabelModalIsVisible={setlabelModalIsVisible}
                 setDonutModalIsVisible={setDonutModalIsVisible}
                 setNotifyModalIsVisible={setNotifyModalIsVisible}
+                setHostSettingsModalIsVisible={setHostSettingsModalIsVisible}
                 cookieExist={cookieExist}
               />
             ))}
@@ -140,6 +142,21 @@ const MonitoringTable = (props) => {
               ""
             }
             action={saveLabel}
+          ></MonitoringModal>
+        ) : null}
+        {hostSettingsModalIsVisible ? (
+          <MonitoringModal
+            setModalIsVisible={setHostSettingsModalIsVisible}
+            alertIcoVisible={false}
+            hostSettings={true}
+            chosenHost={chosenHost}
+            hostname={
+              (monitoringData &&
+                monitoringData.filter((e) => {
+                  return e.id === chosenHost;
+                })[0].hostname) ||
+              ""
+            }
           ></MonitoringModal>
         ) : null}
       </table>
