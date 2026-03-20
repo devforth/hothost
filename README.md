@@ -1,7 +1,7 @@
 # HotHost
 
 <a href="https://devforth.io"><img src="https://raw.githubusercontent.com/devforth/OnLogs/e97944fffc24fec0ce2347b205c9bda3be8de5c5/.assets/df_powered_by.svg" style="height:36px"/></a>
-
+[![Ask AI](http://tluma.ai/badge)](http://tluma.ai/ask-ai/devforth/hothost)
 
 Lightweight and minimalistic monitoring tool for Servers and HTTP web pages. 
 
