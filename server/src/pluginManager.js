@@ -153,7 +153,7 @@ class PluginManager {
 
   async processRssQueue() {
     if (this.rssQueue.length) {
-      const { rssFormatedMessage, enabledPlugins } = this.rssQueue.shift();
+      const { rssFormatedMessage, enabledPlugins, hostGroup } = this.rssQueue.shift();
       const hostPlugins = enabledPlugins || {
         ALL_PLUGINS: {
           value: true,
@@ -208,7 +208,11 @@ class PluginManager {
       await Promise.all(
         plugins.map(async (p) => {
           try {
-            await p.plugin.sendMessage(p.settings, rssFormatedMessage);
+            const webhookOverride =
+              p.plugin.id === "slack-notifications" && hostGroup?.slackWebhook
+                ? hostGroup.slackWebhook
+                : undefined;
+            await p.plugin.sendMessage(p.settings, rssFormatedMessage, webhookOverride);
           } catch (e) {
             console.error("Error in plugin", p.id, e, "stack:", e.stack);
           }
@@ -224,7 +228,7 @@ class PluginManager {
   }
 
 
-  async handleRssEvent({ rssFormatedMessage, enabledPlugins, data }) {
+  async handleRssEvent({ rssFormatedMessage, enabledPlugins, data, hostGroup }) {
     let needExceptMessage = false;
     let needBeHighlighted = false;
     let fullMessageString = "";
@@ -299,7 +303,7 @@ class PluginManager {
         messageString = `🔥🔥🔥 [PRIO] \n${messageString}\n🔥🔥🔥}`;
       }
       if (!onlyPrio || needBeHighlighted) {
-        this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins });
+        this.rssQueue.push({ rssFormatedMessage: messageString, enabledPlugins, hostGroup });
       }
     }
   }

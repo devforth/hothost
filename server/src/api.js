@@ -14,6 +14,7 @@ import {
 
   // checkStatus,
   roundToNearestMinute,
+  getGroupForHost,
 } from "./utils.js";
 import PluginManager from "./pluginManager.js";
 import db from "./levelDB.js";
@@ -119,6 +120,7 @@ router.post("/data/:secret", async (req, res) => {
           ? `\`${newData.HOST_LABEL}\``
           : "",
       EVENT_DURATION: eventDuration(newData, events),
+      HOST_GROUP: getGroupForHost(newData),
     });
     database.data.monitoringData[index] = newData;
     await database.write();

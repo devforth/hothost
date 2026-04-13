@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { getData } from "../../../FetchApi";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { apiFetch } from "../../../FetchApi";
 import { Toast } from "flowbite-react";
 
@@ -15,6 +15,8 @@ const Plugin = () => {
   });
   const [requiredErrors, setRequiredErrors] = useState(false);
   let params = useParams();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get("groupId");
 
   const navigate = useNavigate("");
   const clickAndNavigate = function (path) {
@@ -66,9 +68,12 @@ const Plugin = () => {
         settingsWithoutFalseValue.notify = true;
       }
 
+      const saveUrl = groupId
+        ? `plugin/${params.pluginName}?groupId=${groupId}`
+        : `plugin/${params.pluginName}`;
       const data = await apiFetch (
         settingsWithoutFalseValue,
-        `plugin/${params.pluginName}`
+        saveUrl
       );
       if (data.status === "success" && e.target.id === "save") {
         clickAndNavigate("plugins");
@@ -123,7 +128,10 @@ const Plugin = () => {
 
   useEffect(() => {
     const getPlugin = async function () {
-      const data = await getData(`plugin/${params.pluginName}`);
+      const url = groupId
+        ? `plugin/${params.pluginName}?groupId=${groupId}`
+        : `plugin/${params.pluginName}`;
+      const data = await getData(url);
       if (data) {
         setPlugin(data.data);
         setInputsValue(
@@ -169,6 +177,11 @@ const Plugin = () => {
 
         <h1 className="mb-5 text-3xl font-bold leading-none text-gray-900 dark:text-white">
           {plugin.plugin?.name} plugin
+          {plugin.groupName && (
+            <span className="text-xl ml-2 text-gray-500 dark:text-gray-400">
+              — {plugin.groupName}
+            </span>
+          )}
         </h1>
 
         <div className="max-w-2/3 gap-y-5 gap-y-10 divide-gray-200 dark:divide-gray-700 flex flex-wrap text-gray-800 dark:text-gray-400">
@@ -222,7 +235,7 @@ const Plugin = () => {
                 return (
                   <div className="mb-6" key={per.id}>
                     <label
-                      for={per.id}
+                      htmlFor={per.id}
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                     >
                       {per.name}
@@ -351,16 +364,16 @@ const Plugin = () => {
           >
             {toastState.type === "red" ? (
               <svg
-                class="w-5 h-5"
+                className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M6 18L18 6M6 6l12 12"
                 ></path>
               </svg>

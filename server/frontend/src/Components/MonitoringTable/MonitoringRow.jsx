@@ -12,6 +12,7 @@ const MonitoringRow = (props) => {
   const setDonutModalIsVisible = props.setDonutModalIsVisible;
   const setNotifyModalIsVisible = props.setNotifyModalIsVisible;
   const setHostSettingsModalIsVisible = props.setHostSettingsModalIsVisible;
+  const setAssignGroupModalIsVisible = props.setAssignGroupModalIsVisible;
 
   const index = props.index;
   const cookieExist = props.cookieExist
@@ -55,8 +56,13 @@ const MonitoringRow = (props) => {
               {host.label}
             </span>
           )}
+          {host.groupName && (
+            <span className="bg-blue-100 text-blue-800 text-xs dark:text-blue-100 dark:bg-blue-900 rounded-lg font-semibold px-2.5 py-0.5 ml-1">
+              {host.groupName}
+            </span>
+          )}
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
+        <div className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex">
           <span className="flex  text-center items-center">
             Public IP:&nbsp;
             {host.countryFlag && (
@@ -72,7 +78,7 @@ const MonitoringRow = (props) => {
             )}
             {host.public_ip && <span>{host.public_ip}</span>}
           </span>
-        </p>
+        </div>
       </td>
       <td className="flex-1 col-start-1 row-start-3 sm:px-4 min-w-max">
         <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
@@ -164,15 +170,15 @@ const MonitoringRow = (props) => {
           </div>
         ) : null}
         <p className="text-sm min-w-max">💽 Disk: {host.disk_total}</p>
-        <p className="text-sm text-gray-500 truncate dark:text-gray-400 flex ">
-          <p>{host.disk_used}% used</p>
+        <div className="text-sm text-gray-500 truncate dark:text-gray-400 flex ">
+          <span>{host.disk_used}% used</span>
           {host.disk_warning ? (
             <>
               <Tooltip
                 content={host.humanizeDurationDiskEvent}
                 placement="bottom"
               >
-                <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900 ml-1">
+                <span className="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-pink-200 dark:text-pink-900 ml-1">
                   ALERT
                 </span>
               </Tooltip>
@@ -182,7 +188,7 @@ const MonitoringRow = (props) => {
               OK
             </span>
           )}
-        </p>
+        </div>
       </td>
 
       <td className=" mobile:flex mobile:self-center col-start-3 row-start-3 place-self-end">
@@ -325,6 +331,31 @@ const MonitoringRow = (props) => {
                   />
                 </svg>
                 Settings
+              </button>
+              <button
+                type="button"
+                id={index}
+                className="mx-3 flex text-sm my-2 text-gray-900 dark:text-white hover:underline"
+                onClick={(e) => {
+                  setAssignGroupModalIsVisible && setAssignGroupModalIsVisible(true);
+                  setDotsIsvisible(false);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-6 w-6 pr-2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Assign group
               </button>
               <button
                 type="button"

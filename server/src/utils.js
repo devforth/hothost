@@ -253,6 +253,7 @@ export const calculateAsyncEvents = async () => {
             data.HOST_LABEL && data.HOST_LABEL !== ""
               ? `\`${data.HOST_LABEL}\``
               : "",
+          HOST_GROUP: getGroupForHost(data),
         }
       );
     })
@@ -323,6 +324,7 @@ export const generateHttpEvent = async (prevData, newData) => {
         ),
         EVENT_REASON: reason,
         enabledPlugins: newData.enabledPlugins,
+        HOST_GROUP: getGroupForHost(newData),
       }
     );
   }
@@ -353,6 +355,7 @@ export const generateHttpWarningEvents = async (
         CERT_VALID_UNTIL: new Date(expireDate),
         EVENT_REASON: reason,
         enabledPlugins: newData.enabledPlugins,
+        HOST_GROUP: getGroupForHost(newData),
       }
     );
   }
@@ -589,6 +592,7 @@ export const generateRssEvent = async (e, enabledPlugins, data) => {
     rssFormatedMessage: e,
     enabledPlugins,
     data,
+    hostGroup: getGroupForHost(data),
   });
 };
 
@@ -774,6 +778,14 @@ export const anyNotificationDisabled = function (obj) {
     return newProp;
   }, {});
   return newProp;
+};
+
+export const getGroupForHost = (host) => {
+  if (!host || !host.groupId) return null;
+  const groups = database.data.hostGroups || [];
+  const g = groups.find((gr) => gr.id === host.groupId);
+  if (!g) return null;
+  return { id: g.id, name: g.name, slackWebhook: g.slackWebhook, slackSettings: g.slackSettings || null };
 };
 
 export const getEffectiveSettingsForHost = (host) => {
