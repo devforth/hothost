@@ -7,6 +7,7 @@ import DonutChart from "react-donut-chart";
 import DonutChartModal from "./DonutChartModal";
 import MonitoringModal from "./MonitoringModal/MonitoringModal";
 import NotificationModal from "./MonitoringModal/NotificationModal";
+import AssignGroupModal from "../HostGroups/AssignGroupModal";
 
 const MonitoringTable = (props) => {
   const monitoringData = props.monitoringData;
@@ -18,6 +19,7 @@ const MonitoringTable = (props) => {
   const [hostSettingsModalIsVisible, setHostSettingsModalIsVisible] = useState(false);
   const [deleteModalIsVisible, setDeleteModalIsVisible] = useState(false);
   const [donutModalIsVisible, setDonutModalIsVisible] = useState(false);
+  const [assignGroupModalIsVisible, setAssignGroupModalIsVisible] = useState(false);
 
   const [chosenHost, setChosenHost] = useState("");
 
@@ -61,6 +63,38 @@ const MonitoringTable = (props) => {
     }
   }, [donutModalIsVisible]);
 
+  const visibleHosts = (monitoringData || []).filter((el) => !el.no_data);
+  const groupsMap = new Map();
+  const ungrouped = [];
+  visibleHosts.forEach((host) => {
+    if (host.groupId) {
+      if (!groupsMap.has(host.groupId)) {
+        groupsMap.set(host.groupId, { name: host.groupName || "Unnamed group", hosts: [] });
+      }
+      groupsMap.get(host.groupId).hosts.push(host);
+    } else {
+      ungrouped.push(host);
+    }
+  });
+  const groupedSections = Array.from(groupsMap.entries()).sort((a, b) =>
+    (a[1].name || "").localeCompare(b[1].name || "")
+  );
+
+  const renderRow = (host, index) => (
+    <MonitoringRow
+      host={host}
+      setChosenHost={setChosenHost}
+      key={`hst_tbl_row_${host.id}_${index}`}
+      setDelModalIsVisible={setDeleteModalIsVisible}
+      setlabelModalIsVisible={setlabelModalIsVisible}
+      setDonutModalIsVisible={setDonutModalIsVisible}
+      setNotifyModalIsVisible={setNotifyModalIsVisible}
+      setHostSettingsModalIsVisible={setHostSettingsModalIsVisible}
+      setAssignGroupModalIsVisible={setAssignGroupModalIsVisible}
+      cookieExist={cookieExist}
+    />
+  );
+
   return (
     <>
       <table
@@ -68,24 +102,32 @@ const MonitoringTable = (props) => {
         role="list"
         className="divide-y divide-gray-200 dark:divide-gray-700 w-full"
       >
-        {monitoringData &&
-          monitoringData
-            .filter((el) => {
-              return !el.no_data;
-            })
-            .map((host, index) => (
-              <MonitoringRow
-                host={host}
-                setChosenHost={setChosenHost}
-                key={`hst_tbl_row_${index}`}
-                setDelModalIsVisible={setDeleteModalIsVisible}
-                setlabelModalIsVisible={setlabelModalIsVisible}
-                setDonutModalIsVisible={setDonutModalIsVisible}
-                setNotifyModalIsVisible={setNotifyModalIsVisible}
-                setHostSettingsModalIsVisible={setHostSettingsModalIsVisible}
-                cookieExist={cookieExist}
-              />
-            ))}
+        {groupedSections.map(([gid, section]) => (
+          <tbody key={`grp_${gid}`}>
+            <tr className="bg-gray-200 dark:bg-gray-800">
+              <td
+                colSpan={7}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide"
+              >
+                {section.name}
+              </td>
+            </tr>
+            {section.hosts.map((host, index) => renderRow(host, index))}
+          </tbody>
+        ))}
+        <tbody>
+          {ungrouped.length > 0 && groupedSections.length > 0 && (
+            <tr className="bg-gray-200 dark:bg-gray-800">
+              <td
+                colSpan={7}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide"
+              >
+                Ungrouped
+              </td>
+            </tr>
+          )}
+          {ungrouped.map((host, index) => renderRow(host, index))}
+        </tbody>
 
         {deleteModalIsVisible ? (
           <MonitoringModal
@@ -160,6 +202,17 @@ const MonitoringTable = (props) => {
           ></MonitoringModal>
         ) : null}
       </table>
+      {assignGroupModalIsVisible && (
+        <AssignGroupModal
+          setModalIsVisible={setAssignGroupModalIsVisible}
+          hostId={chosenHost}
+          hostType="host"
+          currentGroupId={
+            (monitoringData.find((e) => e.id === chosenHost) || {}).groupId || ""
+          }
+          onAssigned={refreshData}
+        />
+      )}
       {donutModalIsVisible && (
         <DonutChartModal
           setDonutModalIsVisible={setDonutModalIsVisible}

@@ -31,6 +31,7 @@ db.read = async function () {
 
     };
     db.data.pluginSettings ||= [];
+    db.data.hostGroups ||= [];
 };
 
 export default db;

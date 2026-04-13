@@ -48,6 +48,13 @@ Webhook is URL which look like this:
             type: "str"
         },
         {
+            id: "channel_name",
+            name: "Slack Channel Name",
+            notes: "Optional label shown in the UI (e.g. #alerts-prod)",
+            required: false,
+            type: "str"
+        },
+        {
             id: "disk_is_almost_full_message",
             name: "What message will be shown when you get disk_is_almost_full alert",
             default_value: "⚠️ {{ HOST_NAME }}: {{HOST_LABEL}} Disk is almost full ({{ HOST_PUBLIC_IP }}) \n {{DISK_USED}} / {{DISK_TOTAL}}. Please clean it up",
@@ -112,15 +119,16 @@ Webhook is URL which look like this:
         },
     ],
 
-    async sendMessage(settings, text) {
+    async sendMessage(settings, text, webhookOverride) {
         if(!text) {
             text = '🔥 This is a test notification from HotHost';
         }
-        const { webhook } = settings.params;
+        const webhook = webhookOverride || settings.params.webhook;
+        if (!webhook) return;
         await fetch(webhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 icon_url: "https://raw.githubusercontent.com/devforth/hothost/main/server/static/img/slack_ico.png",
                 username: "HotHost",
                 text: text,
@@ -138,11 +146,18 @@ Webhook is URL which look like this:
 
     // main event handling is done here
     async handleEvent({ eventType, data, settings }) {
-        const template = this.hbs.compile(settings.params[`${eventType}_message`], {noEscape: true});
+        // Use group-specific params (message templates, webhook) when available
+        const groupParams = data?.HOST_GROUP?.slackSettings?.params;
+        const effectiveParams = groupParams
+            ? { ...settings.params, ...groupParams }
+            : settings.params;
+
+        const template = this.hbs.compile(effectiveParams[`${eventType}_message`], {noEscape: true});
         const text = template(data);
 
+        const webhookOverride = data?.HOST_GROUP?.slackWebhook;
         try {
-            this.sendMessage(settings, text);
+            this.sendMessage(settings, text, webhookOverride);
         }
         catch (e) {console.log(e)}
     },

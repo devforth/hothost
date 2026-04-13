@@ -161,6 +161,12 @@ const getMonitoringData = async (req) => {
         isNotificationDisabled: anyNotificationDisabled(
           data.enabledNotifList || initialHostSettings
         ),
+        groupId: data.groupId || null,
+        groupName:
+          (data.groupId &&
+            (database.data.hostGroups || []).find((g) => g.id === data.groupId)
+              ?.name) ||
+          null,
       }
   );
 };
@@ -613,6 +619,12 @@ const getHttpMonitor = () => {
     keyWord: data.key_word,
     enabledPlugins: data.enabledPlugins,
     caseInsensitive: data.caseInsensitive,
+    groupId: data.groupId || null,
+    groupName:
+      (data.groupId &&
+        (database.data.hostGroups || []).find((g) => g.id === data.groupId)
+          ?.name) ||
+      null,
   }));
 };
 
@@ -645,6 +657,12 @@ router.get(
           };
         })
         .reverse(),
+      hostGroups: (database.data.hostGroups || []).map((g) => ({
+        id: g.id,
+        name: g.name,
+        channelName: g.channelName || null,
+        hasSettings: !!g.slackSettings,
+      })),
     });
   })
 );
@@ -662,9 +680,24 @@ router.get(
         code: 401,
       });
     } else {
-      const pluginSettings = database.data.pluginSettings.find(
+      const groupId = req.query.groupId;
+      const group = groupId
+        ? (database.data.hostGroups || []).find((g) => g.id === groupId)
+        : null;
+
+      const globalPluginSettings = database.data.pluginSettings.find(
         (ps) => ps.id === plugin.id
       );
+
+      // For group-specific settings, use group's own params (not the global ones)
+      const pluginSettings = group
+        ? {
+            ...globalPluginSettings,
+            params: group.slackSettings?.params || {},
+            enabledEvents: group.slackSettings?.enabledEvents || globalPluginSettings?.enabledEvents || [],
+            enabled: globalPluginSettings?.enabled,
+          }
+        : globalPluginSettings;
 
       return res.status(200).json({
         status: "success",
@@ -675,6 +708,7 @@ router.get(
             id: plugin.id,
           },
           pluginSettings,
+          groupName: group?.name || null,
           params: [
             ...plugin.supportedEvents.map((e) => {
               return {
@@ -714,6 +748,38 @@ router.post(
       res.redirect("/plugins/");
     } else {
       const input = parseNestedForm(req.body);
+      const groupId = req.query.groupId;
+
+      // If saving group-specific settings for slack
+      if (groupId && plugin.id === "slack-notifications") {
+        const group = (database.data.hostGroups || []).find((g) => g.id === groupId);
+        if (!group) {
+          return res.status(404).json({ error: "Group not found" });
+        }
+        group.slackSettings = {
+          params: input.params,
+          enabledEvents: input.events ? Object.keys(input.events) : [],
+        };
+        // Use group webhook param as the slackWebhook for notification routing
+        if (input.params?.webhook) {
+          group.slackWebhook = input.params.webhook;
+        }
+        if (input.params?.channel_name !== undefined) {
+          group.channelName = input.params.channel_name;
+        }
+        if (input.notify) {
+          const globalSettings = database.data.pluginSettings.find(
+            (ps) => ps.id === plugin.id
+          );
+          const mergedSettings = {
+            ...(globalSettings || {}),
+            params: { ...(globalSettings?.params || {}), ...input.params },
+          };
+          await plugin.sendMessage?.(mergedSettings);
+        }
+        await database.write();
+        return res.status(200).json({ status: "success", code: 200 });
+      }
 
       const psIndex = database.data.pluginSettings.findIndex(
         (ps) => ps.id === plugin.id
@@ -1179,6 +1245,119 @@ router.get(
       process: processByTime,
       totalRamUsage: sizeFormat(ramUsage),
     });
+  })
+);
+
+router.get(
+  "/host_groups",
+  mustBeAuthorizedView((req, res) => {
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: (database.data.hostGroups || []).map((g) => ({
+        id: g.id,
+        name: g.name,
+        slackWebhook: g.slackWebhook,
+        createdAt: g.createdAt,
+      })),
+    });
+  })
+);
+
+router.post(
+  "/host_groups",
+  mustBeAuthorizedView(async (req, res) => {
+    const { name, slackWebhook } = req.body || {};
+    if (!name || !String(name).trim()) {
+      return res
+        .status(400)
+        .json({ status: "rejected", code: 400, error: "name is required" });
+    }
+    database.data.hostGroups ||= [];
+    const group = {
+      id: uuidv4(),
+      name: String(name).trim(),
+      slackWebhook: (slackWebhook || "").trim(),
+      createdAt: new Date().getTime(),
+    };
+    database.data.hostGroups.push(group);
+    await database.write();
+    return res.status(200).json({ status: "success", code: 200, data: group });
+  })
+);
+
+router.post(
+  "/host_groups/:id",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.params;
+    const { name, slackWebhook } = req.body || {};
+    const group = (database.data.hostGroups || []).find((g) => g.id === id);
+    if (!group) {
+      return res
+        .status(404)
+        .json({ status: "rejected", code: 404, error: "group not found" });
+    }
+    if (typeof name === "string" && name.trim()) group.name = name.trim();
+    if (typeof slackWebhook === "string")
+      group.slackWebhook = slackWebhook.trim();
+    await database.write();
+    return res.status(200).json({ status: "success", code: 200, data: group });
+  })
+);
+
+router.post(
+  "/host_groups/:id/delete",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id } = req.params;
+    const idx = (database.data.hostGroups || []).findIndex((g) => g.id === id);
+    if (idx === -1) {
+      return res
+        .status(404)
+        .json({ status: "rejected", code: 404, error: "group not found" });
+    }
+    database.data.hostGroups.splice(idx, 1);
+    // unassign from hosts and http monitors
+    (database.data.monitoringData || []).forEach((h) => {
+      if (h.groupId === id) h.groupId = null;
+    });
+    (database.data.httpMonitoringData || []).forEach((h) => {
+      if (h.groupId === id) h.groupId = null;
+    });
+    await database.write();
+    return res.status(200).json({ status: "success", code: 200 });
+  })
+);
+
+router.post(
+  "/assign_host_group",
+  mustBeAuthorizedView(async (req, res) => {
+    const { id, type, groupId } = req.body || {};
+    if (!id || (type !== "host" && type !== "http")) {
+      return res
+        .status(400)
+        .json({ status: "rejected", code: 400, error: "invalid data" });
+    }
+    if (
+      groupId &&
+      !(database.data.hostGroups || []).some((g) => g.id === groupId)
+    ) {
+      return res
+        .status(400)
+        .json({ status: "rejected", code: 400, error: "unknown groupId" });
+    }
+    const collection =
+      type === "host"
+        ? database.data.monitoringData
+        : database.data.httpMonitoringData;
+    const target = (collection || []).find((h) => h.id === id);
+    if (!target) {
+      return res
+        .status(404)
+        .json({ status: "rejected", code: 404, error: "target not found" });
+    }
+    target.groupId = groupId || null;
+    await database.write();
+    return res.status(200).json({ status: "success", code: 200 });
   })
 );
 
