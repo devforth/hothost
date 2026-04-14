@@ -115,6 +115,8 @@ class PluginManager {
     const enabledPlugins = getEnabledPluginsForHost();
 
     for (let eventType of events) {
+      console.log(`[PluginManager] Event: ${eventType} | host: ${newData.HOST_NAME || newData.url || '?'} | hostEvents disabled: [${hostEvents.join(',')}] | enabledPlugins: [${enabledPlugins.join(',')}]`);
+
       const plugins = this.plugins
         .map((p) => {
           const settings =
@@ -126,13 +128,18 @@ class PluginManager {
         })
 
         .filter((p) => {
-          return (
+          const pass =
             p.settings.enabled &&
-            p.settings.enabledEvents.includes(eventType) &&
+            p.settings.enabledEvents?.includes(eventType) &&
             !hostEvents.includes(eventType) &&
-            enabledPlugins.includes(p.plugin.id)
-          );
+            enabledPlugins.includes(p.plugin.id);
+          if (!pass) {
+            console.log(`[PluginManager] Skip plugin ${p.plugin.id}: enabled=${p.settings.enabled} hasEvent=${p.settings.enabledEvents?.includes(eventType)} notSuppressed=${!hostEvents.includes(eventType)} inEnabledList=${enabledPlugins.includes(p.plugin.id)}`);
+          }
+          return pass;
         });
+
+      console.log(`[PluginManager] Dispatching ${eventType} to ${plugins.length} plugin(s): [${plugins.map(p => p.plugin.id).join(',')}]`);
 
       // handle event by all plugins in parallel
       await Promise.all(
@@ -144,7 +151,7 @@ class PluginManager {
               settings: p.settings,
             });
           } catch (e) {
-            console.error("Error in plugin", p.id, e, "stack:", e.stack);
+            console.error("Error in plugin", p.plugin.id, e, "stack:", e.stack);
           }
         })
       );
