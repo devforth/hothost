@@ -119,6 +119,14 @@ Webhook is URL which look like this:
         },
     ],
 
+    getEffectiveEnabledEvents({ data, settings }) {
+        const groupSlackSettings = data?.HOST_GROUP?.slackSettings;
+        if (groupSlackSettings) {
+            return groupSlackSettings.enabledEvents || [];
+        }
+        return settings.enabledEvents;
+    },
+
     async sendMessage(settings, text, webhookOverride) {
         if(!text) {
             text = '🔥 This is a test notification from HotHost';
