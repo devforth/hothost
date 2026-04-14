@@ -128,13 +128,16 @@ class PluginManager {
         })
 
         .filter((p) => {
+          const effectiveEnabledEvents = p.plugin.getEffectiveEnabledEvents
+            ? p.plugin.getEffectiveEnabledEvents({ data: newData, settings: p.settings })
+            : p.settings.enabledEvents;
           const pass =
             p.settings.enabled &&
-            p.settings.enabledEvents?.includes(eventType) &&
+            effectiveEnabledEvents?.includes(eventType) &&
             !hostEvents.includes(eventType) &&
             enabledPlugins.includes(p.plugin.id);
           if (!pass) {
-            console.log(`[PluginManager] Skip plugin ${p.plugin.id}: enabled=${p.settings.enabled} hasEvent=${p.settings.enabledEvents?.includes(eventType)} notSuppressed=${!hostEvents.includes(eventType)} inEnabledList=${enabledPlugins.includes(p.plugin.id)}`);
+            console.log(`[PluginManager] Skip plugin ${p.plugin.id}: enabled=${p.settings.enabled} hasEvent=${effectiveEnabledEvents?.includes(eventType)} notSuppressed=${!hostEvents.includes(eventType)} inEnabledList=${enabledPlugins.includes(p.plugin.id)}`);
           }
           return pass;
         });
