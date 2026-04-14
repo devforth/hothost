@@ -124,8 +124,12 @@ Webhook is URL which look like this:
             text = '🔥 This is a test notification from HotHost';
         }
         const webhook = webhookOverride || settings.params.webhook;
-        if (!webhook) return;
-        await fetch(webhook, {
+        if (!webhook) {
+            console.log('[Slack] sendMessage skipped: no webhook configured');
+            return;
+        }
+        console.log(`[Slack] Sending to webhook ${webhook.slice(0, 50)}... text: ${text.slice(0, 80)}`);
+        const res = await fetch(webhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -134,6 +138,7 @@ Webhook is URL which look like this:
                 text: text,
             }),
         });
+        console.log(`[Slack] Response: ${res.status} ${res.statusText}`);
     },
     // executed once when plugin is enabled, could be used to perform some initialization of plugin
     async onPluginEnabled() {

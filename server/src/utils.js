@@ -220,7 +220,11 @@ export const calculateDataEvent = (prevData, newData) => {
     events.push("host_is_online");
   }
 
-  return events.filter((e) => e);
+  const filtered = events.filter((e) => e);
+  if (filtered.length > 0) {
+    console.log(`[calculateDataEvent] host=${newData.HOST_NAME || '?'} events=[${filtered.join(',')}]`);
+  }
+  return filtered;
 };
 
 export const calculateAsyncEvents = async () => {
@@ -238,6 +242,7 @@ export const calculateAsyncEvents = async () => {
           safePeriod >=
         new Date().getTime();
       if (!online && data.online) {
+        console.log(`[calculateAsyncEvents] host=${data.HOST_NAME || '?'} went offline`);
         events.push("host_is_offline");
         data.online = false;
         data.ONLINE_EVENT_TS = new Date().getTime();

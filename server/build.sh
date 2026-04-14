@@ -1,7 +1,7 @@
 #!/bin/bash
 version=1.2.39
-docker build . -t devforth/hothost-web:$version
-docker push devforth/hothost-web:$version
-
-docker build . -t devforth/hothost-web
-docker push devforth/hothost-web
+docker buildx create --use
+docker buildx build --platform=linux/amd64,linux/arm64 \
+  --tag "devforth/hothost-web:$version" \
+  --tag "devforth/hothost-web:latest" \
+  --push .
