@@ -488,6 +488,7 @@ const HttpMonitor = ({ cookieExist }) => {
             checkSslWarn={checkSslWarn}
             changeMonitorSetting={changeMonitorSetting}
             cookieExist={cookieExist}
+            refreshData={fetchData}
           ></HttpMonitoringTable>
         </div>
       )}

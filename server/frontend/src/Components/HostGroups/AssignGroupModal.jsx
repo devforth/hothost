@@ -36,7 +36,7 @@ const AssignGroupModal = ({ setModalIsVisible, hostId, hostType, currentGroupId,
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Assign host to group
+          Assign to group
         </h3>
         <select
           value={selectedId}
