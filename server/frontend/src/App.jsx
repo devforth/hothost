@@ -17,7 +17,6 @@ function App() {
   const [monitoringData, setMonitoringData] = useState([]);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [cookieExist, setCookieExist] = useState(false)
-  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -35,9 +34,6 @@ function App() {
       const ck = getCookie('__hhjwt')
       if (!ck || ck == undefined) {
         setCookieExist(false)
-        if (window.location.pathname !== '/login') {
-          navigate('/login');
-        }
       }
       if (ck && ck.length > 0) {
         setCookieExist(true)
