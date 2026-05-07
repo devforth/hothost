@@ -119,13 +119,7 @@ Webhook is URL which look like this:
         },
     ],
 
-    getEffectiveEnabledEvents({ data, settings }) {
-        const groupSlackSettings = data?.HOST_GROUP?.slackSettings;
-        if (groupSlackSettings) {
-            return groupSlackSettings.enabledEvents || [];
-        }
-        return settings.enabledEvents;
-    },
+    // getEffectiveEnabledEvents not needed — pluginManager merges group settings into `settings` automatically
 
     async sendMessage(settings, text, webhookOverride) {
         if(!text) {
@@ -158,19 +152,12 @@ Webhook is URL which look like this:
     },
 
     // main event handling is done here
+    // `settings` already has group overrides merged in by pluginManager
     async handleEvent({ eventType, data, settings }) {
-        // Use group-specific params (message templates, webhook) when available
-        const groupParams = data?.HOST_GROUP?.slackSettings?.params;
-        const effectiveParams = groupParams
-            ? { ...settings.params, ...groupParams }
-            : settings.params;
-
-        const template = this.hbs.compile(effectiveParams[`${eventType}_message`], {noEscape: true});
+        const template = this.hbs.compile(settings.params[`${eventType}_message`], {noEscape: true});
         const text = template(data);
-
-        const webhookOverride = data?.HOST_GROUP?.slackWebhook;
         try {
-            this.sendMessage(settings, text, webhookOverride);
+            this.sendMessage(settings, text);
         }
         catch (e) {console.log(e)}
     },

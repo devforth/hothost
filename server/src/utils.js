@@ -790,7 +790,11 @@ export const getGroupForHost = (host) => {
   const groups = database.data.hostGroups || [];
   const g = groups.find((gr) => gr.id === host.groupId);
   if (!g) return null;
-  return { id: g.id, name: g.name, slackWebhook: g.slackWebhook, slackSettings: g.slackSettings || null };
+  const pluginSettings = {};
+  (database.data.groupPluginSettings || [])
+    .filter((s) => s.groupId === g.id)
+    .forEach((s) => { pluginSettings[s.pluginId] = { params: s.params, enabledEvents: s.enabledEvents }; });
+  return { id: g.id, name: g.name, pluginSettings };
 };
 
 export const getEffectiveSettingsForHost = (host) => {

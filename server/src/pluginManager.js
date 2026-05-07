@@ -48,13 +48,14 @@ class PluginManager {
         return p.default;
       })
     );
+    const pluginsUsedInGroups = new Set(
+      (database.data.groupPluginSettings || []).map((s) => s.pluginId)
+    );
     await Promise.all(
       this.plugins
         .filter((p) => {
-          return (
-            database.data.pluginSettings.find((ps) => ps.id === p.id)
-              ?.enabled ?? false
-          );
+          const globallyEnabled = database.data.pluginSettings.find((ps) => ps.id === p.id)?.enabled ?? false;
+          return globallyEnabled || pluginsUsedInGroups.has(p.id);
         })
         .map((p) => p.onPluginEnabled && p.onPluginEnabled())
     );
@@ -119,25 +120,33 @@ class PluginManager {
 
       const plugins = this.plugins
         .map((p) => {
-          const settings =
+          const globalSettings =
             database.data.pluginSettings.find((ps) => ps.id === p.id) || {};
-          return {
-            plugin: p,
-            settings,
-          };
+          // Merge group-specific plugin settings on top of global settings
+          const groupEntry = newData.HOST_GROUP?.pluginSettings?.[p.id];
+          const settings = groupEntry
+            ? {
+                ...globalSettings,
+                params: { ...globalSettings.params, ...groupEntry.params },
+                enabledEvents: groupEntry.enabledEvents,
+              }
+            : globalSettings;
+          return { plugin: p, settings };
         })
 
         .filter((p) => {
           const effectiveEnabledEvents = p.plugin.getEffectiveEnabledEvents
             ? p.plugin.getEffectiveEnabledEvents({ data: newData, settings: p.settings })
             : p.settings.enabledEvents;
+          const hasGroupOverride = !!newData.HOST_GROUP?.pluginSettings?.[p.plugin.id];
+          const effectiveEnabled = hasGroupOverride || p.settings.enabled;
           const pass =
-            p.settings.enabled &&
+            effectiveEnabled &&
             effectiveEnabledEvents?.includes(eventType) &&
             !hostEvents.includes(eventType) &&
             enabledPlugins.includes(p.plugin.id);
           if (!pass) {
-            console.log(`[PluginManager] Skip plugin ${p.plugin.id}: enabled=${p.settings.enabled} hasEvent=${effectiveEnabledEvents?.includes(eventType)} notSuppressed=${!hostEvents.includes(eventType)} inEnabledList=${enabledPlugins.includes(p.plugin.id)}`);
+            console.log(`[PluginManager] Skip plugin ${p.plugin.id}: enabled=${effectiveEnabled}(group=${hasGroupOverride}) hasEvent=${effectiveEnabledEvents?.includes(eventType)} notSuppressed=${!hostEvents.includes(eventType)} inEnabledList=${enabledPlugins.includes(p.plugin.id)}`);
           }
           return pass;
         });
@@ -201,28 +210,21 @@ class PluginManager {
       }
       const enabledPluginsArr = getEnabledPluginsForHost();
 
-      // plugins var is only enabled plugin for this event based on enabledPlugins
       const plugins = this.plugins
         .map((p) => {
-          const settings =
-            database.data.pluginSettings.find((ps) => ps.id === p.id) || {};
-          return {
-            plugin: p,
-            settings,
-          };
+          const globalSettings = database.data.pluginSettings.find((ps) => ps.id === p.id) || {};
+          const groupEntry = hostGroup?.pluginSettings?.[p.id];
+          const settings = groupEntry
+            ? { ...globalSettings, params: { ...globalSettings.params, ...groupEntry.params } }
+            : globalSettings;
+          return { plugin: p, settings };
         })
+        .filter((p) => p.settings.enabled && enabledPluginsArr.includes(p.plugin.id));
 
-        .filter((p) => {
-          return p.settings.enabled && enabledPluginsArr.includes(p.plugin.id);
-        });
       await Promise.all(
         plugins.map(async (p) => {
           try {
-            const webhookOverride =
-              p.plugin.id === "slack-notifications" && hostGroup?.slackWebhook
-                ? hostGroup.slackWebhook
-                : undefined;
-            await p.plugin.sendMessage(p.settings, rssFormatedMessage, webhookOverride);
+            await p.plugin.sendMessage(p.settings, rssFormatedMessage);
           } catch (e) {
             console.error("Error in plugin", p.id, e, "stack:", e.stack);
           }
