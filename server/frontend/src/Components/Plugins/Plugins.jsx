@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { apiFetch, getData } from "../../../FetchApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 
 const Plugins = () => {
@@ -54,17 +54,17 @@ const Plugins = () => {
       <div className="container mx-auto flex justify-center px-4">
         <div className="min-w-2/3 p-4 my-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700">
           <div className="flex justify-between items-center mb-5">
-            <a
-              onClick={() => navigate("/home")}
+            <Link
+              to="/home"
               className="text-white dark:text-gray-800 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none
         focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5
-        text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center cursor-pointer"
+        text-center mr-3 md:mr-0 dark:bg-green-400 dark:hover:bg-green-500 dark:focus:ring-green-800 flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
               Back to hosts list
-            </a>
+            </Link>
           </div>
 
           {/* Plugins section */}
@@ -81,19 +81,19 @@ const Plugins = () => {
                 <img className="w-40 h-40 my-6 mx-auto rounded-t-lg" src={pl.iconUrlOrBase64} alt={pl.id} />
                 <div className="flex justify-between items-center px-6 pb-6 mt-auto">
                   {pl.pluginEnabled ? (
-                    <a
-                      onClick={() => navigate(`/plugin/${pl.id}`)}
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer"
+                    <Link
+                      to={`/plugin/${pl.id}`}
+                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
                       Settings
-                    </a>
+                    </Link>
                   ) : (
-                    <a
-                      onClick={() => navigate(`/plugin/${pl.id}`)}
-                      className="text-white w-full bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 cursor-pointer"
+                    <Link
+                      to={`/plugin/${pl.id}`}
+                      className="text-white w-full bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                     >
                       Enable
-                    </a>
+                    </Link>
                   )}
                   {pl.pluginEnabled && (
                     <button
@@ -135,12 +135,12 @@ const Plugins = () => {
                             <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">{pluginId}</span>
                           </div>
                           <div className="flex gap-2">
-                            <a
-                              onClick={() => navigate(`/plugin/${pluginId}?groupId=${g.id}`)}
-                              className="text-xs text-center w-full text-white bg-blue-600 hover:bg-blue-700 rounded px-2 py-1 cursor-pointer"
+                            <Link
+                              to={`/plugin/${pluginId}?groupId=${g.id}`}
+                              className="text-xs text-center w-full text-white bg-blue-600 hover:bg-blue-700 rounded px-2 py-1"
                             >
                               Settings
-                            </a>
+                            </Link>
                             <button
                               onClick={() => removePluginFromGroup(g.id, pluginId)}
                               className="text-xs text-center w-full text-white bg-red-600 hover:bg-red-700 rounded px-2 py-1"
