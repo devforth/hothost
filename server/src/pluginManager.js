@@ -234,7 +234,7 @@ class PluginManager {
           try {
             await p.plugin.sendMessage(p.settings, rssFormatedMessage);
           } catch (e) {
-            console.error("Error in plugin", p.id, e, "stack:", e.stack);
+            console.error("Error in plugin", p.plugin.id, e, "stack:", e.stack);
           }
         })
       );

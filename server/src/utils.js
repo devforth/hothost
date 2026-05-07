@@ -793,7 +793,13 @@ export const getGroupForHost = (host) => {
   const pluginSettings = {};
   (database.data.groupPluginSettings || [])
     .filter((s) => s.groupId === g.id)
-    .forEach((s) => { pluginSettings[s.pluginId] = { params: s.params, enabledEvents: s.enabledEvents }; });
+    .forEach((s) => {
+      const entry = { params: s.params };
+      if (Object.prototype.hasOwnProperty.call(s, 'enabledEvents')) {
+        entry.enabledEvents = s.enabledEvents;
+      }
+      pluginSettings[s.pluginId] = entry;
+    });
   return { id: g.id, name: g.name, pluginSettings };
 };
 

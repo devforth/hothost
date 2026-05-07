@@ -47,7 +47,7 @@ db.read = async function () {
                     pluginId: 'slack-notifications',
                     params: group.slackSettings?.params || (group.slackWebhook ? { webhook: group.slackWebhook } : {}),
                 };
-                // Only set enabledEvents if explicitly configured; null means inherit global
+                // Only set enabledEvents if explicitly configured; omit the property to inherit global settings
                 if (group.slackSettings?.enabledEvents) {
                     entry.enabledEvents = group.slackSettings.enabledEvents;
                 }
