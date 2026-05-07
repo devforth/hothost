@@ -35,23 +35,32 @@ db.read = async function () {
     db.data.groupPluginSettings ||= [];
 
     // Migrate legacy slackSettings/slackWebhook from group objects to groupPluginSettings
+    let migrated = false;
     for (const group of db.data.hostGroups) {
         if (group.slackSettings || group.slackWebhook) {
             const alreadyMigrated = db.data.groupPluginSettings.some(
                 (s) => s.groupId === group.id && s.pluginId === 'slack-notifications'
             );
             if (!alreadyMigrated) {
-                db.data.groupPluginSettings.push({
+                const entry = {
                     groupId: group.id,
                     pluginId: 'slack-notifications',
                     params: group.slackSettings?.params || (group.slackWebhook ? { webhook: group.slackWebhook } : {}),
-                    enabledEvents: group.slackSettings?.enabledEvents || [],
-                });
+                };
+                // Only set enabledEvents if explicitly configured; null means inherit global
+                if (group.slackSettings?.enabledEvents) {
+                    entry.enabledEvents = group.slackSettings.enabledEvents;
+                }
+                db.data.groupPluginSettings.push(entry);
             }
             delete group.slackSettings;
             delete group.slackWebhook;
             delete group.channelName;
+            migrated = true;
         }
+    }
+    if (migrated) {
+        await db.write();
     }
 };
 

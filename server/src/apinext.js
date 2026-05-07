@@ -700,10 +700,14 @@ router.get(
       const pluginSettings = group
         ? {
             params: groupPluginEntry?.params || {},
-            enabledEvents: groupPluginEntry?.enabledEvents || globalPluginSettings?.enabledEvents || [],
+            enabledEvents: groupPluginEntry?.enabledEvents ?? globalPluginSettings?.enabledEvents ?? [],
             enabled: globalPluginSettings?.enabled,
           }
-        : globalPluginSettings;
+        : {
+            params: globalPluginSettings?.params || {},
+            enabledEvents: globalPluginSettings?.enabledEvents ?? [],
+            enabled: globalPluginSettings?.enabled,
+          };
 
       return res.status(200).json({
         status: "success",
@@ -770,14 +774,18 @@ router.post(
           groupId,
           pluginId: plugin.id,
           params: input.params || {},
-          enabledEvents: input.events ? Object.keys(input.events) : [],
+          // undefined = inherit global enabledEvents; explicit array = group override
+          ...(input.events ? { enabledEvents: Object.keys(input.events) } : {}),
         };
         const isNew = idx === -1;
         if (isNew) {
           database.data.groupPluginSettings.push(entry);
-          // init plugin if not globally enabled
+          // init plugin if not globally enabled and not already initialized
           const globallyEnabled = database.data.pluginSettings.find((ps) => ps.id === plugin.id)?.enabled;
-          if (!globallyEnabled) await plugin.onPluginEnabled?.();
+          if (!globallyEnabled && !PluginManagerSingleton()._initializedPlugins?.has(plugin.id)) {
+            await plugin.onPluginEnabled?.();
+            PluginManagerSingleton()._initializedPlugins?.add(plugin.id);
+          }
         } else {
           database.data.groupPluginSettings[idx] = entry;
         }

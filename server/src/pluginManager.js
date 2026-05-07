@@ -51,13 +51,17 @@ class PluginManager {
     const pluginsUsedInGroups = new Set(
       (database.data.groupPluginSettings || []).map((s) => s.pluginId)
     );
+    this._initializedPlugins = new Set();
     await Promise.all(
       this.plugins
         .filter((p) => {
           const globallyEnabled = database.data.pluginSettings.find((ps) => ps.id === p.id)?.enabled ?? false;
           return globallyEnabled || pluginsUsedInGroups.has(p.id);
         })
-        .map((p) => p.onPluginEnabled && p.onPluginEnabled())
+        .map((p) => {
+          this._initializedPlugins.add(p.id);
+          return p.onPluginEnabled && p.onPluginEnabled();
+        })
     );
   }
 
@@ -128,7 +132,8 @@ class PluginManager {
             ? {
                 ...globalSettings,
                 params: { ...globalSettings.params, ...groupEntry.params },
-                enabledEvents: groupEntry.enabledEvents,
+                // Only override enabledEvents when explicitly set in group entry
+                ...('enabledEvents' in groupEntry ? { enabledEvents: groupEntry.enabledEvents } : {}),
               }
             : globalSettings;
           return { plugin: p, settings };
@@ -219,7 +224,10 @@ class PluginManager {
             : globalSettings;
           return { plugin: p, settings };
         })
-        .filter((p) => p.settings.enabled && enabledPluginsArr.includes(p.plugin.id));
+        .filter((p) => {
+          const hasGroupOverride = !!hostGroup?.pluginSettings?.[p.plugin.id];
+          return (hasGroupOverride || p.settings.enabled) && enabledPluginsArr.includes(p.plugin.id);
+        });
 
       await Promise.all(
         plugins.map(async (p) => {
