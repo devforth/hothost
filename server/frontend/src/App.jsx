@@ -46,7 +46,6 @@ function App() {
   return (
     <div className="App">
       <Header setTheme={setTheme} theme={theme} cookieExist={cookieExist} />
-
       <Routes>
         <Route path="/" element={<Navigate replace to="/home" />} />
         <Route path="/home" element={<Home cookieExist={cookieExist} />}>
