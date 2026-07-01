@@ -404,6 +404,125 @@ else
   pscommand='ps'
 fi
 
+log_agent_message() {
+  local label="$1"
+  local message="$2"
+  if command -v ts > /dev/null 2>&1; then
+    printf '%s\n' "$message" | ts | while IFS= read -r line; do
+      echo "${line} ℹ️ ${label}"
+    done
+  else
+    echo "${message} ℹ️ ${label}"
+  fi
+}
+
+extract_response_header() {
+  local header_name="$1"
+  local headers_file="$2"
+  grep -i "^${header_name}:" "$headers_file" | tail -n 1 | cut -d ':' -f 2- | sed -e 's/\r$//' -e 's/^[[:space:]]*//'
+}
+
+print_selected_response_headers() {
+  local label="$1"
+  local headers_file="$2"
+  local status_line
+  local header_name
+  local header_value
+  local -a debug_headers=(
+    "server"
+    "content-type"
+    "cf-ray"
+    "cf-cache-status"
+    "cf-mitigated"
+    "x-request-id"
+    "x-correlation-id"
+    "x-amz-cf-id"
+    "x-amz-cf-pop"
+    "retry-after"
+    "location"
+    "via"
+    "x-cache"
+  )
+
+  status_line="$(grep '^HTTP/' "$headers_file" | tail -n 1 | sed 's/\r$//')"
+  if [ -n "$status_line" ]; then
+    log_agent_message "$label" "Response status line: $status_line"
+  fi
+
+  for header_name in "${debug_headers[@]}"; do
+    header_value="$(extract_response_header "$header_name" "$headers_file")"
+    if [ -n "$header_value" ]; then
+      log_agent_message "$label" "Response header ${header_name}: ${header_value}"
+    fi
+  done
+}
+
+post_json_with_retry() {
+  local label="$1"
+  local url="$2"
+  local payload="$3"
+  local curl_exit
+  local delay
+  local header_file
+  local http_code
+  local stderr_file
+  local attempt=1
+  local -a retry_delays=(1 2 3 5 8)
+  local total_attempts=$(( ${#retry_delays[@]} + 1 ))
+  local user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
+
+  while [ "$attempt" -le "$total_attempts" ]; do
+    header_file="$(mktemp)"
+    stderr_file="$(mktemp)"
+
+    http_code="$(
+      curl -sS \
+       -D "$header_file" \
+       -o /dev/null \
+       -w '%{http_code}' \
+       -X POST "$url" \
+       -H 'Content-Type: application/json' \
+       -d "$payload" \
+       -A "$user_agent" \
+        2>"$stderr_file"
+    )"
+    curl_exit=$?
+
+    if [ "$curl_exit" -eq 0 ] && [ "$http_code" = "200" ]; then
+      rm -f "$header_file" "$stderr_file"
+      return 0
+    fi
+
+    if [ "$curl_exit" -ne 0 ]; then
+      log_agent_message "$label" "curl failed with exit code ${curl_exit} (HTTP status ${http_code}) on attempt ${attempt}/${total_attempts}"
+      if [ -s "$header_file" ]; then
+        print_selected_response_headers "$label" "$header_file"
+      fi
+      if [ -s "$stderr_file" ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+          log_agent_message "$label" "curl: $line"
+        done < "$stderr_file"
+      fi
+    else
+      log_agent_message "$label" "Received HTTP status ${http_code} on attempt ${attempt}/${total_attempts}"
+      print_selected_response_headers "$label" "$header_file"
+    fi
+
+    rm -f "$header_file" "$stderr_file"
+
+    if [ "$attempt" -lt "$total_attempts" ]; then
+      delay="${retry_delays[$((attempt - 1))]}"
+      log_agent_message "$label" "Retrying in ${delay}s"
+      sleep "$delay"
+    fi
+
+    attempt=$((attempt + 1))
+  done
+
+  log_agent_message "$label" "Exhausted retries after ${total_attempts} attempts"
+  return 1
+}
+
 while :
 do
 
@@ -528,19 +647,8 @@ do
     \"MONITOR_INTERVAL\":\"${HOTHOST_MONITOR_INTERVAL}\"
   }"
   
-  curl -sS \
-   -X POST $HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET \
-   -H 'Content-Type: application/json' \
-   -d "$JSON_DATA" \
-   -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36' \
-    2>&1 | ts | while read line; do echo ${line} ℹ️ HostInfo; done \
-
-   curl -sS \
-   -X POST $HOTHOST_SERVER_BASE/api/process/$HOTHOST_AGENT_SECRET \
-   -H 'Content-Type: application/json' \
-   -d "$PROC_DATA" \
-   -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36' \
-    2>&1 | ts | while read line; do echo ${line} ℹ️ ProcessInfo; done \
+  post_json_with_retry "HostInfo" "$HOTHOST_SERVER_BASE/api/data/$HOTHOST_AGENT_SECRET" "$JSON_DATA" || true
+  post_json_with_retry "ProcessInfo" "$HOTHOST_SERVER_BASE/api/process/$HOTHOST_AGENT_SECRET" "$PROC_DATA" || true
  
   IS_RESTART=0
   sleep $HOTHOST_MONITOR_INTERVAL
