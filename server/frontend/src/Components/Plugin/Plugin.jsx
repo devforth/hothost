@@ -76,7 +76,7 @@ const Plugin = () => {
         saveUrl
       );
       if (data.status === "success" && e.target.id === "save") {
-        clickAndNavigate("plugins");
+        clickAndNavigate(groupId ? "groups" : "plugins");
       } else {
         if (data.status === "success") {
           setToastState({
@@ -147,6 +147,12 @@ const Plugin = () => {
     getPlugin();
   }, []);
 
+  const isFieldInvalid = (per) => {
+    if (!requiredErrors || !per.required) return false;
+    const value = inputsValue.find((el) => el?.id === per.id)?.value;
+    return !value;
+  };
+
   return (
     <div className="container mx-auto px-4 flex justify-center ">
       <div className="p-4 my-5 bg-gray-100 rounded-lg shadow-md sm:p-8 dark:bg-gray-600 dark:border-gray-700 w-max mobile:container">
@@ -206,10 +212,8 @@ const Plugin = () => {
                   <div className="mb-6" key={per.id}>
                     <label
                       htmlFor={per.id}
-                      className={`block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300 ${
-                        requiredErrors && per.required
-                          ? "text-red-700"
-                          : "normal"
+                      className={`block mb-2 text-sm font-medium dark:text-gray-300 ${
+                        isFieldInvalid(per) ? "text-red-700" : "text-gray-900"
                       }`}
                     >
                       {per.name}
@@ -220,7 +224,11 @@ const Plugin = () => {
                       onChange={changeInputsValue}
                       id={per.id}
                       rows="3"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                        isFieldInvalid(per)
+                          ? "border-red-500 dark:border-red-500"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
                       required={per.required ? true : false}
                       value={
                         inputsValue.filter((el) => {
@@ -236,7 +244,9 @@ const Plugin = () => {
                   <div className="mb-6" key={per.id}>
                     <label
                       htmlFor={per.id}
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                      className={`block mb-2 text-sm font-medium dark:text-gray-300 ${
+                        isFieldInvalid(per) ? "text-red-700" : "text-gray-900"
+                      }`}
                     >
                       {per.name}
                       {per.required ? "*" : null}
@@ -250,7 +260,11 @@ const Plugin = () => {
                           return el?.id === per.id;
                         })[0]?.value
                       }
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                        isFieldInvalid(per)
+                          ? "border-red-500 dark:border-red-500"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
                       required={per.required ? true : false}
                       type={per.inputType ? `${per.inputType}` : "text"}
                     />
@@ -297,7 +311,9 @@ const Plugin = () => {
                   <div className="mb-6" key={per.id}>
                     <label
                       htmlFor={`inp_ ${per.id}`}
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+                      className={`block mb-2 text-sm font-medium dark:text-gray-400 ${
+                        isFieldInvalid(per) ? "text-red-700" : "text-gray-900"
+                      }`}
                     >
                       Select an option
                       {per.required ? "*" : null}
@@ -311,7 +327,11 @@ const Plugin = () => {
                       }
                       onChange={changeSelectValue}
                       name={`${per.inputName}`}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                        isFieldInvalid(per)
+                          ? "border-red-500 dark:border-red-500"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
                     >
                       {per.values.map((val) => {
                         return (
@@ -392,8 +412,7 @@ const Plugin = () => {
               </svg>
             )}
           </div>
-          {toastState.content}
-          <div className="ml-3 text-sm font-normal"></div>
+          <div className="ml-3 text-sm font-normal">{toastState.content}</div>
           <Toast.Toggle />
         </Toast>
       </div>

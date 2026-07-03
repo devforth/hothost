@@ -163,6 +163,9 @@ const httpMonitoringTable = (props) => {
           setModalIsVisible={setAssignGroupModalIsVisible}
           hostId={chosenId}
           hostType="http"
+          hostName={
+            (httpMOnitors.find((m) => m.id === chosenId) || {}).name || ""
+          }
           currentGroupId={
             (httpMOnitors.find((m) => m.id === chosenId) || {}).groupId || ""
           }

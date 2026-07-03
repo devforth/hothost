@@ -9,6 +9,7 @@ import Users from "./Components/Users/Users.jsx";
 import HttpMonitor from "./Components/HttpMonitor/HttpMonitor";
 import Plugins from "./Components/Plugins/Plugins";
 import Plugin from "./Components/Plugin/Plugin";
+import Groups from "./Components/HostGroups/Groups";
 import { getCookie } from "./Components/Utils/Hooks/getCookie.js";
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
         <Route path="/plugin" element={<Plugin />}>
           <Route path=":pluginName" element={<Plugin />}></Route>
         </Route>
+        <Route path="/groups" element={<Groups />} />
       </Routes>
 
     </div>

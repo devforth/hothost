@@ -207,6 +207,10 @@ const MonitoringTable = (props) => {
           setModalIsVisible={setAssignGroupModalIsVisible}
           hostId={chosenHost}
           hostType="host"
+          hostName={(() => {
+            const h = monitoringData.find((e) => e.id === chosenHost) || {};
+            return [h.os_name, h.hostname].filter(Boolean).join(" · ");
+          })()}
           currentGroupId={
             (monitoringData.find((e) => e.id === chosenHost) || {}).groupId || ""
           }

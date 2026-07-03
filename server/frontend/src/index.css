@@ -68,6 +68,37 @@
   scrollbar-width: none;
 }
 
+.scrollbar-visible {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.scrollbar-visible::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 8px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.dark .scrollbar-visible {
+  scrollbar-color: #4b5563 transparent;
+}
+
+.dark .scrollbar-visible::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+.dark .scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
 .choices__inner {
   display: flex;
   color: black;

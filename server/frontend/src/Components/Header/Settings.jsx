@@ -11,7 +11,7 @@ const Settings = ({ clickAndNavigate, setingsIsVisible }) => {
       }bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600 `}
     >
       <div
-        className="py-3 block cursor-pointer"
+        className="py-1 block cursor-pointer"
         onClick={() => {
           clickAndNavigate("users");
         }}
@@ -35,7 +35,7 @@ const Settings = ({ clickAndNavigate, setingsIsVisible }) => {
         </a>
       </div>
       <div
-        className="py-3 block cursor-pointer"
+        className="py-1 block cursor-pointer"
         onClick={() => {
           clickAndNavigate("plugins");
         }}
@@ -59,7 +59,31 @@ const Settings = ({ clickAndNavigate, setingsIsVisible }) => {
         </a>
       </div>
       <div
-        className="py-3 block cursor-pointer"
+        className="py-1 block cursor-pointer"
+        onClick={() => {
+          clickAndNavigate("groups");
+        }}
+      >
+        <a className="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white ">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 mr-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            />
+          </svg>
+          Groups
+        </a>
+      </div>
+      <div
+        className="py-1 block cursor-pointer"
         onClick={() => {
           clickAndNavigate("settings");
         }}
