@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.39
+version=1.2.42
 docker buildx create --use
 docker buildx build --platform=linux/amd64,linux/arm64 \
   --tag "devforth/hothost-web:$version" \
