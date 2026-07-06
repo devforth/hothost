@@ -1280,6 +1280,9 @@ router.get(
         id: g.id,
         name: g.name,
         createdAt: g.createdAt,
+        installedPlugins: (database.data.groupPluginSettings || [])
+          .filter((s) => s.groupId === g.id)
+          .map((s) => s.pluginId),
       })),
     });
   })

@@ -10,6 +10,7 @@ const AssignGroupModal = ({
   onAssigned,
 }) => {
   const [groups, setGroups] = useState([]);
+  const [plugins, setPlugins] = useState([]);
   const [selectedId, setSelectedId] = useState(currentGroupId || "");
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -20,6 +21,8 @@ const AssignGroupModal = ({
     (async () => {
       const data = await getData("host_groups");
       if (data && data.data) setGroups(data.data);
+      const pl = await getData("plugins");
+      if (pl && pl.plugins) setPlugins(pl.plugins);
     })();
     inputRef.current?.focus();
   }, []);
@@ -52,6 +55,10 @@ const AssignGroupModal = ({
   };
 
   const save = async () => {
+    if (selectedId === (currentGroupId || "")) {
+      setModalIsVisible(false);
+      return;
+    }
     setSaving(true);
     const res = await apiFetch(
       { id: hostId, type: hostType, groupId: selectedId || null },
@@ -60,7 +67,8 @@ const AssignGroupModal = ({
     setSaving(false);
     if (!res.error) {
       setModalIsVisible(false);
-      if (onAssigned) onAssigned();
+      const assigned = groups.find((g) => g.id === selectedId) || null;
+      if (onAssigned) onAssigned(assigned);
     }
   };
 
@@ -142,9 +150,26 @@ const AssignGroupModal = ({
                     <span className="h-2.5 w-2.5 rounded-full bg-green-600 dark:bg-green-400" />
                   )}
                 </span>
-                <span className={`truncate ${g.id === "" ? "italic" : ""}`}>
+                <span className={`flex-1 truncate ${g.id === "" ? "italic" : ""}`}>
                   {g.name}
                 </span>
+                {g.installedPlugins && g.installedPlugins.length > 0 && (
+                  <span className="ml-auto flex flex-shrink-0 items-center gap-1">
+                    {g.installedPlugins.map((pluginId) => {
+                      const pl = plugins.find((p) => p.id === pluginId);
+                      if (!pl) return null;
+                      return (
+                        <img
+                          key={pluginId}
+                          className="h-4 w-4 rounded"
+                          src={pl.iconUrlOrBase64}
+                          alt={pluginId}
+                          title={pluginId}
+                        />
+                      );
+                    })}
+                  </span>
+                )}
               </button>
             );
           })}
