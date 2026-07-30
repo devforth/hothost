@@ -49,7 +49,7 @@ const ModalDelete = (props) => {
                 ></path>
               </svg>
             </button>
-            <div class="  first-letter:p-6 text-center">
+            <div class="  p-6 text-center">
               <svg
                 class="mx-auto mb-4 w-14 h-14 text-gray-400 dark:text-gray-200"
                 fill="none"

@@ -1,10 +1,13 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Tooltip, Dropdown } from "flowbite-react";
-import OutsideHider from "../OutsideAlert/OutsideAlert";
 
 const MonitoringRow = (props) => {
   const [dotsIsVisible, setDotsIsvisible] = useState(false);
+  const [menuStyle, setMenuStyle] = useState(null);
+  const dotsRef = useRef(null);
+  const menuRef = useRef(null);
   const host = props.host;
   const setChosenHost = props.setChosenHost;
   const setDelModalIsVisible = props.setDelModalIsVisible;
@@ -16,6 +19,22 @@ const MonitoringRow = (props) => {
 
   const index = props.index;
   const cookieExist = props.cookieExist
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (
+        dotsIsVisible &&
+        dotsRef.current &&
+        !dotsRef.current.contains(e.target) &&
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
+        setDotsIsvisible(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dotsIsVisible]);
 
   return (
     <tr
@@ -193,8 +212,9 @@ const MonitoringRow = (props) => {
 
       <td className=" mobile:flex mobile:self-center col-start-3 row-start-3 place-self-end">
         {cookieExist ? (
-          <OutsideHider state={dotsIsVisible} setstate={setDotsIsvisible}>
+          <>
             <svg
+              ref={dotsRef}
               xmlns="http://www.w3.org/2000/svg"
               id={host.id}
               data-dropdown-placement="bottom-end"
@@ -207,7 +227,23 @@ const MonitoringRow = (props) => {
                 if (e.target.id) {
                   setChosenHost(e.target.id);
 
-                  setDotsIsvisible(!dotsIsVisible);
+                  const willOpen = !dotsIsVisible;
+                  if (willOpen && dotsRef.current) {
+                    const rect = dotsRef.current.getBoundingClientRect();
+                    const estimatedMenuHeight = 300;
+                    const above =
+                      rect.bottom + estimatedMenuHeight > window.innerHeight &&
+                      rect.top - estimatedMenuHeight > 0;
+                    setMenuStyle({
+                      position: "fixed",
+                      right: window.innerWidth - rect.right,
+                      ...(above
+                        ? { bottom: window.innerHeight - rect.top + 8 }
+                        : { top: rect.bottom + 8 }),
+                      zIndex: 9999,
+                    });
+                  }
+                  setDotsIsvisible(willOpen);
                 }
               }}
             >
@@ -217,11 +253,15 @@ const MonitoringRow = (props) => {
                 d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
               />
             </svg>
-            <div
-              id={index}
-              className={`z-10 ${dotsIsVisible ? "" : "hidden"
-                } w-max  bg-white shadow text-sm font-medium text-white rounded-lg absolute translate-x-[-75%]  transition-opacity duration-300 dark:bg-gray-700`}
-            >
+            {dotsIsVisible &&
+              menuStyle &&
+              createPortal(
+                <div
+                  ref={menuRef}
+                  id={index}
+                  style={menuStyle}
+                  className="w-max bg-white shadow text-sm font-medium text-white rounded-lg transition-opacity duration-300 dark:bg-gray-700"
+                >
               <button
                 type="button"
                 id={index}
@@ -383,8 +423,10 @@ const MonitoringRow = (props) => {
                 </svg>
                 Delete
               </button>
-            </div>
-          </OutsideHider>
+                </div>,
+                document.body
+              )}
+          </>
         ) : null}
       </td>
     </tr>
