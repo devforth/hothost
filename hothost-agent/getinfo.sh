@@ -584,10 +584,13 @@ do
       RAM=$(echo $line | awk '{print $1;}')
       process=$(echo $line | sed "s/^[^ ]* //")
 
-      # process line migth have \u characters, remove them because they crash express body-parser
-      process=$(echo $process | sed 's/\\u//g')
+      # command lines can contain backslashes, double quotes or control
+      # characters (e.g. `-c foo="bar"`) which are not valid inside a JSON
+      # string as-is and would break the payload's structure server-side.
+      # Escape backslashes first, then quotes, then strip control chars.
+      process=$(printf '%s' "$process" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr -d '\000-\037')
 
-      JSON_PROCESS+="\"$RAM\":\"$process\","  
+      JSON_PROCESS+="\"$RAM\":\"$process\","
 
   done <<< "$process_output"
   JSON_PROCESS=${JSON_PROCESS::-1}

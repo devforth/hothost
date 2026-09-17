@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.0.3
+version=1.0.5
 docker build . -t devforth/hothost-agent:$version
 docker push devforth/hothost-agent:$version
 
