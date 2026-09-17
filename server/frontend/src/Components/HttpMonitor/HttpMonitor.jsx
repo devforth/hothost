@@ -48,6 +48,7 @@ const HttpMonitor = ({ cookieExist }) => {
   const [monitorTypeSlt, setMonitorTypeSlt] = useState("status_code");
   const [keyWordInp, setKeyWordInp] = useState("");
   const [caseSensitiveChk, setCaseSensitiveChk] = useState(true);
+  const [ignoreSslErrorsChk, setIgnoreSslErrorsChk] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [urlError, setUrlError] = useState(false);
@@ -94,6 +95,7 @@ const HttpMonitor = ({ cookieExist }) => {
       if (findingHost.monitor_type !== "status_code") {
         setKeyWordInp(findingHost.keyWord);
       }
+      setIgnoreSslErrorsChk(!!findingHost.ignoreSslErrors);
     }
 
     setEdditingMonitor(!edditingMonitor);
@@ -139,6 +141,8 @@ const HttpMonitor = ({ cookieExist }) => {
         monitor_interval: monitorIntervalRng,
 
         monitor_type: monitorTypeSlt,
+
+        ignoreSslErrors: ignoreSslErrorsChk,
 
         enabledPlugins: {
           ALL_PLUGINS: {
@@ -188,6 +192,7 @@ const HttpMonitor = ({ cookieExist }) => {
         monitor_type: monitorTypeSlt,
         key_word: keyWordInp,
         caseInsensitive: !caseSensitiveChk,
+        ignoreSslErrors: ignoreSslErrorsChk,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -211,6 +216,7 @@ const HttpMonitor = ({ cookieExist }) => {
         monitor_type: monitorTypeSlt,
         key_word: keyWordInp,
         caseInsensitive: !caseSensitiveChk,
+        ignoreSslErrors: ignoreSslErrorsChk,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -231,6 +237,7 @@ const HttpMonitor = ({ cookieExist }) => {
       monitor_type: monitorTypeSlt,
       key_word: keyWordInp,
       caseInsensitive: !caseSensitiveChk,
+      ignoreSslErrors: ignoreSslErrorsChk,
       id,
     };
 
@@ -398,6 +405,11 @@ const HttpMonitor = ({ cookieExist }) => {
             className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
           />
         </div>
+        <ToggleButton
+          text={"Ignore SSL/TLS certificate errors (e.g. expired certificate)"}
+          value={ignoreSslErrorsChk}
+          toggle={() => setIgnoreSslErrorsChk(!ignoreSslErrorsChk)}
+        />
         <div className="mb-6">
           <label
             htmlFor="monitor_type"

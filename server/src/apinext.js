@@ -619,6 +619,7 @@ const getHttpMonitor = () => {
     keyWord: data.key_word,
     enabledPlugins: data.enabledPlugins,
     caseInsensitive: data.caseInsensitive,
+    ignoreSslErrors: data.ignoreSslErrors,
     groupId: data.groupId || null,
     groupName:
       (data.groupId &&
