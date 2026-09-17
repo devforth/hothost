@@ -37,7 +37,41 @@ async function main() {
 
   const port = env.WEB_PORT || 8007;
 
-  app.use(express.json());
+  app.use(
+    express.json({
+      verify: (req, res, buf) => {
+        // keep the raw bytes around so a JSON parse failure below can log
+        // exactly what the client sent instead of just "Unexpected token"
+        req.rawBody = buf.toString("utf8");
+      },
+    })
+  );
+  // surfaces malformed JSON bodies (e.g. from a buggy agent build) instead of
+  // letting Express's default handler swallow the payload
+  app.use((err, req, res, next) => {
+    if (err.type === "entity.parse.failed" || err instanceof SyntaxError) {
+      const posMatch = /position (\d+)/.exec(err.message);
+      console.error(
+        `[JSON parse error] ${req.method} ${req.originalUrl}: ${err.message}`
+      );
+      if (req.rawBody) {
+        if (posMatch) {
+          const pos = parseInt(posMatch[1], 10);
+          const start = Math.max(0, pos - 60);
+          const end = Math.min(req.rawBody.length, pos + 60);
+          console.error(
+            `[JSON parse error] around position ${pos}: ...${req.rawBody.slice(
+              start,
+              end
+            )}...`
+          );
+        }
+        console.error(`[JSON parse error] raw body: ${req.rawBody}`);
+      }
+      return res.status(400).send({ error: "Invalid JSON payload" });
+    }
+    next(err);
+  });
   app.use(cookieParser());
 
   app.use(

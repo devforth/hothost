@@ -97,9 +97,9 @@ export const readableRandomStringMaker = (length) => {
     var s = "";
     s.length < length;
     s +=
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(
-        (Math.random() * 62) | 0
-      )
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(
+      (Math.random() * 62) | 0
+    )
   );
   return s;
 };
@@ -236,13 +236,14 @@ export const calculateAsyncEvents = async () => {
 
       const online =
         data.updatedAt +
-          +data.MONITOR_INTERVAL *
-            1000 *
-            (1 + +(HOST_IS_DOWN_CONFIRMATIONS || 0)) +
-          safePeriod >=
+        +data.MONITOR_INTERVAL *
+        1000 *
+        (1 + +(HOST_IS_DOWN_CONFIRMATIONS || 0)) +
+        safePeriod >=
         new Date().getTime();
       if (!online && data.online) {
-        console.log(`[calculateAsyncEvents] host=${data.HOST_NAME || '?'} went offline`);
+        console.log(`[calculateAsyncEvents] host=${data.HOST_NAME || '?'} went offline`, { HOST_IS_DOWN_CONFIRMATIONS, updatedAt: data.updatedAt, safePeriod, monitorInterval: data.MONITOR_INTERVAL })
+
         events.push("host_is_offline");
         data.online = false;
         data.ONLINE_EVENT_TS = new Date().getTime();
@@ -468,7 +469,7 @@ export const checkStatus = async (hostData) => {
       signal: controller.signal,
       cache: "no-cache",
     });
-  } catch (e) {}
+  } catch (e) { }
 
   let respText = null;
   if (response !== null) {
@@ -724,7 +725,7 @@ export const checkSslCert = async (cert, dbData) => {
   const { DAYS_FOR_SSL_EXPIRED } = database.data.settings;
   if (
     cert.daysRemaining <
-      (DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) &&
+    (DAYS_FOR_SSL_EXPIRED || DEFAULT_DAYS_FOR_SSL_EXPIRED) &&
     cert.valid
   ) {
     await generateHttpWarningEvents(
