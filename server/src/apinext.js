@@ -12,6 +12,7 @@ import {
   authorizeUser,
   parseNestedForm,
   mustBeAuthorizedView,
+  mustBeAdminView,
   mustNotBeAuthorizedView,
   roundToNearestMinute,
   stopScheduleJob,
@@ -35,6 +36,14 @@ import {
 import database from "./database.js";
 
 const router = express.Router();
+
+const SESSION_COOKIE = "__hhjwt";
+const AUTHORIZED_COOKIE = "__hhauthorized";
+const SESSION_COOKIE_OPTIONS = {
+  maxAge: 60 * 60 * 1000,
+  sameSite: "Strict",
+  secure: true,
+};
 
 const getIconName = (osName) => {
   const icons = {
@@ -197,7 +206,7 @@ router.get(
 
 router.get(
   "/getUsers",
-  mustBeAuthorizedView((req, res) => {
+  mustBeAdminView((req, res) => {
     return res.status(200).json({
       status: "success",
       code: 200,
@@ -217,12 +226,15 @@ router.get(
 
 router.post(
   "/remove_user",
-  mustBeAuthorizedView(async (req, res) => {
+  mustBeAdminView(async (req, res) => {
     const { id } = req.body;
     const { users } = database.data;
 
     if (id) {
       const index = users.findIndex((el) => el.id === id);
+      if (index === -1) {
+        return res.status(404).json({ error: "User not found" });
+      }
       users.splice(index, 1);
       await database.write();
       return res.status(200).json({
@@ -389,7 +401,7 @@ router.post(
 
 router.post(
   "/add_user",
-  mustBeAuthorizedView(async (req, res) => {
+  mustBeAdminView(async (req, res) => {
     const user = req.body.user;
 
     const { users } = database.data;
@@ -454,11 +466,8 @@ router.post(
 
       if (jwtToken !== "error") {
         return res
-          .cookie("__hhjwt", jwtToken, {
-            maxAge: 60 * 60 * 1000,
-            sameSite: "Strict", // prevents from broader class of CSRF attacks then even Lax, no need in external CSRF handlers for 92.16% of browsers
-            secure: false, // some users might have non-SSL sites, probably should go from ENV var which gives greenlight
-          })
+          .cookie(SESSION_COOKIE, jwtToken, { ...SESSION_COOKIE_OPTIONS, httpOnly: true })
+          .cookie(AUTHORIZED_COOKIE, "1", SESSION_COOKIE_OPTIONS)
           .status(200)
           .json({
             status: "successful",
@@ -482,10 +491,14 @@ router.post(
 );
 
 router.post("/logout", (req, res) => {
-  res.cookie("__hhjwt", "", { maxAge: -1 }).status(200).json({
-    status: "successful",
-    code: 200,
-  });
+  res
+    .clearCookie(SESSION_COOKIE)
+    .clearCookie(AUTHORIZED_COOKIE)
+    .status(200)
+    .json({
+      status: "successful",
+      code: 200,
+    });
 });
 
 router.post(
@@ -671,7 +684,7 @@ router.get(
 
 router.get(
   "/plugin/:id/",
-  mustBeAuthorizedView((req, res) => {
+  mustBeAdminView((req, res) => {
     const plugin = PluginManagerSingleton().plugins.find(
       (p) => p.id === req.params.id
     );
@@ -750,7 +763,7 @@ router.get(
 
 router.post(
   "/plugin/:id/",
-  mustBeAuthorizedView(async (req, res) => {
+  mustBeAdminView(async (req, res) => {
     const plugin = PluginManagerSingleton().plugins.find(
       (p) => p.id === req.params.id
     );
@@ -759,6 +772,9 @@ router.post(
       res.redirect("/plugins/");
     } else {
       const input = parseNestedForm(req.body);
+      if (!Object.values(input.params ?? {}).every((value) => typeof value === "string")) {
+        return res.status(400).json({ error: "Plugin params must be strings" });
+      }
       const groupId = req.query.groupId;
 
       // If saving group-specific plugin settings
@@ -855,7 +871,7 @@ router.post(
 
 router.post(
   "/plugin_disable/",
-  mustBeAuthorizedView(async (req, res) => {
+  mustBeAdminView(async (req, res) => {
     const plugin = PluginManagerSingleton().plugins.find(
       (p) => p.id === req.body.id
     );
@@ -1356,7 +1372,7 @@ router.post(
 
 router.post(
   "/host_groups/:groupId/plugin/:pluginId/remove",
-  mustBeAuthorizedView(async (req, res) => {
+  mustBeAdminView(async (req, res) => {
     const { groupId, pluginId } = req.params;
     database.data.groupPluginSettings = (database.data.groupPluginSettings || []).filter(
       (s) => !(s.groupId === groupId && s.pluginId === pluginId)

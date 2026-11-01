@@ -21,6 +21,53 @@ import db from "./levelDB.js";
 
 const router = express.Router();
 
+const HOST_NOT_FOUND = "HOST NOT FOUND";
+const AGENT_METRIC_FIELDS = [
+  "CONTAINER_OS_NAME",
+  "CONTAINER_OS_ID",
+  "CONTAINER_OS_ID_LIKE",
+  "CONTAINER_OS_VERSION",
+  "CONTAINER_OS_VERSION_ID",
+  "CONTAINER_OS_DETECTION",
+  "CONTAINER_IS_OFFICIAL_IMAGE",
+  "HOST_NAME",
+  "HOST_OS_NAME",
+  "HOST_OS_ID",
+  "HOST_OS_ID_LIKE",
+  "HOST_OS_VERSION",
+  "HOST_OS_VERSION_ID",
+  "HOST_OS_DETECTION",
+  "HOST_IS_K8S_NODE",
+  "SYSTEM_KERNEL_NAME",
+  "SYSTEM_KERNEL_VERSION",
+  "SYSTEM_ARCHITECTURE",
+  "SYSTEM_VIRTUALIZATION",
+  "SYSTEM_VIRT_DETECTION",
+  "SYSTEM_CONTAINER",
+  "SYSTEM_CONTAINER_DETECTION",
+  "SYSTEM_CPU_LOGICAL_CPU_COUNT",
+  "SYSTEM_CPU_VENDOR",
+  "SYSTEM_CPU_MODEL",
+  "SYSTEM_CPU_FREQ",
+  "SYSTEM_CPU_DETECTION",
+  "SYSTEM_TOTAL_RAM",
+  "SYSTEM_FREE_RAM",
+  "SYSTEM_TOTAL_SWAP",
+  "SYSTEM_FREE_SWAP",
+  "SYSTEM_RAM_DETECTION",
+  "SYSTEM_TOTAL_DISK_SIZE",
+  "SYSTEM_DISK_DETECTION",
+  "INSTANCE_CLOUD_TYPE",
+  "INSTANCE_CLOUD_INSTANCE_TYPE",
+  "INSTANCE_CLOUD_INSTANCE_REGION",
+  "DISK_USED",
+  "DISK_AVAIL",
+  "HOST_PUBLIC_IP",
+  "HOST_PUBLIC_IP_FALLBACK",
+  "HOST_PUBLIC_IP_COUNTRY",
+  "MONITOR_INTERVAL",
+];
+
 router.post("/process/:secret", async (req, res) => {
   const procData = req.body;
   const process = procData.PROCESS;
@@ -40,8 +87,7 @@ router.post("/process/:secret", async (req, res) => {
     (el) => el.secret === req.params.secret
   );
   if (!host) {
-    res.statusCode = 401;
-    res.send(`HOST NOT FOUND with such secret ${req.params.secret}`);
+    res.status(401).send(HOST_NOT_FOUND);
     return;
   }
   const hostId = host.id;
@@ -74,11 +120,10 @@ router.post("/data/:secret", async (req, res) => {
     (md) => md.secret === req.params.secret
   );
   if (index === -1) {
-    res.statusCode = 401;
-    res.send(`HOST NOT FOUND with such secret ${req.params.secret}`);
+    res.status(401).send(HOST_NOT_FOUND);
     return;
   } else {
-    const data = Object.keys(monitorData).reduce((acc, key) => {
+    const data = AGENT_METRIC_FIELDS.filter((key) => key in monitorData).reduce((acc, key) => {
       const value = monitorData[key];
       acc[key] =
         value !== undefined && value !== null ? value.toString() : value;

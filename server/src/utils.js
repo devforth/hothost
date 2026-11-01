@@ -74,6 +74,14 @@ export const mustBeAuthorizedView = (callback) => {
     }
   };
 };
+export const mustBeAdminView = (callback) =>
+  mustBeAuthorizedView((req, res) => {
+    const user = database.data.users.find((el) => el.id === req.user.id);
+    if (user?.username !== env.WEB_ADMIN_USERNAME) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    callback(req, res);
+  });
 export const notAuthorizedView = (callback) => {
   return (req, res) => {
     callback(req, res);

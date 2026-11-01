@@ -32,7 +32,7 @@ function App() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const ck = getCookie('__hhjwt')
+      const ck = getCookie('__hhauthorized')
       if (!ck || ck == undefined) {
         setCookieExist(false)
       }

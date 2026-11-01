@@ -99,4 +99,8 @@ async function main() {
   });
 }
 
+process.on("unhandledRejection", (reason) => {
+  console.error(`[unhandledRejection] ${new Date().toISOString()}`, reason);
+});
+
 main().catch(console.error);
