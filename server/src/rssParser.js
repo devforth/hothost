@@ -1,7 +1,10 @@
 import { json } from "express";
 import Parser from "rss-parser";
 import { convert } from "html-to-text";
+import { safeFetch } from "./safeRequest.js";
 // There is also an alias to `convert` called `htmlToText`.
+
+const RSS_FETCH_TIMEOUT_MS = 60 * 1000;
 
 let parser = new Parser({
   customFields: {
@@ -15,7 +18,10 @@ export const rssParser = async (url, lastElTime) => {
   let sortedByDateFeedArr = [];
   async function getFeedItems() {
     try {
-      const feed = await parser.parseURL(url);
+      const response = await safeFetch(url, {
+        signal: AbortSignal.timeout(RSS_FETCH_TIMEOUT_MS),
+      });
+      const feed = await parser.parseString(await response.text());
       feedArr = feed.items;
     } catch (e) {
       `RSS parser error : ${e}`;

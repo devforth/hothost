@@ -1,5 +1,5 @@
 import hbs from 'handlebars';
-// import fetch from 'node-fetch';
+import { safeFetch } from '../safeRequest.js';
 
 export default {
     id: 'slack-notifications',  // this is just ID of plugin, should have slug format
@@ -131,7 +131,7 @@ Webhook is URL which look like this:
             return;
         }
         console.log(`[Slack] Sending to webhook ${webhook.slice(0, 50)}... text: ${text.slice(0, 80)}`);
-        const res = await fetch(webhook, {
+        const res = await safeFetch(webhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -2,9 +2,7 @@ import md5 from "md5";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import humanizeDuration from "humanize-duration";
-// import fetch from "node-fetch";
-import { Agent as UndiciAgent } from "undici";
-import sslChecker from "ssl-checker";
+import { safeFetch, safeSslCheck } from "./safeRequest.js";
 import env from "./env.js";
 import database from "./database.js";
 import PluginManager from "./pluginManager.js";
@@ -462,24 +460,13 @@ export const checkStatus = async (hostData) => {
     ).toString("base64");
     reqHeaders.Authorization = `Basic ${base64Auth}`;
   }
-  const fetchOptions = {
-    method: "GET",
-    headers: reqHeaders,
-    signal: controller.signal,
-    cache: "no-cache",
-  };
-  // opt-in per-monitor escape hatch: some hosts front a known-broken/expired
-  // TLS certificate that the operator has already accepted the risk of
-  // (e.g. a staging box), so let the check ignore cert validation errors
-  // instead of forcing a cert renewal before monitoring can pass again.
-  if (hostData.ignoreSslErrors) {
-    fetchOptions.dispatcher = new UndiciAgent({
-      connect: { rejectUnauthorized: false },
-    });
-  }
   let response = null;
   try {
-    response = await fetch(hostData.URL, fetchOptions);
+    response = await safeFetch(hostData.URL, {
+      headers: reqHeaders,
+      signal: controller.signal,
+      ignoreSslErrors: hostData.ignoreSslErrors,
+    });
   } catch (e) { }
 
   let respText = null;
@@ -708,7 +695,7 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
           //get sslCert information
           if (!dbData.URL.includes("localhost:")) {
             try {
-              cert = await sslChecker(getHostName(dbData.URL));
+              cert = await safeSslCheck(getHostName(dbData.URL));
             } catch (e) {
               console.log(`sslChecker error for ${dbData.URL}`, new Date(), e);
             }

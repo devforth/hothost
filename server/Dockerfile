@@ -1,4 +1,4 @@
-FROM node:16-alpine as builder
+FROM node:26-alpine AS builder
 WORKDIR /code/
 ADD frontend/package-lock.json .
 ADD frontend/package.json .
@@ -6,7 +6,7 @@ RUN npm ci
 ADD frontend .
 RUN npm run build
 
-FROM node:18-alpine
+FROM node:26-alpine
 WORKDIR /code/
 ADD package.json .
 ADD package-lock.json .

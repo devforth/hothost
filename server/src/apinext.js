@@ -5,7 +5,7 @@ import env from "./env.js";
 import PluginManagerSingleton from "./pluginManager.js";
 import md from "markdown-it";
 import db from "./levelDB.js";
-import sslChecker from "ssl-checker";
+import { safeSslCheck } from "./safeRequest.js";
 
 import {
   sizeFormat,
@@ -425,7 +425,7 @@ router.post(
   })
 );
 
-router.post("/add_label", async (req, res) => {
+router.post("/add_label", mustBeAuthorizedView(async (req, res) => {
   const { id, label } = req.body;
 
   const monData = database.data.monitoringData.find((el) => el.id === id);
@@ -435,7 +435,7 @@ router.post("/add_label", async (req, res) => {
     await database.write();
   }
   res.json([req.body]);
-});
+}));
 
 router.get(
   "/checkAuth",
@@ -1399,7 +1399,7 @@ router.post(
   })
 );
 
-router.post("/check-ssl", async (req, res) => {
+router.post("/check-ssl", mustBeAuthorizedView(async (req, res) => {
   const { id } = req.body;
   const now = new Date().getTime();
 
@@ -1409,7 +1409,7 @@ router.post("/check-ssl", async (req, res) => {
     let cert = null;
     if (!monData.URL.includes("localhost:")) {
       try {
-        cert = await sslChecker(getHostName(monData.URL));
+        cert = await safeSslCheck(getHostName(monData.URL));
       } catch (e) {
         console.log(`sslChecker error for ${monData.URL}`, new Date(), e);
       }
@@ -1424,4 +1424,4 @@ router.post("/check-ssl", async (req, res) => {
       });
     }
   }
-});
+}));
