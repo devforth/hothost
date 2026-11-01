@@ -21,6 +21,8 @@ import db from "./levelDB.js";
 
 const router = express.Router();
 
+router.get("/health", (req, res) => res.send("OK"));
+
 const HOST_NOT_FOUND = "HOST NOT FOUND";
 const AGENT_METRIC_FIELDS = [
   "CONTAINER_OS_NAME",

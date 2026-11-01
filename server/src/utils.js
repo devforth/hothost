@@ -8,6 +8,7 @@ import database from "./database.js";
 import PluginManager from "./pluginManager.js";
 import levelDb from "./levelDB.js";
 import { rssParser } from "./rssParser.js";
+import { getReachableSince } from "./selfCheck.js";
 
 export const DATE_HUMANIZER_CONFIG = {
   round: true,
@@ -235,6 +236,8 @@ export const calculateDataEvent = (prevData, newData) => {
 };
 
 export const calculateAsyncEvents = async () => {
+  const reachableSince = getReachableSince();
+  if (!reachableSince) return;
   await Promise.all(
     database.data.monitoringData.map(async (data) => {
       const safePeriod = 0.1 * 1000;
@@ -242,7 +245,7 @@ export const calculateAsyncEvents = async () => {
       const { HOST_IS_DOWN_CONFIRMATIONS } = getEffectiveSettingsForHost(data);
 
       const online =
-        data.updatedAt +
+        Math.max(data.updatedAt, reachableSince) +
         +data.MONITOR_INTERVAL *
         1000 *
         (1 + +(HOST_IS_DOWN_CONFIRMATIONS || 0)) +

@@ -83,6 +83,7 @@ services:
       - HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!
       - HOTHOST_WEB_PORT=8007
       - HOTHOST_WEB_PUBLIC_VIEW_ENABLED=false
+      - HOTHOST_WEB_PUBLIC_URL=https://subdomain.yourdomain.com
     ports:
       - 8007:8007
     volumes:
@@ -92,6 +93,8 @@ volumes:
 ```
 
 Now you should proxy https://subdomain.yourdomain.com to serve requests from 127.0.0.1:8007.
+
+`HOTHOST_WEB_PUBLIC_URL` is optional but recommended: HotHost requests its own `/api/health` through this URL every 10 seconds, exactly the way agents reach it. If it gets no successful answer for 30 seconds it sends a single `host_is_offline` notification about itself and pauses per-host offline alerts; when the URL answers again it sends one `host_is_online` and resumes, giving every host a full reporting interval before it can be declared offline. This prevents a wave of false "Host is offline" / "back online" alerts when your reverse proxy or the HotHost container restarts.
 
 Example Nginx Proxy:
 
@@ -141,6 +144,7 @@ docker run -d --name=hothost-web \
   --env HOTHOST_WEB_ADMIN_USERNAME=admin  \
   --env HOTHOST_WEB_ADMIN_PASSWORD=!!!CHANGE_ME!!!  \
   --env HOTHOST_WEB_PUBLIC_VIEW_ENABLED=false  \
+  --env HOTHOST_WEB_PUBLIC_URL=https://subdomain.yourdomain.com  \
   --restart=always  \
   --env HOTHOST_WEB_PORT=8007  \
   -p 8007:8007  \

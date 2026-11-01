@@ -20,6 +20,7 @@ import {
   dbClearScheduler,
 } from "./utils.js";
 import { authMiddleware } from "./middleware.js";
+import { startSelfCheck } from "./selfCheck.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,7 +31,8 @@ async function main() {
   await PluginManager().loadPlugins();
   await checkUserExistsOrCreate();
   startScheduler();
-  setTimeout(() => setInterval(calculateAsyncEvents, 1000), 90 * 1000);
+  startSelfCheck();
+  setInterval(calculateAsyncEvents, 1000);
   setInterval(dbClearScheduler, 100 * 1000);
 
   const app = express();
