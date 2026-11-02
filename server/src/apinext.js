@@ -633,6 +633,7 @@ const getHttpMonitor = () => {
     enabledPlugins: data.enabledPlugins,
     caseInsensitive: data.caseInsensitive,
     ignoreSslErrors: data.ignoreSslErrors,
+    downConfirmations: data.down_confirmations ?? null,
     groupId: data.groupId || null,
     groupName:
       (data.groupId &&

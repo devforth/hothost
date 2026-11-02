@@ -665,10 +665,13 @@ export const createScheduleJob = async (httpHostId, targetInterval) => {
           }
           dbData.numberOfFalseWarnings = dbData.numberOfFalseWarnings + 1;
 
-          if (
-            dbData.numberOfFalseWarnings >=
-            +(HTTP_ISSUE_CONFIRMATION || 0) + 1
-          ) {
+          // per-monitor override applies to going down only, back online keeps the global value
+          const confirmations =
+            !res.response && typeof dbData.down_confirmations === "number"
+              ? dbData.down_confirmations
+              : +(HTTP_ISSUE_CONFIRMATION || 0);
+
+          if (dbData.numberOfFalseWarnings >= confirmations + 1) {
             await generateHttpEvent(dbData, {
               ...dbData,
               okStatus: !!res.response,

@@ -7,6 +7,7 @@ import validator from "validator";
 import { Toast } from "flowbite-react";
 import ToggleButton from "../ToggleButton/ToggleButton.jsx";
 import AddHostBtn from "../../Components/AddHostBtn/AddHostBtn";
+import InputExplanation from "../Settings/InputExplanation.jsx";
 
 const HttpMonitor = ({ cookieExist }) => {
 
@@ -49,6 +50,8 @@ const HttpMonitor = ({ cookieExist }) => {
   const [keyWordInp, setKeyWordInp] = useState("");
   const [caseSensitiveChk, setCaseSensitiveChk] = useState(true);
   const [ignoreSslErrorsChk, setIgnoreSslErrorsChk] = useState(false);
+  const [downConfirmations, setDownConfirmations] = useState("");
+  const [globalHttpIssueConfirmations, setGlobalHttpIssueConfirmations] = useState(1);
   const [passwordError, setPasswordError] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [urlError, setUrlError] = useState(false);
@@ -71,6 +74,21 @@ const HttpMonitor = ({ cookieExist }) => {
     setMonitorIntervalRng(Math.max(MIN_INTERVAL_HTTP_MONITORING, Math.min(MAX_INTERVAL_HTTP_MONITORING, value)));
   }
 
+  const updateDownConfirmations = value => {
+    if (value === "" || value === null || value === undefined) {
+      setDownConfirmations("");
+      return;
+    }
+    if (isNaN(value)) {
+      return;
+    }
+
+    setDownConfirmations(Math.max(0, Math.floor(+value)));
+  }
+
+  // empty field means "use global Http issue confirmations"
+  const downConfirmationsValue = downConfirmations === "" ? null : +downConfirmations;
+
   useEffect(() => {
     const intervalId = setInterval(fetchData, 10000);
     fetchData();
@@ -79,6 +97,21 @@ const HttpMonitor = ({ cookieExist }) => {
       clearInterval(intervalId);
     };
   }, []);
+
+  // getSettings requires login, while this page is also shown in public view
+  useEffect(() => {
+    if (!cookieExist) {
+      return;
+    }
+    const fetchGlobalSettings = async () => {
+      const data = await getData("getSettings");
+      if (data?.data) {
+        setGlobalHttpIssueConfirmations(data.data.http_issue_confirmations);
+        setDownConfirmations(data.data.http_issue_confirmations);
+      }
+    };
+    fetchGlobalSettings();
+  }, [cookieExist]);
 
   const changeMonitorSetting = function (id) {
     setLastCHangedMonitorId(id);
@@ -96,6 +129,7 @@ const HttpMonitor = ({ cookieExist }) => {
         setKeyWordInp(findingHost.keyWord);
       }
       setIgnoreSslErrorsChk(!!findingHost.ignoreSslErrors);
+      updateDownConfirmations(findingHost.downConfirmations ?? globalHttpIssueConfirmations);
     }
 
     setEdditingMonitor(!edditingMonitor);
@@ -115,6 +149,7 @@ const HttpMonitor = ({ cookieExist }) => {
   const keywordInpEl = useRef(null);
 
   const setVisable = () => {
+    setDownConfirmations(globalHttpIssueConfirmations);
     setMonitorIsVisible(!monitorIsVisible);
   }
 
@@ -193,6 +228,7 @@ const HttpMonitor = ({ cookieExist }) => {
         key_word: keyWordInp,
         caseInsensitive: !caseSensitiveChk,
         ignoreSslErrors: ignoreSslErrorsChk,
+        down_confirmations: downConfirmationsValue,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -217,6 +253,7 @@ const HttpMonitor = ({ cookieExist }) => {
         key_word: keyWordInp,
         caseInsensitive: !caseSensitiveChk,
         ignoreSslErrors: ignoreSslErrorsChk,
+        down_confirmations: downConfirmationsValue,
       };
       if (validationIsOk) {
         const data = await apiFetch(body, "add_http_monitor");
@@ -238,6 +275,7 @@ const HttpMonitor = ({ cookieExist }) => {
       key_word: keyWordInp,
       caseInsensitive: !caseSensitiveChk,
       ignoreSslErrors: ignoreSslErrorsChk,
+      down_confirmations: downConfirmationsValue,
       id,
     };
 
@@ -356,6 +394,33 @@ const HttpMonitor = ({ cookieExist }) => {
             <span className="text-gray-900 dark:text-gray-200">sec</span>
           </div>
         </div>
+        {monitorTypeSlt !== "rss_parser" ? (
+          <div className="mb-5">
+            <label
+              htmlFor="down_confirmations"
+              className="block mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200"
+            >
+              Http issue confirmations
+            </label>
+            <input
+              name="down_confirmations"
+              id="downConfirmations"
+              type="number"
+              min={0}
+              placeholder={globalHttpIssueConfirmations}
+              value={downConfirmations}
+              onChange={(e) => updateDownConfirmations(e.target.value)}
+              className="w-20 text-center p-2 rounded border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+            />
+            <InputExplanation
+              text={[
+                "0 - send notification and update status instantly, once you receive host is down event. Fastest - alert is send within MONITORING_INTERVAL (selected in settings). But might give false positive alerts during short-term network issue.",
+                "1 - (Default value) - send notification only after 1st event which confirms host is down. Alert is send within 2 * MONITORING_INTERVAL.",
+                "N - send notification after N confirmations. Notification is delayed by (N + 1) * MONITORING_INTERVAL.",
+              ]}
+            ></InputExplanation>
+          </div>
+        ) : null}
         {monitorTypeSlt !== "rss_parser" ? (
           <ToggleButton
             text={"Enable basic auth"}
